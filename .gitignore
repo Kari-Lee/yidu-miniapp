@@ -1,0 +1,21 @@
+# Dependencies and build outputs
+node_modules/
+miniprogram_npm/
+dist/
+build/
+
+# WeChat DevTools local/private config
+project.private.config.json
+*.local.*
+
+# Generated logs and system files
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+.DS_Store
+
+# Obsolete local template kept out of source control
+miniprogram-backup/
+
+# Accidental shell-brace directories
+miniprogram/{pages*/
