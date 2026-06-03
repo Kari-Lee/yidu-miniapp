@@ -1,0 +1,113 @@
+/* 全局样式 - 匹配 yidu.click 设计系统 */
+page {
+  background: linear-gradient(180deg, #EDF4FA 0%, #F4F8FB 30%, #F8FAFB 100%);
+  min-height: 100vh;
+  font-family: -apple-system, BlinkMacSystemFont, 'PingFang SC', 'Helvetica Neue', sans-serif;
+  color: #1A1A2E;
+  font-size: 28rpx;
+  line-height: 1.6;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* 通用容器 */
+.container {
+  padding: 0 40rpx;
+  max-width: 1000rpx;
+  margin: 0 auto;
+}
+
+/* serif 模拟 */
+.serif {
+  font-family: Georgia, 'Songti SC', 'SimSun', serif;
+}
+
+/* 卡片 */
+.card {
+  background: #FFFFFF;
+  border-radius: 40rpx;
+  padding: 48rpx;
+  box-shadow: 0 4rpx 40rpx rgba(0,0,0,0.04);
+  margin-bottom: 28rpx;
+}
+
+.card-sm {
+  background: #FFFFFF;
+  border-radius: 36rpx;
+  padding: 32rpx;
+  box-shadow: 0 4rpx 32rpx rgba(0,0,0,0.04);
+  margin-bottom: 24rpx;
+}
+
+/* 按钮 */
+.btn-main {
+  width: 100%;
+  padding: 34rpx 0;
+  border-radius: 36rpx;
+  border: none;
+  font-size: 32rpx;
+  font-weight: 700;
+  color: #1A1A2E;
+  background: #2D3436;
+  box-shadow: 0 16rpx 56rpx rgba(44,62,107,0.15);
+  text-align: center;
+}
+
+.btn-main::after { border: none; }
+
+.btn-main[disabled] {
+  background: #ddd;
+  color: #999;
+  box-shadow: none;
+}
+
+.btn-reset {
+  width: 100%;
+  padding: 28rpx 0;
+  background: #FFFFFF;
+  color: #8395A7;
+  border: 2rpx solid rgba(0,0,0,0.04);
+  border-radius: 32rpx;
+  font-size: 28rpx;
+  font-weight: 600;
+  text-align: center;
+}
+
+.btn-reset::after { border: none; }
+
+/* 金色分割线 */
+.gold-line {
+  width: 48rpx;
+  height: 3rpx;
+  background: #B8860B;
+  margin: 28rpx auto;
+  border-radius: 2rpx;
+}
+
+/* 动画 */
+@keyframes fu {
+  from { opacity: 0; transform: translateY(20px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.fu { animation: fu 0.5s cubic-bezier(.4,0,.2,1) both; }
+
+@keyframes float {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-6px); }
+}
+
+@keyframes shimmer {
+  0% { background-position: -200% center; }
+  100% { background-position: 200% center; }
+}
+
+/* 颜色工具类 */
+.c-gold { color: #B8860B; }
+.c-ink { color: #1A1A2E; }
+.c-sub { color: #8395A7; }
+.c-muted { color: #C8D6E5; }
+.c-rose { color: #E17055; }
+.c-sage { color: #00B894; }
+.c-wine { color: #2D3436; }
+
+.bg-warm { background: #F8FAFB; }

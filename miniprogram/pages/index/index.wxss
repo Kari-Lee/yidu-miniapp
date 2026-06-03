@@ -1,0 +1,20 @@
+.header {
+  text-align: center;
+  padding: 60rpx 0 24rpx;
+}
+
+.func-card {
+  background: #FFFFFF;
+  border-radius: 36rpx;
+  padding: 44rpx 28rpx;
+  box-shadow: 0 4rpx 32rpx rgba(0,0,0,0.04);
+  text-align: center;
+}
+
+.func-card-sm {
+  background: #FFFFFF;
+  border-radius: 28rpx;
+  padding: 36rpx 16rpx 28rpx;
+  box-shadow: 0 4rpx 24rpx rgba(0,0,0,0.03);
+  text-align: center;
+}

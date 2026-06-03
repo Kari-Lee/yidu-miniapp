@@ -1,0 +1,90 @@
+<view class="container" style="padding-bottom: 120rpx;">
+  <view style="height: {{statusBarHeight}}px"></view>
+  <view style="padding: 24rpx 0;">
+    <text bindtap="goBack" style="font-size: 24rpx; color: #B8860B; font-weight: 600;">‹ 返回</text>
+  </view>
+
+  <!-- INPUT -->
+  <view wx:if="{{step === 'input'}}" class="fu">
+    <view wx:if="{{err}}" style="padding: 28rpx 36rpx; background: #FFF5F5; border-radius: 28rpx; margin-bottom: 28rpx; font-size: 26rpx; color: #E17055;">{{err}}</view>
+    <view class="card" style="padding: 52rpx;">
+      <textarea style="width: 100%; padding: 28rpx 8rpx; background: transparent; border: none; color: #1A1A2E; font-size: 30rpx; line-height: 1.9;" maxlength="-1" auto-height placeholder="粘贴聊天记录..." placeholder-style="color: #C8D6E5" value="{{text}}" bindinput="onInput"></textarea>
+    </view>
+    <button class="btn-main" style="margin-top: 32rpx; background: {{text.trim() ? '#5B8FB9' : '#ddd'}};" disabled="{{!text.trim()}}" bindtap="nextStep">预测 🔭</button>
+  </view>
+
+  <!-- CONTEXT -->
+  <view wx:if="{{step === 'context'}}" class="fu">
+    <view class="card" style="padding: 56rpx;">
+      <view class="serif" style="font-size: 44rpx; font-weight: 700; color: #1A1A2E; margin-bottom: 16rpx;">Ta是你的什么人？</view>
+      <view style="font-size: 26rpx; color: #8395A7; margin-bottom: 40rpx;">比如：暧昧三个月 / 同事 / Ta总是已读不回</view>
+      <textarea style="width: 100%; padding: 28rpx 8rpx; background: transparent; border: none; border-top: 2rpx solid rgba(0,0,0,0.04); color: #1A1A2E; font-size: 30rpx; line-height: 1.9;" auto-height placeholder="正在折磨我的人..." placeholder-style="color: #C8D6E5" value="{{ctx}}" bindinput="onCtxInput"></textarea>
+    </view>
+    <view style="display: flex; gap: 20rpx; margin-top: 28rpx;">
+      <button class="btn-reset" style="flex: 1;" bindtap="backToInput">返回</button>
+      <button class="btn-main" style="flex: 2; background: #5B8FB9;" bindtap="submit">预测 🔭</button>
+    </view>
+  </view>
+
+  <!-- LOADING -->
+  <view wx:if="{{step === 'loading'}}" class="fu" style="text-align: center;">
+    <view style="display: inline-flex; align-items: center; gap: 20rpx; padding: 28rpx 56rpx; border-radius: 999rpx; background: #fff; box-shadow: 0 8rpx 48rpx rgba(0,0,0,0.06); margin-bottom: 40rpx;">
+      <view class="loading-dots"><view></view><view></view><view></view></view>
+      <text style="font-size: 26rpx; color: #8395A7;">{{loadingMsg}}</text>
+    </view>
+    <view style="opacity: 0.5;">
+      <view class="skeleton" style="height: 200rpx; margin-bottom: 28rpx;"></view>
+      <view class="skeleton" style="height: 160rpx; margin-bottom: 28rpx;"></view>
+      <view class="skeleton" style="height: 160rpx;"></view>
+    </view>
+  </view>
+
+  <!-- RESULT -->
+  <view wx:if="{{step === 'result' && res}}" class="fu">
+    <!-- 阶段 -->
+    <view class="card" style="background: linear-gradient(135deg,#EDF2FF,#F0E6F6); border: none;">
+      <view style="font-size: 24rpx; color: #B8860B; font-weight: 700; margin-bottom: 12rpx; letter-spacing: 1rpx;">当前阶段</view>
+      <view class="serif" style="font-size: 44rpx; font-weight: 900; color: #1A1A2E; margin-bottom: 16rpx;">{{res.stage}}</view>
+      <view style="font-size: 28rpx; color: rgba(26,26,46,0.8); line-height: 1.8;">{{res.stage_desc}}</view>
+    </view>
+
+    <!-- 时间线 -->
+    <view class="serif" style="font-size: 28rpx; color: #B8860B; font-style: italic; margin-bottom: 24rpx;">🔮 时间线预测</view>
+    <view wx:for="{{res.predictions}}" wx:key="index" class="card" style="display: flex; gap: 28rpx; align-items: flex-start;">
+      <view style="width: 92rpx; height: 92rpx; border-radius: 28rpx; background: {{predBgs[index]}}; display: flex; align-items: center; justify-content: center; font-size: 48rpx; flex-shrink: 0;">{{item.emoji}}</view>
+      <view style="flex: 1;">
+        <view style="display: flex; justify-content: space-between; margin-bottom: 8rpx;">
+          <text style="font-size: 28rpx; font-weight: 800; color: #1A1A2E;">{{item.time}}</text>
+          <text style="font-size: 24rpx; color: #8395A7; font-weight: 700;">{{item.prob}}%</text>
+        </view>
+        <view style="font-size: 26rpx; color: rgba(26,26,46,0.8); line-height: 1.7;">{{item.scene}}</view>
+      </view>
+    </view>
+
+    <!-- 转折点 -->
+    <view class="card" style="background: #FFF5F3; border: none;">
+      <view style="font-size: 26rpx; font-weight: 800; color: #E17055; margin-bottom: 12rpx;">⚠️ 转折点</view>
+      <view style="font-size: 28rpx; color: rgba(26,26,46,0.8); line-height: 1.8;">{{res.turning}}</view>
+    </view>
+
+    <!-- 最好最差 -->
+    <view style="display: flex; gap: 20rpx; margin-bottom: 28rpx;">
+      <view class="card" style="flex: 1; background: #F0FFF4; border: none;">
+        <view style="font-size: 24rpx; font-weight: 700; color: #00B894; margin-bottom: 8rpx;">最好</view>
+        <view style="font-size: 26rpx; color: rgba(26,26,46,0.8);">{{res.best}}</view>
+      </view>
+      <view class="card" style="flex: 1; background: #FFF5F3; border: none;">
+        <view style="font-size: 24rpx; font-weight: 700; color: #E17055; margin-bottom: 8rpx;">最差</view>
+        <view style="font-size: 26rpx; color: rgba(26,26,46,0.8);">{{res.worst}}</view>
+      </view>
+    </view>
+
+    <!-- 建议 -->
+    <view class="card" style="background: linear-gradient(135deg,#F8FAFB,#F0E6F6); border: none;">
+      <view class="serif" style="font-size: 28rpx; font-weight: 700; color: #1A1A2E; margin-bottom: 16rpx;">💡 你现在应该做的一件事</view>
+      <view style="font-size: 30rpx; font-weight: 600; color: #1A1A2E; line-height: 1.9;">{{res.todo}}</view>
+    </view>
+
+    <button class="btn-reset" style="margin-top: 16rpx;" bindtap="resetInput">再来一次 ↻</button>
+  </view>
+</view>

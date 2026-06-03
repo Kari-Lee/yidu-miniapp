@@ -1,0 +1,59 @@
+.option {
+  width: 100%;
+  padding: 32rpx 40rpx;
+  border-radius: 32rpx;
+  border: 4rpx solid rgba(0,0,0,0.04);
+  background: #F4F8FB;
+  color: #1A1A2E;
+  font-size: 28rpx;
+  font-weight: 500;
+  text-align: left;
+  line-height: 1.6;
+  display: flex;
+  align-items: center;
+  gap: 24rpx;
+}
+
+.option-active {
+  border-color: #B8860B;
+  background: rgba(184,134,11,0.07);
+  color: #B8860B;
+}
+
+.option-letter {
+  display: inline-flex;
+  width: 48rpx;
+  height: 48rpx;
+  border-radius: 16rpx;
+  background: rgba(195,214,229,0.25);
+  color: #8395A7;
+  align-items: center;
+  justify-content: center;
+  font-size: 22rpx;
+  font-weight: 800;
+  flex-shrink: 0;
+}
+
+.option-letter-active {
+  background: #B8860B;
+  color: #fff;
+}
+
+.type-card {
+  border-radius: 56rpx;
+  padding: 96rpx 56rpx 80rpx;
+  color: #1A1A2E;
+  text-align: center;
+  position: relative;
+  overflow: hidden;
+}
+
+.trait-tag {
+  padding: 12rpx 28rpx;
+  border-radius: 999rpx;
+  font-size: 24rpx;
+  font-weight: 600;
+  background: rgba(0,0,0,0.04);
+  color: rgba(26,26,46,0.8);
+  border: 2rpx solid rgba(0,0,0,0.04);
+}

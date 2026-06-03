@@ -1,0 +1,20 @@
+{
+  "pages": [
+    "pages/index/index",
+    "pages/quiz/quiz",
+    "pages/diagnose/diagnose",
+    "pages/translate/translate",
+    "pages/check/check",
+    "pages/predict/predict"
+  ],
+  "window": {
+    "navigationBarBackgroundColor": "#F4F8FB",
+    "navigationBarTitleText": "",
+    "navigationBarTextStyle": "black",
+    "backgroundColor": "#F4F8FB",
+    "backgroundTextStyle": "dark",
+    "navigationStyle": "custom"
+  },
+  "style": "v2",
+  "sitemapLocation": "sitemap.json"
+}

@@ -1,0 +1,47 @@
+<view class="container" style="padding: 0 32rpx 120rpx;">
+  <view style="height: {{statusBarHeight}}px"></view>
+  <view style="padding: 24rpx 0;">
+    <text bindtap="goBack" style="font-size: 24rpx; color: #B8860B; font-weight: 600;">‹ 返回</text>
+  </view>
+
+  <view wx:if="{{step === 'input'}}" class="fu">
+    <view wx:if="{{err}}" style="padding: 28rpx 36rpx; background: #FFF5F5; border-radius: 28rpx; margin-bottom: 28rpx; font-size: 26rpx; color: #E17055;">{{err}}</view>
+    <view class="card" style="padding: 52rpx;">
+      <textarea style="width: 100%; padding: 28rpx 8rpx; background: transparent; border: none; color: #1A1A2E; font-size: 30rpx; line-height: 1.9;" maxlength="-1" auto-height placeholder="Ta说的话（可以多条一行一句）..." placeholder-style="color: #C8D6E5" value="{{text}}" bindinput="onInput"></textarea>
+    </view>
+    <button class="btn-main" style="margin-top: 32rpx; background: {{hasInput ? '#636E72' : '#ddd'}};" disabled="{{!hasInput}}" bindtap="submit">翻译 🔮</button>
+  </view>
+
+  <view wx:if="{{step === 'loading'}}" class="fu" style="text-align: center;">
+    <view style="display: inline-flex; align-items: center; gap: 20rpx; padding: 28rpx 56rpx; border-radius: 999rpx; background: #fff; box-shadow: 0 8rpx 48rpx rgba(0,0,0,0.06); margin-bottom: 40rpx;">
+      <view class="loading-dots"><view></view><view></view><view></view></view>
+      <text style="font-size: 26rpx; color: #8395A7;">{{loadingMsg}}</text>
+    </view>
+    <view style="opacity: 0.5;">
+      <view class="skeleton" style="height: 200rpx; margin-bottom: 28rpx;"></view>
+      <view class="skeleton" style="height: 300rpx;"></view>
+    </view>
+  </view>
+
+  <view wx:if="{{step === 'result' && res}}" class="fu">
+    <view wx:for="{{res.translations}}" wx:key="index" class="card" style="padding: 48rpx; margin-bottom: 28rpx;">
+      <view style="padding: 28rpx 36rpx; background: #F8FAFB; border-radius: 28rpx; margin-bottom: 32rpx; border-left: 6rpx solid #636E72;">
+        <view style="font-size: 22rpx; color: #8395A7; font-weight: 700; margin-bottom: 4rpx;">Ta说</view>
+        <view class="serif" style="font-size: 34rpx; font-weight: 700; color: #1A1A2E;">「{{item.original}}」</view>
+      </view>
+      <view class="serif" style="font-size: 34rpx; font-weight: 700; color: #636E72; margin-bottom: 28rpx;">{{item.verdict}}</view>
+      <view wx:for="{{item.possibilities}}" wx:for-item="p" wx:for-index="pi" wx:key="pi" style="display: flex; gap: 20rpx; padding: 20rpx 0; opacity: {{pi === 0 ? 1 : 0.55}}; {{pi < 2 ? 'border-bottom: 2rpx solid rgba(0,0,0,0.04);' : ''}}">
+        <view style="width: 56rpx; height: 56rpx; border-radius: 16rpx; background: {{colors[pi]}}; display: flex; align-items: center; justify-content: center; font-size: 24rpx; font-weight: 900; flex-shrink: 0; color: #fff;">{{p.label}}</view>
+        <view style="flex: 1;">
+          <view style="font-size: 26rpx; font-weight: 700; color: #1A1A2E;">{{p.meaning}} <text style="font-size: 22rpx; color: #8395A7;">{{p.percent}}%</text></view>
+          <view style="font-size: 24rpx; color: #8395A7;">{{p.reason}}</view>
+        </view>
+      </view>
+      <view style="margin-top: 24rpx; padding: 20rpx 28rpx; background: #FFF5F3; border-radius: 24rpx; font-size: 26rpx;">
+        <text style="font-weight: 800; color: #E17055;">最可能：{{item.most_likely}}</text>
+        <text style="color: #8395A7;"> {{item.why}}</text>
+      </view>
+    </view>
+    <button class="btn-reset" bindtap="resetInput">再来一次 ↻</button>
+  </view>
+</view>
