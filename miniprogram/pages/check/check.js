@@ -2,6 +2,7 @@ var D = require('../../utils/data')
 var API = require('../../utils/api')
 var H = require('../../utils/history')
 var N = require('../../utils/normalize')
+var Share = require('../../utils/share')
 var MSGS = ["评估杀伤力", "模拟Ta反应"]
 
 Page({
@@ -48,5 +49,9 @@ Page({
       clearInterval(self._timer)
       self.setData({ step: 'input', err: e.message || '出错了' })
     })
+  },
+
+  onShareAppMessage: function() {
+    return Share.check(this.data.res && this.data.res.verdict)
   }
 })

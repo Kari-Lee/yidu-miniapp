@@ -1,4 +1,5 @@
 var H = require('../../utils/history')
+var Share = require('../../utils/share')
 
 Page({
   data: {
@@ -30,5 +31,9 @@ Page({
         self.setData({ records: [] })
       }
     })
+  },
+
+  onShareAppMessage: function() {
+    return Share.home()
   }
 })

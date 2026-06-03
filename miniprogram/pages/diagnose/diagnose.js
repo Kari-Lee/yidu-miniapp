@@ -2,6 +2,7 @@ var D = require('../../utils/data')
 var API = require('../../utils/api')
 var H = require('../../utils/history')
 var N = require('../../utils/normalize')
+var Share = require('../../utils/share')
 
 var GRADS = {
   anxious: "linear-gradient(135deg,#E17055,#D63031,#C0392B)",
@@ -116,5 +117,9 @@ Page({
       clearInterval(self._timer)
       self.setData({ step: 'input', err: e.message || '出错了' })
     })
+  },
+
+  onShareAppMessage: function() {
+    return Share.diagnose()
   }
 })

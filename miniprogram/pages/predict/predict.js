@@ -2,6 +2,7 @@ var D = require('../../utils/data')
 var API = require('../../utils/api')
 var H = require('../../utils/history')
 var N = require('../../utils/normalize')
+var Share = require('../../utils/share')
 var MSGS = ["扫描关系轨迹", "模拟未来走向"]
 
 Page({
@@ -44,5 +45,9 @@ Page({
       clearInterval(self._timer)
       self.setData({ step: 'input', err: e.message || '出错了' })
     })
+  },
+
+  onShareAppMessage: function() {
+    return Share.predict(this.data.res && this.data.res.stage)
   }
 })

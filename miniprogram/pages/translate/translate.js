@@ -2,6 +2,7 @@ var D = require('../../utils/data')
 var API = require('../../utils/api')
 var H = require('../../utils/history')
 var N = require('../../utils/normalize')
+var Share = require('../../utils/share')
 var MSGS = ["解码潜台词", "翻译真实意图"]
 
 Page({
@@ -40,5 +41,9 @@ Page({
       clearInterval(self._timer)
       self.setData({ step: 'input', err: e.message || '出错了' })
     })
+  },
+
+  onShareAppMessage: function() {
+    return Share.translate()
   }
 })

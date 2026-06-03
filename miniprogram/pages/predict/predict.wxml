@@ -89,7 +89,10 @@
       <view style="font-size: 30rpx; font-weight: 600; color: #1A1A2E; line-height: 1.9;">{{res.todo}}</view>
     </view>
 
-    <button class="btn-reset" style="margin-top: 16rpx;" bindtap="resetInput">再来一次 ↻</button>
+    <view style="display: flex; gap: 20rpx; margin-top: 16rpx;">
+      <button class="btn-reset" style="flex: 1;" bindtap="resetInput">再来一次 ↻</button>
+      <button class="btn-main" style="flex: 1; background: #5B8FB9;" open-type="share">分享</button>
+    </view>
     <view class="disclaimer">关系会被新的选择改写。预测结果不是结局通知书，只是提醒你别重复同一个坑。</view>
   </view>
 </view>
