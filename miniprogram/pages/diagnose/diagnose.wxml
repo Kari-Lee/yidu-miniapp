@@ -7,6 +7,10 @@
   <!-- ═══ INPUT ═══ -->
   <view wx:if="{{step === 'input'}}" class="fu">
     <view wx:if="{{err}}" style="padding: 28rpx 36rpx; background: #FFF5F5; border-radius: 28rpx; margin-bottom: 28rpx; font-size: 26rpx; color: #E17055; border: 2rpx solid #FFE3E3;">{{err}}</view>
+    <view class="notice">
+      <view class="notice-title">上传前先打码</view>
+      <view>聊天截图会用于本次 AI 分析。建议隐藏头像、昵称、手机号和地址；结果只供关系观察参考，不是心理诊断。</view>
+    </view>
     <view class="card" style="padding: 52rpx;">
       <!-- 图片上传 -->
       <view style="margin-bottom: 32rpx;">
@@ -107,5 +111,6 @@
     </view>
 
     <button class="btn-reset" style="margin-top: 16rpx;" bindtap="resetInput">再来一次 ↻</button>
+    <view class="disclaimer">以上分析由 AI 根据你提供的内容生成，只适合做自我觉察和沟通参考。别拿它当判决书，更别替代专业心理咨询。</view>
   </view>
 </view>

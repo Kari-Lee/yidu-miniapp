@@ -65,7 +65,8 @@
 
     <view style="display: flex; gap: 20rpx; margin-top: 16rpx;">
       <button class="btn-reset" style="flex: 1;" bindtap="retry">重测 ↻</button>
-      <button class="btn-main" style="flex: 1;" bindtap="goDiagnose">继续确诊 🩺</button>
+      <button class="btn-main" style="flex: 1;" bindtap="goDiagnose">继续分析 🩺</button>
     </view>
+    <view class="disclaimer">测试结果基于你选择的答案生成，只适合自我觉察，不构成心理诊断。你不是一个标签，最多是暂时被这个标签说中了。</view>
   </view>
 </view>

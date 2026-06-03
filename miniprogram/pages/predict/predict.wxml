@@ -7,6 +7,10 @@
   <!-- INPUT -->
   <view wx:if="{{step === 'input'}}" class="fu">
     <view wx:if="{{err}}" style="padding: 28rpx 36rpx; background: #FFF5F5; border-radius: 28rpx; margin-bottom: 28rpx; font-size: 26rpx; color: #E17055;">{{err}}</view>
+    <view class="notice">
+      <view class="notice-title">预测不是判命</view>
+      <view>请删掉隐私信息。AI 会根据聊天模式推测关系走向，结果只供参考，别把概率当圣旨。</view>
+    </view>
     <view class="card" style="padding: 52rpx;">
       <textarea style="width: 100%; padding: 28rpx 8rpx; background: transparent; border: none; color: #1A1A2E; font-size: 30rpx; line-height: 1.9;" maxlength="-1" auto-height placeholder="粘贴聊天记录..." placeholder-style="color: #C8D6E5" value="{{text}}" bindinput="onInput"></textarea>
     </view>
@@ -86,5 +90,6 @@
     </view>
 
     <button class="btn-reset" style="margin-top: 16rpx;" bindtap="resetInput">再来一次 ↻</button>
+    <view class="disclaimer">关系会被新的选择改写。预测结果不是结局通知书，只是提醒你别重复同一个坑。</view>
   </view>
 </view>

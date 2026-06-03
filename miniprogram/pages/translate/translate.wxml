@@ -6,6 +6,10 @@
 
   <view wx:if="{{step === 'input'}}" class="fu">
     <view wx:if="{{err}}" style="padding: 28rpx 36rpx; background: #FFF5F5; border-radius: 28rpx; margin-bottom: 28rpx; font-size: 26rpx; color: #E17055;">{{err}}</view>
+    <view class="notice">
+      <view class="notice-title">少贴隐私，多贴上下文</view>
+      <view>请删掉姓名、手机号和地址。AI 会根据你贴的内容推测潜台词，结论只适合参考，不保证 Ta 真这么想。</view>
+    </view>
     <view class="card" style="padding: 52rpx;">
       <textarea style="width: 100%; padding: 28rpx 8rpx; background: transparent; border: none; color: #1A1A2E; font-size: 30rpx; line-height: 1.9;" maxlength="-1" auto-height placeholder="Ta说的话（可以多条一行一句）..." placeholder-style="color: #C8D6E5" value="{{text}}" bindinput="onInput"></textarea>
     </view>
@@ -43,5 +47,6 @@
       </view>
     </view>
     <button class="btn-reset" bindtap="resetInput">再来一次 ↻</button>
+    <view class="disclaimer">潜台词不是读心术。真正有用的是看 Ta 后续怎么做，而不是把一句话审到天亮。</view>
   </view>
 </view>

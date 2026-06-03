@@ -31,7 +31,7 @@
     <view class="func-card" style="flex: 1; margin-right: 20rpx;" bindtap="goDiagnose">
       <view style="font-size: 48rpx; margin-bottom: 12rpx;">🩺</view>
       <view style="font-size: 28rpx; font-weight: 700; color: #1A1A2E; margin-bottom: 4rpx;">聊天记录确诊</view>
-      <view style="font-size: 22rpx; color: #8395A7;">AI分析双方类型</view>
+      <view style="font-size: 22rpx; color: #8395A7;">AI观察互动模式</view>
     </view>
     <view class="func-card" style="flex: 1;" bindtap="goTranslate">
       <view style="font-size: 48rpx; margin-bottom: 12rpx;">🔮</view>

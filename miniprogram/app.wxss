@@ -111,3 +111,30 @@ page {
 .c-wine { color: #2D3436; }
 
 .bg-warm { background: #F8FAFB; }
+
+/* 合规提示 */
+.notice {
+  padding: 24rpx 28rpx;
+  border-radius: 28rpx;
+  background: rgba(184,134,11,0.08);
+  color: rgba(26,26,46,0.72);
+  font-size: 24rpx;
+  line-height: 1.8;
+  margin-bottom: 24rpx;
+}
+
+.notice-title {
+  color: #B8860B;
+  font-weight: 800;
+  margin-bottom: 6rpx;
+}
+
+.disclaimer {
+  padding: 28rpx 32rpx;
+  border-radius: 28rpx;
+  background: #F8FAFB;
+  color: #8395A7;
+  font-size: 23rpx;
+  line-height: 1.8;
+  margin-top: 20rpx;
+}
