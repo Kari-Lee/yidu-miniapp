@@ -1,5 +1,6 @@
 var D = require('../../utils/data')
 var API = require('../../utils/api')
+var H = require('../../utils/history')
 var MSGS = ["解码潜台词", "翻译真实意图"]
 
 Page({
@@ -23,6 +24,15 @@ Page({
 
     API.callAI(D.P.translate, 'Ta说的话：\n' + self.data.text, null).then(function(res) {
       clearInterval(self._timer)
+      var first = res.translations && res.translations[0]
+      H.addRecord({
+        kind: 'translate',
+        kindLabel: '潜台词',
+        title: first ? first.original : '潜台词翻译',
+        summary: first ? first.verdict : '已生成潜台词分析',
+        input: self.data.text.slice(0, 80),
+        result: res
+      })
       self.setData({ step: 'result', res: res })
     }).catch(function(e) {
       clearInterval(self._timer)

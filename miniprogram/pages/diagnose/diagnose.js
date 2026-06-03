@@ -1,5 +1,6 @@
 var D = require('../../utils/data')
 var API = require('../../utils/api')
+var H = require('../../utils/history')
 
 var GRADS = {
   anxious: "linear-gradient(135deg,#E17055,#D63031,#C0392B)",
@@ -92,6 +93,15 @@ Page({
       clearInterval(self._timer)
       var ut = D.TI[res.user_type] || D.TI.secure
       var pt = D.TI[res.partner_type] || D.TI.secure
+      H.addRecord({
+        kind: 'diagnose',
+        kindLabel: '聊天确诊',
+        title: '你：' + (res.user_label || ut.label) + ' / Ta：' + (res.partner_label || pt.label),
+        summary: res.match || '已生成双方依恋分析',
+        input: self.data.text.slice(0, 80),
+        imageCount: self.data.imgs.length,
+        result: res
+      })
       self.setData({
         step: 'result', res: res,
         userTI: ut, partnerTI: pt,

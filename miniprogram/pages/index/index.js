@@ -23,4 +23,5 @@ Page({
   goTranslate: function() { wx.navigateTo({ url: '/pages/translate/translate' }) },
   goCheck: function() { wx.navigateTo({ url: '/pages/check/check' }) },
   goPredict: function() { wx.navigateTo({ url: '/pages/predict/predict' }) },
+  goHistory: function() { wx.navigateTo({ url: '/pages/history/history' }) },
 })

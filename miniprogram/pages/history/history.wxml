@@ -1,0 +1,48 @@
+<view class="container" style="padding: 0 32rpx 120rpx;">
+  <view style="height: {{statusBarHeight}}px"></view>
+  <view style="padding: 24rpx 0; display: flex; align-items: center; justify-content: space-between;">
+    <text bindtap="goBack" style="font-size: 24rpx; color: #B8860B; font-weight: 600;">‹ 返回</text>
+    <text wx:if="{{records.length}}" bindtap="clearHistory" style="font-size: 24rpx; color: #E17055; font-weight: 600;">清空</text>
+  </view>
+
+  <view style="padding: 24rpx 0 36rpx;">
+    <view class="serif" style="font-size: 56rpx; font-weight: 900; color: #1A1A2E;">最近分析</view>
+    <view style="font-size: 24rpx; color: #8395A7; margin-top: 8rpx;">只保存在本机，最多保留50条</view>
+  </view>
+
+  <view wx:if="{{!records.length}}" class="card" style="text-align: center; padding: 80rpx 40rpx;">
+    <view style="font-size: 72rpx; margin-bottom: 20rpx;">🗂️</view>
+    <view class="serif" style="font-size: 34rpx; font-weight: 800; color: #1A1A2E;">还没有记录</view>
+    <view style="font-size: 26rpx; color: #8395A7; margin-top: 12rpx;">做一次测试或 AI 分析后会出现在这里</view>
+  </view>
+
+  <view wx:for="{{records}}" wx:key="id" class="card history-card">
+    <view style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 18rpx;">
+      <view style="padding: 8rpx 20rpx; border-radius: 999rpx; background: #F8FAFB; color: #B8860B; font-size: 22rpx; font-weight: 800;">{{item.kindLabel}}</view>
+      <view style="font-size: 22rpx; color: #C8D6E5;">{{item.timeText}}</view>
+    </view>
+
+    <view class="serif" style="font-size: 34rpx; font-weight: 900; color: #1A1A2E; line-height: 1.4; margin-bottom: 12rpx;">{{item.title}}</view>
+    <view style="font-size: 26rpx; color: rgba(26,26,46,0.72); line-height: 1.8;">{{item.summary}}</view>
+
+    <view wx:if="{{item.input}}" style="margin-top: 20rpx; padding: 22rpx 26rpx; border-radius: 24rpx; background: #F8FAFB; color: #8395A7; font-size: 24rpx; line-height: 1.7;">{{item.input}}</view>
+    <view wx:if="{{item.imageCount}}" style="margin-top: 16rpx; color: #00B894; font-size: 24rpx; font-weight: 700;">含 {{item.imageCount}} 张截图</view>
+
+    <view wx:if="{{item.kind === 'quiz' && item.result.scores}}" class="mini-grid">
+      <text>焦虑 {{item.result.scores.anxious}}</text>
+      <text>回避 {{item.result.scores.avoidant}}</text>
+      <text>安全 {{item.result.scores.secure}}</text>
+      <text>混乱 {{item.result.scores.disorganized}}</text>
+    </view>
+
+    <view wx:if="{{item.kind === 'check' && item.result.alternative}}" class="result-block">
+      <view style="color: #00B894; font-weight: 800; margin-bottom: 8rpx;">替代消息</view>
+      <view>「{{item.result.alternative}}」</view>
+    </view>
+
+    <view wx:if="{{item.kind === 'predict' && item.result.todo}}" class="result-block">
+      <view style="color: #B8860B; font-weight: 800; margin-bottom: 8rpx;">现在该做</view>
+      <view>{{item.result.todo}}</view>
+    </view>
+  </view>
+</view>

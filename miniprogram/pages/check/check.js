@@ -1,5 +1,6 @@
 var D = require('../../utils/data')
 var API = require('../../utils/api')
+var H = require('../../utils/history')
 var MSGS = ["评估杀伤力", "模拟Ta反应"]
 
 Page({
@@ -32,6 +33,14 @@ Page({
 
     API.callAI(D.P.check, um, null).then(function(res) {
       clearInterval(self._timer)
+      H.addRecord({
+        kind: 'check',
+        kindLabel: '发不发',
+        title: res.verdict || '消息检测',
+        summary: res.reason || res.prediction || '已生成发送建议',
+        input: self.data.text.slice(0, 80),
+        result: res
+      })
       self.setData({ step: 'result', res: res })
     }).catch(function(e) {
       clearInterval(self._timer)

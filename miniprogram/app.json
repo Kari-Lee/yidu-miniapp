@@ -5,7 +5,8 @@
     "pages/diagnose/diagnose",
     "pages/translate/translate",
     "pages/check/check",
-    "pages/predict/predict"
+    "pages/predict/predict",
+    "pages/history/history"
   ],
   "window": {
     "navigationBarBackgroundColor": "#F4F8FB",

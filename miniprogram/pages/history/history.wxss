@@ -1,0 +1,30 @@
+.history-card {
+  padding: 40rpx;
+}
+
+.mini-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 12rpx;
+  margin-top: 24rpx;
+}
+
+.mini-grid text {
+  padding: 16rpx;
+  border-radius: 20rpx;
+  background: #F8FAFB;
+  color: #8395A7;
+  font-size: 22rpx;
+  font-weight: 700;
+  text-align: center;
+}
+
+.result-block {
+  margin-top: 24rpx;
+  padding: 24rpx 28rpx;
+  border-radius: 24rpx;
+  background: #F8FAFB;
+  color: rgba(26,26,46,0.82);
+  font-size: 26rpx;
+  line-height: 1.8;
+}

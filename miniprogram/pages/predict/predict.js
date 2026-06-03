@@ -1,5 +1,6 @@
 var D = require('../../utils/data')
 var API = require('../../utils/api')
+var H = require('../../utils/history')
 var MSGS = ["扫描关系轨迹", "模拟未来走向"]
 
 Page({
@@ -28,6 +29,14 @@ Page({
 
     API.callAI(D.P.predict, um, null).then(function(res) {
       clearInterval(self._timer)
+      H.addRecord({
+        kind: 'predict',
+        kindLabel: '感情预测',
+        title: res.stage || '感情预测',
+        summary: res.stage_desc || res.todo || '已生成关系走向预测',
+        input: self.data.text.slice(0, 80),
+        result: res
+      })
       self.setData({ step: 'result', res: res })
     }).catch(function(e) {
       clearInterval(self._timer)

@@ -1,4 +1,5 @@
 var D = require('../../utils/data')
+var H = require('../../utils/history')
 
 var GRADS = {
   anxious: "linear-gradient(135deg,#E17055,#D63031,#C0392B)",
@@ -73,6 +74,13 @@ Page({
         var scoreList = Object.keys(r.scores).map(function(k) {
           var pct = Math.round((r.scores[k] / D.QUIZ.length) * 100)
           return { key:k, emoji:D.TI[k].emoji, label:D.TI[k].label, color:D.TI[k].color, pct:pct, grad:GRADS[k] }
+        })
+        H.addRecord({
+          kind: 'quiz',
+          kindLabel: '依恋测试',
+          title: ti.label,
+          summary: ti.desc,
+          result: { type: r.type, scores: r.scores, label: ti.label, desc: ti.desc }
         })
         self.setData({
           answers: answers,
