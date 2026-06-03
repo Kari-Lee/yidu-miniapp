@@ -12,7 +12,7 @@
       <view style="margin-bottom: 32rpx;">
         <view bindtap="chooseImg" style="display: flex; align-items: center; justify-content: center; gap: 16rpx; padding: 32rpx; border-radius: 32rpx; border: 4rpx dashed {{imgs.length ? 'rgba(0,184,148,0.5)' : 'rgba(0,0,0,0.04)'}}; background: {{imgs.length ? '#F0FFF4' : '#F4F8FB'}}; color: {{imgs.length ? '#00B894' : '#C8D6E5'}}; font-size: 28rpx; font-weight: 600;">
           <text style="font-size: 44rpx;">{{imgs.length ? '📎' : '📷'}}</text>
-          <text>{{imgs.length ? imgs.length + '张截图已选择 · 点击继续添加' : '上传聊天截图（可多选）'}}</text>
+          <text>{{imgs.length ? imgs.length + '张截图已选择 · 最多4张' : '上传聊天截图（最多4张）'}}</text>
         </view>
         <view style="text-align: center; font-size: 24rpx; color: #C8D6E5; margin: 24rpx 0 12rpx;">—— 或 ——</view>
       </view>

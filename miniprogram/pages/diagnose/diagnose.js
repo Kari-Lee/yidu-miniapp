@@ -12,6 +12,23 @@ var BGS = {
   secure: "rgba(0,184,148,0.08)", disorganized: "rgba(108,92,231,0.08)"
 }
 var MSGS = ["扫描互动模式", "分析依恋信号", "生成双人报告"]
+var MAX_IMAGES = 4
+
+function readImageAsBase64(path) {
+  return new Promise(function(resolve, reject) {
+    wx.getFileSystemManager().readFile({
+      filePath: path,
+      encoding: 'base64',
+      success: function(r) { resolve(r.data) },
+      fail: function() { reject(new Error('图片读取失败，请重新选择截图')) }
+    })
+  })
+}
+
+function readImagesAsBase64(paths) {
+  if (!paths || paths.length === 0) return Promise.resolve(null)
+  return Promise.all(paths.map(readImageAsBase64))
+}
 
 Page({
   data: {
@@ -35,8 +52,13 @@ Page({
 
   chooseImg: function() {
     var self = this
+    var remaining = MAX_IMAGES - self.data.imgs.length
+    if (remaining <= 0) {
+      wx.showToast({ title: '最多上传4张截图', icon: 'none' })
+      return
+    }
     wx.chooseImage({
-      count: 9, sizeType: ['compressed'],
+      count: remaining, sizeType: ['compressed'],
       success: function(r) {
         var paths = self.data.imgs.concat(r.tempFilePaths)
         self.setData({ imgs: paths, hasInput: true })
@@ -64,8 +86,9 @@ Page({
     var um = (self.data.ctx ? '关系背景：' + self.data.ctx + '\n\n' : '') +
       (self.data.text.trim() ? '聊天记录：\n' + self.data.text : '请分析这些聊天记录截图')
 
-    // TODO: 图片需要转base64传给后端，这里先只传文本
-    API.callAI(D.P.diagnose, um, null).then(function(res) {
+    readImagesAsBase64(self.data.imgs).then(function(images) {
+      return API.callAI(D.P.diagnose, um, images)
+    }).then(function(res) {
       clearInterval(self._timer)
       var ut = D.TI[res.user_type] || D.TI.secure
       var pt = D.TI[res.partner_type] || D.TI.secure
