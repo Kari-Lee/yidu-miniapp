@@ -3,6 +3,7 @@ var API = require('../../utils/api')
 var H = require('../../utils/history')
 var N = require('../../utils/normalize')
 var Share = require('../../utils/share')
+var Format = require('../../utils/format')
 var MSGS = ["评估杀伤力", "模拟Ta反应"]
 
 Page({
@@ -60,5 +61,10 @@ Page({
 
   onShareAppMessage: function() {
     return Share.check(this.data.res && this.data.res.verdict)
+  },
+
+  copyResult: function() {
+    if (!this.data.res) return
+    wx.setClipboardData({ data: Format.check(this.data.res) })
   }
 })

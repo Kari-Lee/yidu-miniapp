@@ -3,6 +3,7 @@ var API = require('../../utils/api')
 var H = require('../../utils/history')
 var N = require('../../utils/normalize')
 var Share = require('../../utils/share')
+var Format = require('../../utils/format')
 
 var GRADS = {
   anxious: "linear-gradient(135deg,#E17055,#D63031,#C0392B)",
@@ -130,5 +131,10 @@ Page({
 
   onShareAppMessage: function() {
     return Share.diagnose()
+  },
+
+  copyResult: function() {
+    if (!this.data.res) return
+    wx.setClipboardData({ data: Format.diagnose(this.data.res) })
   }
 })

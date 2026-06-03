@@ -48,6 +48,7 @@
     </view>
     <view style="display: flex; gap: 20rpx;">
       <button class="btn-reset" style="flex: 1;" bindtap="resetInput">再来一次 ↻</button>
+      <button class="btn-reset" style="flex: 1;" bindtap="copyResult">复制</button>
       <button class="btn-main" style="flex: 1; background: #636E72;" open-type="share">分享</button>
     </view>
     <view class="disclaimer">潜台词不是读心术。真正有用的是看 Ta 后续怎么做，而不是把一句话审到天亮。</view>

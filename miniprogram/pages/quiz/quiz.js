@@ -1,6 +1,7 @@
 var D = require('../../utils/data')
 var H = require('../../utils/history')
 var Share = require('../../utils/share')
+var Format = require('../../utils/format')
 
 var GRADS = {
   anxious: "linear-gradient(135deg,#E17055,#D63031,#C0392B)",
@@ -111,6 +112,13 @@ Page({
 
   goDiagnose: function() {
     wx.navigateTo({ url: '/pages/diagnose/diagnose' })
+  },
+
+  copyResult: function() {
+    if (!this.data.typeInfo) return
+    wx.setClipboardData({
+      data: Format.quiz(this.data.typeInfo, this.data.scoreList)
+    })
   },
 
   onShareAppMessage: function() {

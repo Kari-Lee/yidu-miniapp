@@ -3,6 +3,7 @@ var API = require('../../utils/api')
 var H = require('../../utils/history')
 var N = require('../../utils/normalize')
 var Share = require('../../utils/share')
+var Format = require('../../utils/format')
 var MSGS = ["解码潜台词", "翻译真实意图"]
 
 Page({
@@ -52,5 +53,10 @@ Page({
 
   onShareAppMessage: function() {
     return Share.translate()
+  },
+
+  copyResult: function() {
+    if (!this.data.res) return
+    wx.setClipboardData({ data: Format.translate(this.data.res) })
   }
 })

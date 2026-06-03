@@ -3,6 +3,7 @@ var API = require('../../utils/api')
 var H = require('../../utils/history')
 var N = require('../../utils/normalize')
 var Share = require('../../utils/share')
+var Format = require('../../utils/format')
 var MSGS = ["扫描关系轨迹", "模拟未来走向"]
 
 Page({
@@ -56,5 +57,10 @@ Page({
 
   onShareAppMessage: function() {
     return Share.predict(this.data.res && this.data.res.stage)
+  },
+
+  copyResult: function() {
+    if (!this.data.res) return
+    wx.setClipboardData({ data: Format.predict(this.data.res) })
   }
 })

@@ -112,6 +112,7 @@
 
     <view style="display: flex; gap: 20rpx; margin-top: 16rpx;">
       <button class="btn-reset" style="flex: 1;" bindtap="resetInput">再来一次 ↻</button>
+      <button class="btn-reset" style="flex: 1;" bindtap="copyResult">复制</button>
       <button class="btn-main" style="flex: 1;" open-type="share">分享</button>
     </view>
     <view class="disclaimer">以上分析由 AI 根据你提供的内容生成，只适合做自我觉察和沟通参考。别拿它当判决书，更别替代专业心理咨询。</view>
