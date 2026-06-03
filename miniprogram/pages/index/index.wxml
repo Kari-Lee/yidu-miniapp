@@ -19,12 +19,17 @@
     <view style="font-size: 18rpx; color: #B8860B; margin-top: 12rpx; font-weight: 700; letter-spacing: 4rpx;">DAILY QUOTE</view>
   </view>
 
-  <view class="card-sm" style="padding: 28rpx 36rpx; margin-bottom: 24rpx; display: flex; align-items: center; justify-content: space-between;" bindtap="goHistory">
-    <view>
-      <view style="font-size: 28rpx; font-weight: 800; color: #1A1A2E;">最近分析</view>
-      <view style="font-size: 22rpx; color: #8395A7; margin-top: 4rpx;">复看测试、确诊和预测结果</view>
+  <view style="display: flex; gap: 20rpx; margin-bottom: 24rpx;">
+    <view class="mini-entry" style="flex: 1;" bindtap="goProfiles">
+      <view style="font-size: 34rpx; margin-bottom: 8rpx;">🗃️</view>
+      <view style="font-size: 26rpx; font-weight: 800; color: #1A1A2E;">关系档案</view>
+      <view style="font-size: 20rpx; color: #8395A7; margin-top: 4rpx;">分开管理每个Ta</view>
     </view>
-    <view style="font-size: 34rpx; color: #B8860B;">›</view>
+    <view class="mini-entry" style="flex: 1;" bindtap="goHistory">
+      <view style="font-size: 34rpx; margin-bottom: 8rpx;">🗂️</view>
+      <view style="font-size: 26rpx; font-weight: 800; color: #1A1A2E;">最近分析</view>
+      <view style="font-size: 20rpx; color: #8395A7; margin-top: 4rpx;">复看历史结果</view>
+    </view>
   </view>
 
   <view style="display: flex; margin-bottom: 20rpx;">

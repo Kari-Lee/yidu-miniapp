@@ -25,5 +25,6 @@ Page({
   goCheck: function() { wx.navigateTo({ url: '/pages/check/check' }) },
   goPredict: function() { wx.navigateTo({ url: '/pages/predict/predict' }) },
   goHistory: function() { wx.navigateTo({ url: '/pages/history/history' }) },
+  goProfiles: function() { wx.navigateTo({ url: '/pages/profiles/profiles' }) },
   onShareAppMessage: function() { return Share.home() },
 })

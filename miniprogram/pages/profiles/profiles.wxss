@@ -1,0 +1,79 @@
+.profile-input {
+  width: 100%;
+  min-height: 88rpx;
+  padding: 0 8rpx;
+  color: #1A1A2E;
+  font-size: 30rpx;
+  border-bottom: 2rpx solid rgba(0,0,0,0.06);
+  box-sizing: border-box;
+}
+
+.field-title {
+  margin: 36rpx 0 18rpx;
+  color: #8395A7;
+  font-size: 24rpx;
+  font-weight: 800;
+}
+
+.chip-row {
+  display: flex;
+  gap: 14rpx;
+  flex-wrap: wrap;
+}
+
+.chip,
+.type-chip {
+  padding: 16rpx 24rpx;
+  border-radius: 26rpx;
+  border: 3rpx solid rgba(0,0,0,0.04);
+  color: #8395A7;
+  font-size: 24rpx;
+  font-weight: 700;
+}
+
+.chip-active {
+  border-color: #B8860B;
+  background: rgba(184,134,11,0.08);
+  color: #B8860B;
+}
+
+.profile-textarea {
+  width: 100%;
+  min-height: 180rpx;
+  margin-top: 36rpx;
+  padding: 28rpx;
+  border-radius: 28rpx;
+  background: #F8FAFB;
+  color: #1A1A2E;
+  font-size: 28rpx;
+  line-height: 1.8;
+  box-sizing: border-box;
+}
+
+.profile-card {
+  padding: 40rpx;
+}
+
+.action-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 12rpx;
+  margin-top: 28rpx;
+}
+
+.action-grid button {
+  padding: 18rpx 0;
+  border-radius: 22rpx;
+  background: #F8FAFB;
+  color: #2D3436;
+  font-size: 24rpx;
+  font-weight: 800;
+}
+
+.action-grid button::after {
+  border: none;
+}
+
+.action-grid .danger {
+  color: #E17055;
+}

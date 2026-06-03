@@ -18,3 +18,11 @@
   box-shadow: 0 4rpx 24rpx rgba(0,0,0,0.03);
   text-align: center;
 }
+
+.mini-entry {
+  background: #FFFFFF;
+  border-radius: 28rpx;
+  padding: 28rpx 20rpx;
+  box-shadow: 0 4rpx 24rpx rgba(0,0,0,0.03);
+  text-align: center;
+}

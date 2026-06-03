@@ -31,11 +31,16 @@ function predict(stage) {
   return page(stage ? '这段关系现在像是：' + stage : '让已读预测一下这段关系走向', '/pages/predict/predict')
 }
 
+function profiles() {
+  return page('给每个Ta建个关系档案，别混着分析', '/pages/profiles/profiles')
+}
+
 module.exports = {
   home: home,
   quiz: quiz,
   diagnose: diagnose,
   translate: translate,
   check: check,
-  predict: predict
+  predict: predict,
+  profiles: profiles
 }

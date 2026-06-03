@@ -18,6 +18,10 @@ var BGS = {
 var MSGS = ["扫描互动模式", "分析依恋信号", "生成双人报告"]
 var MAX_IMAGES = 4
 
+function safeDecode(v) {
+  try { return decodeURIComponent(v) } catch(e) { return v || '' }
+}
+
 function readImageAsBase64(path) {
   return new Promise(function(resolve, reject) {
     wx.getFileSystemManager().readFile({
@@ -42,8 +46,11 @@ Page({
   },
   _timer: null,
 
-  onLoad: function() {
-    this.setData({ statusBarHeight: getApp().globalData.statusBarHeight })
+  onLoad: function(options) {
+    this.setData({
+      statusBarHeight: getApp().globalData.statusBarHeight,
+      ctx: options && options.ctx ? safeDecode(options.ctx) : ''
+    })
   },
 
   onUnload: function() { this.stopLoading() },

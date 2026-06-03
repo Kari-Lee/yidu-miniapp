@@ -18,7 +18,12 @@ Page({
     ]
   },
   _timer: null,
-  onLoad: function() { this.setData({ statusBarHeight: getApp().globalData.statusBarHeight }) },
+  onLoad: function(options) {
+    this.setData({
+      statusBarHeight: getApp().globalData.statusBarHeight,
+      pType: options && options.pType ? options.pType : ''
+    })
+  },
   onUnload: function() { this.stopLoading() },
   goBack: function() { wx.navigateBack() },
   stopLoading: function() {

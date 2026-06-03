@@ -1,0 +1,66 @@
+<view class="container" style="padding: 0 32rpx 120rpx;">
+  <view style="height: {{statusBarHeight}}px"></view>
+  <view style="padding: 24rpx 0; display: flex; align-items: center; justify-content: space-between;">
+    <text bindtap="goBack" style="font-size: 24rpx; color: #B8860B; font-weight: 600;">‹ 返回</text>
+    <text bindtap="toggleForm" style="font-size: 24rpx; color: #B8860B; font-weight: 800;">{{showForm ? '收起' : '新建'}}</text>
+  </view>
+
+  <view style="padding: 24rpx 0 32rpx;">
+    <view class="serif" style="font-size: 56rpx; font-weight: 900; color: #1A1A2E;">关系档案</view>
+    <view style="font-size: 24rpx; color: #8395A7; margin-top: 8rpx;">把不同的 Ta 分开分析，别让前任和暧昧对象互相污染</view>
+  </view>
+
+  <view class="notice">
+    <view class="notice-title">只保存在本机</view>
+    <view>档案用于快速带入关系背景，不会自动上传。真正上传给 AI 的，只有你在分析页提交的内容。</view>
+  </view>
+
+  <view wx:if="{{showForm}}" class="card" style="padding: 44rpx;">
+    <view class="serif" style="font-size: 34rpx; font-weight: 900; color: #1A1A2E; margin-bottom: 28rpx;">新建 Ta 的档案</view>
+    <input class="profile-input" placeholder="Ta是谁，比如：小王 / 前任 / 那个不回消息的人" placeholder-style="color:#C8D6E5" value="{{form.name}}" bindinput="onNameInput" />
+
+    <view class="field-title">关系</view>
+    <view class="chip-row">
+      <view wx:for="{{relationOptions}}" wx:key="index" class="chip {{form.relation === item ? 'chip-active' : ''}}" data-relation="{{item}}" bindtap="pickRelation">{{item}}</view>
+    </view>
+
+    <view class="field-title">Ta的疑似依恋类型</view>
+    <view class="chip-row">
+      <view wx:for="{{typeOptions}}" wx:key="key" class="type-chip" data-key="{{item.key}}" bindtap="pickType"
+        style="border-color: {{form.type === item.key ? item.color : 'rgba(0,0,0,0.04)'}}; background: {{form.type === item.key ? item.bg : '#fff'}}; color: {{form.type === item.key ? item.color : '#8395A7'}};">
+        {{item.emoji}} {{item.label}}
+      </view>
+    </view>
+
+    <textarea class="profile-textarea" auto-height maxlength="-1" placeholder="备注：比如认识多久、最近卡在哪里、Ta最烦人的点..." placeholder-style="color:#C8D6E5" value="{{form.note}}" bindinput="onNoteInput"></textarea>
+
+    <view style="display: flex; gap: 20rpx; margin-top: 28rpx;">
+      <button class="btn-reset" style="flex: 1;" bindtap="resetForm">取消</button>
+      <button class="btn-main" style="flex: 1;" bindtap="saveProfile">保存</button>
+    </view>
+  </view>
+
+  <view wx:if="{{!profiles.length && !showForm}}" class="card" style="text-align: center; padding: 80rpx 40rpx;">
+    <view style="font-size: 72rpx; margin-bottom: 20rpx;">🗃️</view>
+    <view class="serif" style="font-size: 34rpx; font-weight: 800; color: #1A1A2E;">还没有档案</view>
+    <view style="font-size: 26rpx; color: #8395A7; margin-top: 12rpx;">先建一个 Ta，后面分析就不用每次重讲背景</view>
+    <button class="btn-main" style="margin-top: 32rpx;" bindtap="toggleForm">新建档案</button>
+  </view>
+
+  <view wx:for="{{profiles}}" wx:key="id" class="card profile-card">
+    <view style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16rpx;">
+      <view style="padding: 8rpx 20rpx; border-radius: 999rpx; background: #F8FAFB; color: #B8860B; font-size: 22rpx; font-weight: 800;">{{item.relation}}</view>
+      <view style="font-size: 22rpx; color: #C8D6E5;">{{item.timeText}}</view>
+    </view>
+    <view class="serif" style="font-size: 42rpx; font-weight: 900; color: #1A1A2E; line-height: 1.35;">{{item.name}}</view>
+    <view style="font-size: 24rpx; color: #8395A7; margin-top: 8rpx;">疑似类型：{{item.typeLabel || '未知'}}</view>
+    <view wx:if="{{item.note}}" style="margin-top: 20rpx; padding: 24rpx 28rpx; border-radius: 24rpx; background: #F8FAFB; color: rgba(26,26,46,0.75); font-size: 25rpx; line-height: 1.8;">{{item.note}}</view>
+
+    <view class="action-grid">
+      <button bindtap="goDiagnose" data-id="{{item.id}}">分析</button>
+      <button bindtap="goCheck" data-id="{{item.id}}">发不发</button>
+      <button bindtap="goPredict" data-id="{{item.id}}">预测</button>
+      <button class="danger" bindtap="deleteProfile" data-id="{{item.id}}">删除</button>
+    </view>
+  </view>
+</view>

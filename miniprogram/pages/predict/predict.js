@@ -6,6 +6,10 @@ var Share = require('../../utils/share')
 var Format = require('../../utils/format')
 var MSGS = ["扫描关系轨迹", "模拟未来走向"]
 
+function safeDecode(v) {
+  try { return decodeURIComponent(v) } catch(e) { return v || '' }
+}
+
 Page({
   data: {
     statusBarHeight: 0, step: 'input', text: '', ctx: '', err: null,
@@ -13,7 +17,12 @@ Page({
     predBgs: ['#FFF5F3', '#FFF9E6', '#F0FFF4']
   },
   _timer: null,
-  onLoad: function() { this.setData({ statusBarHeight: getApp().globalData.statusBarHeight }) },
+  onLoad: function(options) {
+    this.setData({
+      statusBarHeight: getApp().globalData.statusBarHeight,
+      ctx: options && options.ctx ? safeDecode(options.ctx) : ''
+    })
+  },
   onUnload: function() { this.stopLoading() },
   goBack: function() { wx.navigateBack() },
   stopLoading: function() {
