@@ -1,6 +1,7 @@
 var D = require('../../utils/data')
 var API = require('../../utils/api')
 var H = require('../../utils/history')
+var N = require('../../utils/normalize')
 var MSGS = ["扫描关系轨迹", "模拟未来走向"]
 
 Page({
@@ -29,6 +30,7 @@ Page({
 
     API.callAI(D.P.predict, um, null).then(function(res) {
       clearInterval(self._timer)
+      res = N.normalizePredict(res)
       H.addRecord({
         kind: 'predict',
         kindLabel: '感情预测',

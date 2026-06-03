@@ -18,4 +18,4 @@ yarn-error.log*
 miniprogram-backup/
 
 # Accidental shell-brace directories
-miniprogram/{pages*/
+miniprogram/[{]pages*/

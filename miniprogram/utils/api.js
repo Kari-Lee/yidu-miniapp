@@ -32,7 +32,7 @@ function callAI(sys, message, images) {
             if (first !== -1 && last > first) {
               try { resolve(JSON.parse(raw.substring(first, last + 1))); return } catch(e) {}
             }
-            if (first === -1 && raw.length > 10) { resolve({ text: raw, fallback: true }); return }
+            if (raw.length > 10) { resolve({ text: raw, fallback: true }); return }
             reject(new Error('AI返回格式异常'))
           } catch(e) {
             reject(new Error('解析失败，请重试'))

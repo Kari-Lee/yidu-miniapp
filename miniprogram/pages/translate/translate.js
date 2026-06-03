@@ -1,6 +1,7 @@
 var D = require('../../utils/data')
 var API = require('../../utils/api')
 var H = require('../../utils/history')
+var N = require('../../utils/normalize')
 var MSGS = ["解码潜台词", "翻译真实意图"]
 
 Page({
@@ -24,6 +25,7 @@ Page({
 
     API.callAI(D.P.translate, 'Ta说的话：\n' + self.data.text, null).then(function(res) {
       clearInterval(self._timer)
+      res = N.normalizeTranslate(res, self.data.text)
       var first = res.translations && res.translations[0]
       H.addRecord({
         kind: 'translate',

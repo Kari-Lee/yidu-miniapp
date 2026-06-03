@@ -1,6 +1,7 @@
 var D = require('../../utils/data')
 var API = require('../../utils/api')
 var H = require('../../utils/history')
+var N = require('../../utils/normalize')
 var MSGS = ["评估杀伤力", "模拟Ta反应"]
 
 Page({
@@ -33,6 +34,7 @@ Page({
 
     API.callAI(D.P.check, um, null).then(function(res) {
       clearInterval(self._timer)
+      res = N.normalizeCheck(res)
       H.addRecord({
         kind: 'check',
         kindLabel: '发不发',

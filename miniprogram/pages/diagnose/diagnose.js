@@ -1,6 +1,7 @@
 var D = require('../../utils/data')
 var API = require('../../utils/api')
 var H = require('../../utils/history')
+var N = require('../../utils/normalize')
 
 var GRADS = {
   anxious: "linear-gradient(135deg,#E17055,#D63031,#C0392B)",
@@ -91,6 +92,7 @@ Page({
       return API.callAI(D.P.diagnose, um, images)
     }).then(function(res) {
       clearInterval(self._timer)
+      res = N.normalizeDiagnose(res)
       var ut = D.TI[res.user_type] || D.TI.secure
       var pt = D.TI[res.partner_type] || D.TI.secure
       H.addRecord({
