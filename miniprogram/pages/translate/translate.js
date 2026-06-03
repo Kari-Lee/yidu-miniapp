@@ -13,19 +13,26 @@ Page({
   },
   _timer: null,
   onLoad: function() { this.setData({ statusBarHeight: getApp().globalData.statusBarHeight }) },
+  onUnload: function() { this.stopLoading() },
   goBack: function() { wx.navigateBack() },
+  stopLoading: function() {
+    if (!this._timer) return
+    clearInterval(this._timer)
+    this._timer = null
+  },
   onInput: function(e) { this.setData({ text: e.detail.value, hasInput: !!e.detail.value.trim() }) },
   resetInput: function() { this.setData({ step: 'input', text: '', err: null, res: null, hasInput: false }) },
 
   submit: function() {
     if (!this.data.text.trim()) return
     var self = this
+    self.stopLoading()
     self.setData({ step: 'loading', err: null, loadingMsg: MSGS[0] })
     var n = 0
     self._timer = setInterval(function() { n++; self.setData({ loadingMsg: MSGS[n % MSGS.length] }) }, 1200)
 
     API.callAI(D.P.translate, 'Ta说的话：\n' + self.data.text, null).then(function(res) {
-      clearInterval(self._timer)
+      self.stopLoading()
       res = N.normalizeTranslate(res, self.data.text)
       var first = res.translations && res.translations[0]
       H.addRecord({
@@ -38,7 +45,7 @@ Page({
       })
       self.setData({ step: 'result', res: res })
     }).catch(function(e) {
-      clearInterval(self._timer)
+      self.stopLoading()
       self.setData({ step: 'input', err: e.message || '出错了' })
     })
   },

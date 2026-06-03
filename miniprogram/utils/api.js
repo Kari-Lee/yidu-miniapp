@@ -1,4 +1,14 @@
 var app = getApp()
+var REQUEST_TIMEOUT = 60000
+
+function getErrorMessage(r) {
+  var data = r.data || {}
+  if (data.error) return data.error
+  if (r.statusCode === 413) return '截图太大了，少传几张或裁剪后再试'
+  if (r.statusCode === 429) return '分析太频繁了，稍等一下再试'
+  if (r.statusCode >= 500) return 'AI服务暂时不稳定，等会再试'
+  return '服务暂时不可用'
+}
 
 function callAI(sys, message, images) {
   return new Promise(function(resolve, reject) {
@@ -10,6 +20,7 @@ function callAI(sys, message, images) {
       method: 'POST',
       header: { 'Content-Type': 'application/json' },
       data: body,
+      timeout: REQUEST_TIMEOUT,
       success: function(r) {
         if (r.statusCode === 200 && r.data) {
           try {
@@ -38,11 +49,14 @@ function callAI(sys, message, images) {
             reject(new Error('解析失败，请重试'))
           }
         } else {
-          reject(new Error('服务暂时不可用'))
+          reject(new Error(getErrorMessage(r)))
         }
       },
-      fail: function() {
-        reject(new Error('网络连接失败'))
+      fail: function(e) {
+        var msg = e && e.errMsg && e.errMsg.indexOf('timeout') !== -1
+          ? '分析超时了，少传一点内容再试'
+          : '网络连接失败'
+        reject(new Error(msg))
       }
     })
   })

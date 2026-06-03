@@ -13,7 +13,13 @@ Page({
   },
   _timer: null,
   onLoad: function() { this.setData({ statusBarHeight: getApp().globalData.statusBarHeight }) },
+  onUnload: function() { this.stopLoading() },
   goBack: function() { wx.navigateBack() },
+  stopLoading: function() {
+    if (!this._timer) return
+    clearInterval(this._timer)
+    this._timer = null
+  },
   onInput: function(e) { this.setData({ text: e.detail.value, hasInput: !!e.detail.value.trim() }) },
   onCtxInput: function(e) { this.setData({ ctx: e.detail.value }) },
   nextStep: function() { if (this.data.hasInput) this.setData({ step: 'context' }) },
@@ -22,6 +28,7 @@ Page({
 
   submit: function() {
     var self = this
+    self.stopLoading()
     self.setData({ step: 'loading', err: null, loadingMsg: MSGS[0] })
     var n = 0
     self._timer = setInterval(function() { n++; self.setData({ loadingMsg: MSGS[n % MSGS.length] }) }, 1200)
@@ -30,7 +37,7 @@ Page({
       (self.data.text.trim() ? '聊天记录：\n' + self.data.text : '')
 
     API.callAI(D.P.predict, um, null).then(function(res) {
-      clearInterval(self._timer)
+      self.stopLoading()
       res = N.normalizePredict(res)
       H.addRecord({
         kind: 'predict',
@@ -42,7 +49,7 @@ Page({
       })
       self.setData({ step: 'result', res: res })
     }).catch(function(e) {
-      clearInterval(self._timer)
+      self.stopLoading()
       self.setData({ step: 'input', err: e.message || '出错了' })
     })
   },

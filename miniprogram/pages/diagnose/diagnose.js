@@ -45,7 +45,15 @@ Page({
     this.setData({ statusBarHeight: getApp().globalData.statusBarHeight })
   },
 
+  onUnload: function() { this.stopLoading() },
+
   goBack: function() { wx.navigateBack() },
+
+  stopLoading: function() {
+    if (!this._timer) return
+    clearInterval(this._timer)
+    this._timer = null
+  },
 
   onInput: function(e) {
     this.setData({ text: e.detail.value, hasInput: !!(e.detail.value.trim() || this.data.imgs.length) })
@@ -82,6 +90,7 @@ Page({
 
   submit: function() {
     var self = this
+    self.stopLoading()
     self.setData({ step: 'loading', err: null, loadingMsg: MSGS[0] })
     var n = 0
     self._timer = setInterval(function() { n++; self.setData({ loadingMsg: MSGS[n % MSGS.length] }) }, 1200)
@@ -92,7 +101,7 @@ Page({
     readImagesAsBase64(self.data.imgs).then(function(images) {
       return API.callAI(D.P.diagnose, um, images)
     }).then(function(res) {
-      clearInterval(self._timer)
+      self.stopLoading()
       res = N.normalizeDiagnose(res)
       var ut = D.TI[res.user_type] || D.TI.secure
       var pt = D.TI[res.partner_type] || D.TI.secure
@@ -114,7 +123,7 @@ Page({
         partnerBg: BGS[res.partner_type] || BGS.secure,
       })
     }).catch(function(e) {
-      clearInterval(self._timer)
+      self.stopLoading()
       self.setData({ step: 'input', err: e.message || '出错了' })
     })
   },
