@@ -37,3 +37,61 @@
   background-size: 200% 100%;
   animation: shimmer 1.5s infinite;
 }
+
+.shot-panel {
+  margin-top: 24rpx;
+  padding: 24rpx;
+  border-radius: 28rpx;
+  background: #F8FAFB;
+}
+
+.shot-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 14rpx;
+}
+
+.shot-tile {
+  position: relative;
+  height: 128rpx;
+  border-radius: 22rpx;
+  overflow: hidden;
+  background: #EDF4FA;
+}
+
+.shot-img {
+  width: 100%;
+  height: 100%;
+  display: block;
+}
+
+.shot-remove {
+  position: absolute;
+  top: 8rpx;
+  right: 8rpx;
+  width: 34rpx;
+  height: 34rpx;
+  border-radius: 50%;
+  background: rgba(26,26,46,0.72);
+  color: #fff;
+  font-size: 26rpx;
+  line-height: 34rpx;
+  text-align: center;
+  font-weight: 800;
+}
+
+.shot-order {
+  position: absolute;
+  left: 8rpx;
+  bottom: 8rpx;
+  min-width: 30rpx;
+  height: 30rpx;
+  padding: 0 8rpx;
+  border-radius: 999rpx;
+  background: rgba(255,255,255,0.86);
+  color: #2D3436;
+  font-size: 20rpx;
+  line-height: 30rpx;
+  text-align: center;
+  font-weight: 800;
+}

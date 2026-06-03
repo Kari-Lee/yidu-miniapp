@@ -38,6 +38,10 @@ function readImagesAsBase64(paths) {
   return Promise.all(paths.map(readImageAsBase64))
 }
 
+function hasInput(text, imgs) {
+  return !!((text || '').trim() || (imgs && imgs.length))
+}
+
 Page({
   data: {
     statusBarHeight: 0, step: 'input', text: '', ctx: '', imgs: [], err: null,
@@ -64,7 +68,7 @@ Page({
   },
 
   onInput: function(e) {
-    this.setData({ text: e.detail.value, hasInput: !!(e.detail.value.trim() || this.data.imgs.length) })
+    this.setData({ text: e.detail.value, hasInput: hasInput(e.detail.value, this.data.imgs) })
   },
 
   onCtxInput: function(e) { this.setData({ ctx: e.detail.value }) },
@@ -83,6 +87,25 @@ Page({
         self.setData({ imgs: paths, hasInput: true })
       }
     })
+  },
+
+  previewImg: function(e) {
+    var idx = e.currentTarget.dataset.index
+    wx.previewImage({
+      current: this.data.imgs[idx],
+      urls: this.data.imgs
+    })
+  },
+
+  removeImg: function(e) {
+    var idx = e.currentTarget.dataset.index
+    var imgs = this.data.imgs.slice()
+    imgs.splice(idx, 1)
+    this.setData({ imgs: imgs, hasInput: hasInput(this.data.text, imgs) })
+  },
+
+  clearImgs: function() {
+    this.setData({ imgs: [], hasInput: hasInput(this.data.text, []) })
   },
 
   nextStep: function() {

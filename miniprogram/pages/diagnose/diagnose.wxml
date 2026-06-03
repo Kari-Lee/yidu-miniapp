@@ -18,6 +18,19 @@
           <text style="font-size: 44rpx;">{{imgs.length ? '📎' : '📷'}}</text>
           <text>{{imgs.length ? imgs.length + '张截图已选择 · 最多4张' : '上传聊天截图（最多4张）'}}</text>
         </view>
+        <view wx:if="{{imgs.length}}" class="shot-panel">
+          <view style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 18rpx;">
+            <text style="font-size: 22rpx; color: #8395A7; font-weight: 700;">点击预览，右上角删除</text>
+            <text bindtap="clearImgs" style="font-size: 22rpx; color: #E17055; font-weight: 800;">清空</text>
+          </view>
+          <view class="shot-grid">
+            <view wx:for="{{imgs}}" wx:key="*this" class="shot-tile" data-index="{{index}}" bindtap="previewImg">
+              <image class="shot-img" src="{{item}}" mode="aspectFill"></image>
+              <view class="shot-remove" data-index="{{index}}" catchtap="removeImg">×</view>
+              <view class="shot-order">{{index + 1}}</view>
+            </view>
+          </view>
+        </view>
         <view style="text-align: center; font-size: 24rpx; color: #C8D6E5; margin: 24rpx 0 12rpx;">—— 或 ——</view>
       </view>
       <textarea style="width: 100%; padding: 28rpx 8rpx; background: transparent; border: none; color: #1A1A2E; font-size: 30rpx; line-height: 1.9;" maxlength="-1" auto-height placeholder="粘贴聊天记录..." placeholder-style="color: #C8D6E5" value="{{text}}" bindinput="onInput"></textarea>
