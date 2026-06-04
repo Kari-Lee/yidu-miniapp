@@ -7,7 +7,8 @@
     "pages/check/check",
     "pages/predict/predict",
     "pages/history/history",
-    "pages/profiles/profiles"
+    "pages/profiles/profiles",
+    "pages/history-detail/history-detail"
   ],
   "window": {
     "navigationBarBackgroundColor": "#F4F8FB",

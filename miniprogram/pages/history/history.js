@@ -19,6 +19,10 @@ Page({
     wx.navigateBack()
   },
 
+  openDetail: function(e) {
+    wx.navigateTo({ url: '/pages/history-detail/history-detail?id=' + e.currentTarget.dataset.id })
+  },
+
   clearHistory: function() {
     var self = this
     wx.showModal({

@@ -1,0 +1,88 @@
+.section-title {
+  color: #8395A7;
+  font-size: 24rpx;
+  font-weight: 900;
+  margin-bottom: 18rpx;
+}
+
+.input-block {
+  margin-top: 20rpx;
+  padding: 22rpx 26rpx;
+  border-radius: 24rpx;
+  background: #F8FAFB;
+  color: #8395A7;
+  font-size: 24rpx;
+  line-height: 1.7;
+}
+
+.score-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 14rpx;
+}
+
+.score-grid view,
+.kv {
+  padding: 18rpx 22rpx;
+  border-radius: 20rpx;
+  background: #F8FAFB;
+  color: rgba(26,26,46,0.78);
+  font-size: 25rpx;
+  font-weight: 700;
+  margin-bottom: 14rpx;
+}
+
+.body-text {
+  color: rgba(26,26,46,0.8);
+  font-size: 28rpx;
+  line-height: 1.9;
+  margin-top: 16rpx;
+}
+
+.signal-row,
+.poss-row,
+.timeline-row {
+  display: flex;
+  gap: 18rpx;
+  padding: 22rpx 0;
+  border-bottom: 2rpx solid rgba(0,0,0,0.04);
+}
+
+.advice-block {
+  margin-top: 22rpx;
+  padding: 24rpx 28rpx;
+  border-radius: 24rpx;
+  background: #F8FAFB;
+  color: rgba(26,26,46,0.82);
+  font-size: 26rpx;
+  line-height: 1.8;
+}
+
+.quote {
+  padding: 24rpx 28rpx;
+  border-radius: 24rpx;
+  background: #F8FAFB;
+  color: #1A1A2E;
+  font-size: 30rpx;
+  font-weight: 800;
+  margin-bottom: 20rpx;
+}
+
+.verdict {
+  text-align: center;
+  border-radius: 34rpx;
+  padding: 44rpx 28rpx;
+  font-size: 62rpx;
+  font-weight: 900;
+  margin-bottom: 24rpx;
+}
+
+.verdict.danger {
+  background: #FFF5F3;
+  color: #E17055;
+}
+
+.verdict.safe {
+  background: #F0FFF4;
+  color: #00B894;
+}

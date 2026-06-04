@@ -18,6 +18,10 @@ function getRecords() {
   }
 }
 
+function getRecord(id) {
+  return getRecords().filter(function(item) { return item.id === id })[0] || null
+}
+
 function addRecord(record) {
   var ts = Date.now()
   var item = Object.assign({
@@ -34,8 +38,15 @@ function clearRecords() {
   wx.removeStorageSync(KEY)
 }
 
+function removeRecord(id) {
+  var list = getRecords().filter(function(item) { return item.id !== id })
+  wx.setStorageSync(KEY, list)
+}
+
 module.exports = {
   addRecord: addRecord,
   getRecords: getRecords,
-  clearRecords: clearRecords
+  getRecord: getRecord,
+  clearRecords: clearRecords,
+  removeRecord: removeRecord
 }
