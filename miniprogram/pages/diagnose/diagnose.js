@@ -17,9 +17,57 @@ var BGS = {
 }
 var MSGS = ["扫描互动模式", "分析依恋信号", "生成双人报告"]
 var MAX_IMAGES = 8
+var COMPRESS_QUALITY = 65
+var MAX_TOTAL_BYTES = 7 * 1024 * 1024
 
 function safeDecode(v) {
   try { return decodeURIComponent(v) } catch(e) { return v || '' }
+}
+
+function sizeText(bytes) {
+  if (!bytes) return '未知大小'
+  if (bytes >= 1024 * 1024) return (bytes / 1024 / 1024).toFixed(1) + 'MB'
+  return Math.max(1, Math.round(bytes / 1024)) + 'KB'
+}
+
+function getFileInfo(path) {
+  return new Promise(function(resolve) {
+    wx.getFileInfo({
+      filePath: path,
+      success: function(r) { resolve({ size: r.size || 0, sizeText: sizeText(r.size || 0) }) },
+      fail: function() { resolve({ size: 0, sizeText: '未知大小' }) }
+    })
+  })
+}
+
+function compressImage(path) {
+  return new Promise(function(resolve) {
+    wx.compressImage({
+      src: path,
+      quality: COMPRESS_QUALITY,
+      success: function(r) { resolve(r.tempFilePath || path) },
+      fail: function() { resolve(path) }
+    })
+  })
+}
+
+function prepareImage(path) {
+  return compressImage(path).then(function(compressedPath) {
+    return getFileInfo(compressedPath).then(function(info) {
+      return {
+        path: compressedPath,
+        originalPath: path,
+        size: info.size,
+        sizeText: info.sizeText
+      }
+    })
+  })
+}
+
+function totalImageBytes(imgs) {
+  return (imgs || []).reduce(function(sum, item) {
+    return sum + (item.size || 0)
+  }, 0)
 }
 
 function readImageAsBase64(path) {
@@ -35,7 +83,9 @@ function readImageAsBase64(path) {
 
 function readImagesAsBase64(paths) {
   if (!paths || paths.length === 0) return Promise.resolve(null)
-  return Promise.all(paths.map(readImageAsBase64))
+  return Promise.all(paths.map(function(item) {
+    return readImageAsBase64(item.path || item)
+  }))
 }
 
 function hasInput(text, imgs) {
@@ -83,17 +133,25 @@ Page({
     wx.chooseImage({
       count: remaining, sizeType: ['compressed'],
       success: function(r) {
-        var paths = self.data.imgs.concat(r.tempFilePaths)
-        self.setData({ imgs: paths, hasInput: true })
+        wx.showLoading({ title: '压缩中' })
+        Promise.all(r.tempFilePaths.map(prepareImage)).then(function(items) {
+          wx.hideLoading()
+          var imgs = self.data.imgs.concat(items)
+          self.setData({ imgs: imgs, hasInput: true })
+        }).catch(function() {
+          wx.hideLoading()
+          wx.showToast({ title: '图片处理失败，请重选', icon: 'none' })
+        })
       }
     })
   },
 
   previewImg: function(e) {
     var idx = e.currentTarget.dataset.index
+    var urls = this.data.imgs.map(function(item) { return item.path })
     wx.previewImage({
-      current: this.data.imgs[idx],
-      urls: this.data.imgs
+      current: urls[idx],
+      urls: urls
     })
   },
 
@@ -121,6 +179,10 @@ Page({
 
   submit: function() {
     var self = this
+    if (totalImageBytes(self.data.imgs) > MAX_TOTAL_BYTES) {
+      self.setData({ err: '截图总大小超过7MB，请删除几张或裁剪后再试' })
+      return
+    }
     self.stopLoading()
     self.setData({ step: 'loading', err: null, loadingMsg: MSGS[0] })
     var n = 0

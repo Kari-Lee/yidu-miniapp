@@ -95,3 +95,20 @@
   text-align: center;
   font-weight: 800;
 }
+
+.shot-size {
+  position: absolute;
+  right: 8rpx;
+  bottom: 8rpx;
+  max-width: 76rpx;
+  height: 30rpx;
+  padding: 0 8rpx;
+  border-radius: 999rpx;
+  background: rgba(255,255,255,0.86);
+  color: #8395A7;
+  font-size: 18rpx;
+  line-height: 30rpx;
+  text-align: center;
+  font-weight: 800;
+  overflow: hidden;
+}
