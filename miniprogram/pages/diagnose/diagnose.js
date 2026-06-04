@@ -16,7 +16,7 @@ var BGS = {
   secure: "rgba(0,184,148,0.08)", disorganized: "rgba(108,92,231,0.08)"
 }
 var MSGS = ["扫描互动模式", "分析依恋信号", "生成双人报告"]
-var MAX_IMAGES = 4
+var MAX_IMAGES = 8
 
 function safeDecode(v) {
   try { return decodeURIComponent(v) } catch(e) { return v || '' }
@@ -77,7 +77,7 @@ Page({
     var self = this
     var remaining = MAX_IMAGES - self.data.imgs.length
     if (remaining <= 0) {
-      wx.showToast({ title: '最多上传4张截图', icon: 'none' })
+      wx.showToast({ title: '最多上传8张截图', icon: 'none' })
       return
     }
     wx.chooseImage({
