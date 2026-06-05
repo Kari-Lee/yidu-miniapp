@@ -39,6 +39,23 @@ function addProfile(profile) {
   return item
 }
 
+function updateProfile(id, patch) {
+  var ts = Date.now()
+  var updated = null
+  var list = getProfiles().map(function(item) {
+    if (item.id !== id) return item
+    updated = Object.assign({}, item, patch, {
+      id: item.id,
+      createdAt: item.createdAt,
+      updatedAt: ts,
+      timeText: formatTime(ts)
+    })
+    return updated
+  })
+  saveProfiles(list)
+  return updated
+}
+
 function removeProfile(id) {
   saveProfiles(getProfiles().filter(function(item) { return item.id !== id }))
 }
@@ -55,6 +72,7 @@ function touchProfile(id) {
 module.exports = {
   getProfiles: getProfiles,
   addProfile: addProfile,
+  updateProfile: updateProfile,
   removeProfile: removeProfile,
   touchProfile: touchProfile
 }

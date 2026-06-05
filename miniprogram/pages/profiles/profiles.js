@@ -10,6 +10,7 @@ Page({
     statusBarHeight: 0,
     profiles: [],
     showForm: false,
+    editingId: '',
     form: Object.assign({}, EMPTY_FORM),
     relationOptions: ['暧昧对象', '伴侣', '前任', '相亲对象', '同事', '朋友'],
     typeOptions: [
@@ -41,7 +42,11 @@ Page({
   },
 
   toggleForm: function() {
-    this.setData({ showForm: !this.data.showForm })
+    if (this.data.showForm) {
+      this.resetForm()
+      return
+    }
+    this.setData({ showForm: true, editingId: '', form: Object.assign({}, EMPTY_FORM) })
   },
 
   onNameInput: function(e) {
@@ -61,7 +66,7 @@ Page({
   },
 
   resetForm: function() {
-    this.setData({ form: Object.assign({}, EMPTY_FORM), showForm: false })
+    this.setData({ form: Object.assign({}, EMPTY_FORM), showForm: false, editingId: '' })
   },
 
   saveProfile: function() {
@@ -72,13 +77,18 @@ Page({
       return
     }
     var ti = D.TI[form.type]
-    Profiles.addProfile({
+    var payload = {
       name: name,
       relation: form.relation,
       type: form.type,
       typeLabel: ti ? ti.label : '未知',
       note: form.note.trim()
-    })
+    }
+    if (this.data.editingId) {
+      Profiles.updateProfile(this.data.editingId, payload)
+    } else {
+      Profiles.addProfile(payload)
+    }
     this.resetForm()
     this.loadProfiles()
   },
@@ -99,6 +109,21 @@ Page({
   profileParams: function(profile) {
     return 'profileId=' + encodeURIComponent(profile.id) +
       '&profileName=' + encodeURIComponent(profile.name)
+  },
+
+  editProfile: function(e) {
+    var profile = this.findProfile(e.currentTarget.dataset.id)
+    if (!profile) return
+    this.setData({
+      showForm: true,
+      editingId: profile.id,
+      form: {
+        name: profile.name || '',
+        relation: profile.relation || '暧昧对象',
+        type: profile.type || '',
+        note: profile.note || ''
+      }
+    })
   },
 
   goDiagnose: function(e) {

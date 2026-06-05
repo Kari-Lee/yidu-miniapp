@@ -16,7 +16,7 @@
   </view>
 
   <view wx:if="{{showForm}}" class="card" style="padding: 44rpx;">
-    <view class="serif" style="font-size: 34rpx; font-weight: 900; color: #1A1A2E; margin-bottom: 28rpx;">新建 Ta 的档案</view>
+    <view class="serif" style="font-size: 34rpx; font-weight: 900; color: #1A1A2E; margin-bottom: 28rpx;">{{editingId ? '编辑 Ta 的档案' : '新建 Ta 的档案'}}</view>
     <input class="profile-input" placeholder="Ta是谁，比如：小王 / 前任 / 那个不回消息的人" placeholder-style="color:#C8D6E5" value="{{form.name}}" bindinput="onNameInput" />
 
     <view class="field-title">关系</view>
@@ -36,7 +36,7 @@
 
     <view style="display: flex; gap: 20rpx; margin-top: 28rpx;">
       <button class="btn-reset" style="flex: 1;" bindtap="resetForm">取消</button>
-      <button class="btn-main" style="flex: 1;" bindtap="saveProfile">保存</button>
+      <button class="btn-main" style="flex: 1;" bindtap="saveProfile">{{editingId ? '更新' : '保存'}}</button>
     </view>
   </view>
 
@@ -64,6 +64,7 @@
       <button bindtap="goDiagnose" data-id="{{item.id}}">分析</button>
       <button bindtap="goCheck" data-id="{{item.id}}">发不发</button>
       <button bindtap="goPredict" data-id="{{item.id}}">预测</button>
+      <button bindtap="editProfile" data-id="{{item.id}}">编辑</button>
       <button class="danger" bindtap="deleteProfile" data-id="{{item.id}}">删除</button>
     </view>
   </view>
