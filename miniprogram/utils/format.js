@@ -78,18 +78,20 @@ function predict(res) {
 
 function record(item) {
   if (!item) return ''
+  var prefix = item.profileName ? '关系档案：' + item.profileName : ''
   if (item.kind === 'quiz') {
     return joinLines([
       '已读 Yidu 依恋测试',
+      prefix,
       '结果：' + (item.result && item.result.label || item.title || '未知'),
       item.result && item.result.desc || item.summary
     ])
   }
-  if (item.kind === 'diagnose') return diagnose(item.result || {})
-  if (item.kind === 'translate') return translate(item.result || {})
-  if (item.kind === 'check') return check(item.result || {})
-  if (item.kind === 'predict') return predict(item.result || {})
-  return joinLines([item.kindLabel, item.title, item.summary])
+  if (item.kind === 'diagnose') return joinLines([prefix, diagnose(item.result || {})])
+  if (item.kind === 'translate') return joinLines([prefix, translate(item.result || {})])
+  if (item.kind === 'check') return joinLines([prefix, check(item.result || {})])
+  if (item.kind === 'predict') return joinLines([prefix, predict(item.result || {})])
+  return joinLines([item.kindLabel, prefix, item.title, item.summary])
 }
 
 module.exports = {

@@ -23,6 +23,7 @@
     </view>
 
     <view class="serif" style="font-size: 34rpx; font-weight: 900; color: #1A1A2E; line-height: 1.4; margin-bottom: 12rpx;">{{item.title}}</view>
+    <view wx:if="{{item.profileName}}" style="font-size: 22rpx; color: #B8860B; font-weight: 800; margin-bottom: 10rpx;">关系档案：{{item.profileName}}</view>
     <view style="font-size: 26rpx; color: rgba(26,26,46,0.72); line-height: 1.8;">{{item.summary}}</view>
 
     <view wx:if="{{item.input}}" style="margin-top: 20rpx; padding: 22rpx 26rpx; border-radius: 24rpx; background: #F8FAFB; color: #8395A7; font-size: 24rpx; line-height: 1.7;">{{item.input}}</view>

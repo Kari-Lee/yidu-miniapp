@@ -54,6 +54,13 @@
   padding: 40rpx;
 }
 
+.latest-block {
+  margin-top: 20rpx;
+  padding: 24rpx 28rpx;
+  border-radius: 24rpx;
+  background: rgba(184,134,11,0.08);
+}
+
 .action-grid {
   display: grid;
   grid-template-columns: repeat(4, 1fr);

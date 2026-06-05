@@ -18,6 +18,7 @@
         <view style="font-size: 22rpx; color: #C8D6E5;">{{record.timeText}}</view>
       </view>
       <view class="serif" style="font-size: 44rpx; font-weight: 900; color: #1A1A2E; line-height: 1.35;">{{record.title}}</view>
+      <view wx:if="{{record.profileName}}" style="font-size: 23rpx; color: #B8860B; font-weight: 900; margin-top: 14rpx;">关系档案：{{record.profileName}}</view>
       <view style="font-size: 27rpx; color: rgba(26,26,46,0.72); line-height: 1.8; margin-top: 16rpx;">{{record.summary}}</view>
       <view wx:if="{{record.input}}" class="input-block">{{record.input}}</view>
       <view wx:if="{{record.imageCount}}" style="margin-top: 16rpx; color: #00B894; font-size: 24rpx; font-weight: 800;">含 {{record.imageCount}} 张截图</view>

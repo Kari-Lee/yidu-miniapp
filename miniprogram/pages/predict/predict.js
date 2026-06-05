@@ -13,6 +13,7 @@ function safeDecode(v) {
 Page({
   data: {
     statusBarHeight: 0, step: 'input', text: '', ctx: '', err: null,
+    profileId: '', profileName: '',
     hasInput: false, loadingMsg: '', res: null,
     predBgs: ['#FFF5F3', '#FFF9E6', '#F0FFF4']
   },
@@ -20,7 +21,9 @@ Page({
   onLoad: function(options) {
     this.setData({
       statusBarHeight: getApp().globalData.statusBarHeight,
-      ctx: options && options.ctx ? safeDecode(options.ctx) : ''
+      ctx: options && options.ctx ? safeDecode(options.ctx) : '',
+      profileId: options && options.profileId ? safeDecode(options.profileId) : '',
+      profileName: options && options.profileName ? safeDecode(options.profileName) : ''
     })
   },
   onUnload: function() { this.stopLoading() },
@@ -55,6 +58,8 @@ Page({
         title: res.stage || '感情预测',
         summary: res.stage_desc || res.todo || '已生成关系走向预测',
         input: self.data.text.slice(0, 80),
+        profileId: self.data.profileId,
+        profileName: self.data.profileName,
         result: res
       })
       self.setData({ step: 'result', res: res })

@@ -1,5 +1,6 @@
 var D = require('../../utils/data')
 var Profiles = require('../../utils/profiles')
+var H = require('../../utils/history')
 var Share = require('../../utils/share')
 
 var EMPTY_FORM = { name: '', relation: '暧昧对象', type: '', note: '' }
@@ -32,7 +33,11 @@ Page({
   goBack: function() { wx.navigateBack() },
 
   loadProfiles: function() {
-    this.setData({ profiles: Profiles.getProfiles() })
+    var profiles = Profiles.getProfiles().map(function(profile) {
+      var latest = H.getLatestByProfile(profile.id)
+      return Object.assign({}, profile, { latest: latest })
+    })
+    this.setData({ profiles: profiles })
   },
 
   toggleForm: function() {
@@ -91,25 +96,30 @@ Page({
     ].filter(Boolean).join('\n')
   },
 
+  profileParams: function(profile) {
+    return 'profileId=' + encodeURIComponent(profile.id) +
+      '&profileName=' + encodeURIComponent(profile.name)
+  },
+
   goDiagnose: function(e) {
     var profile = this.findProfile(e.currentTarget.dataset.id)
     if (!profile) return
     Profiles.touchProfile(profile.id)
-    wx.navigateTo({ url: '/pages/diagnose/diagnose?ctx=' + encodeURIComponent(this.profileContext(profile)) })
+    wx.navigateTo({ url: '/pages/diagnose/diagnose?ctx=' + encodeURIComponent(this.profileContext(profile)) + '&' + this.profileParams(profile) })
   },
 
   goPredict: function(e) {
     var profile = this.findProfile(e.currentTarget.dataset.id)
     if (!profile) return
     Profiles.touchProfile(profile.id)
-    wx.navigateTo({ url: '/pages/predict/predict?ctx=' + encodeURIComponent(this.profileContext(profile)) })
+    wx.navigateTo({ url: '/pages/predict/predict?ctx=' + encodeURIComponent(this.profileContext(profile)) + '&' + this.profileParams(profile) })
   },
 
   goCheck: function(e) {
     var profile = this.findProfile(e.currentTarget.dataset.id)
     if (!profile) return
     Profiles.touchProfile(profile.id)
-    wx.navigateTo({ url: '/pages/check/check?pType=' + (profile.type || '') })
+    wx.navigateTo({ url: '/pages/check/check?pType=' + (profile.type || '') + '&' + this.profileParams(profile) })
   },
 
   deleteProfile: function(e) {

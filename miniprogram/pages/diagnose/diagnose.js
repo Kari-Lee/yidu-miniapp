@@ -95,6 +95,7 @@ function hasInput(text, imgs) {
 Page({
   data: {
     statusBarHeight: 0, step: 'input', text: '', ctx: '', imgs: [], err: null,
+    profileId: '', profileName: '',
     hasInput: false, loadingMsg: '', res: null,
     userTI: null, partnerTI: null, userGrad: '', partnerGrad: '', userBg: '', partnerBg: ''
   },
@@ -103,7 +104,9 @@ Page({
   onLoad: function(options) {
     this.setData({
       statusBarHeight: getApp().globalData.statusBarHeight,
-      ctx: options && options.ctx ? safeDecode(options.ctx) : ''
+      ctx: options && options.ctx ? safeDecode(options.ctx) : '',
+      profileId: options && options.profileId ? safeDecode(options.profileId) : '',
+      profileName: options && options.profileName ? safeDecode(options.profileName) : ''
     })
   },
 
@@ -205,6 +208,8 @@ Page({
         summary: res.match || '已生成双方依恋分析',
         input: self.data.text.slice(0, 80),
         imageCount: self.data.imgs.length,
+        profileId: self.data.profileId,
+        profileName: self.data.profileName,
         result: res
       })
       self.setData({

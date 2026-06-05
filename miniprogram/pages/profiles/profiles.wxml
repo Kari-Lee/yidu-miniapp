@@ -55,6 +55,10 @@
     <view class="serif" style="font-size: 42rpx; font-weight: 900; color: #1A1A2E; line-height: 1.35;">{{item.name}}</view>
     <view style="font-size: 24rpx; color: #8395A7; margin-top: 8rpx;">疑似类型：{{item.typeLabel || '未知'}}</view>
     <view wx:if="{{item.note}}" style="margin-top: 20rpx; padding: 24rpx 28rpx; border-radius: 24rpx; background: #F8FAFB; color: rgba(26,26,46,0.75); font-size: 25rpx; line-height: 1.8;">{{item.note}}</view>
+    <view wx:if="{{item.latest}}" class="latest-block">
+      <view style="font-size: 22rpx; color: #B8860B; font-weight: 900; margin-bottom: 8rpx;">最近分析 · {{item.latest.kindLabel}} · {{item.latest.timeText}}</view>
+      <view style="font-size: 25rpx; color: rgba(26,26,46,0.76); line-height: 1.7;">{{item.latest.title}}</view>
+    </view>
 
     <view class="action-grid">
       <button bindtap="goDiagnose" data-id="{{item.id}}">分析</button>

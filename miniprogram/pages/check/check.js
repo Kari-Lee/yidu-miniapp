@@ -6,9 +6,14 @@ var Share = require('../../utils/share')
 var Format = require('../../utils/format')
 var MSGS = ["评估杀伤力", "模拟Ta反应"]
 
+function safeDecode(v) {
+  try { return decodeURIComponent(v) } catch(e) { return v || '' }
+}
+
 Page({
   data: {
     statusBarHeight: 0, step: 'input', text: '', pType: '', err: null,
+    profileId: '', profileName: '',
     hasInput: false, loadingMsg: '', res: null,
     typeOptions: [
       { key:'avoidant', emoji:'🧊', label:'回避型', color:'#0984E3', bg:'rgba(9,132,227,0.08)' },
@@ -21,7 +26,9 @@ Page({
   onLoad: function(options) {
     this.setData({
       statusBarHeight: getApp().globalData.statusBarHeight,
-      pType: options && options.pType ? options.pType : ''
+      pType: options && options.pType ? options.pType : '',
+      profileId: options && options.profileId ? safeDecode(options.profileId) : '',
+      profileName: options && options.profileName ? safeDecode(options.profileName) : ''
     })
   },
   onUnload: function() { this.stopLoading() },
@@ -55,6 +62,8 @@ Page({
         title: res.verdict || '消息检测',
         summary: res.reason || res.prediction || '已生成发送建议',
         input: self.data.text.slice(0, 80),
+        profileId: self.data.profileId,
+        profileName: self.data.profileName,
         result: res
       })
       self.setData({ step: 'result', res: res })
