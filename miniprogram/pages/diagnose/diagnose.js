@@ -102,6 +102,7 @@ Page({
   data: {
     statusBarHeight: 0, step: 'input', text: '', ctx: '', imgs: [], err: null,
     initialCtx: '', profileId: '', profileName: '', profileHistoryCount: 0, contextTip: '',
+    ctxEnabled: false, initialCtxEnabled: false, ctxPreviewOpen: false,
     hasInput: false, loadingMsg: '', res: null,
     userTI: null, partnerTI: null, userGrad: '', partnerGrad: '', userBg: '', partnerBg: '',
     profileSynced: false
@@ -117,6 +118,8 @@ Page({
       statusBarHeight: getApp().globalData.statusBarHeight,
       ctx: ctx,
       initialCtx: ctx,
+      ctxEnabled: !!ctx,
+      initialCtxEnabled: !!ctx,
       profileId: profileId,
       profileName: profileName,
       profileHistoryCount: historyCount,
@@ -139,6 +142,14 @@ Page({
   },
 
   onCtxInput: function(e) { this.setData({ ctx: e.detail.value }) },
+
+  toggleCtxEnabled: function(e) {
+    this.setData({ ctxEnabled: e.detail.value })
+  },
+
+  toggleCtxPreview: function() {
+    this.setData({ ctxPreviewOpen: !this.data.ctxPreviewOpen })
+  },
 
   chooseImg: function() {
     var self = this
@@ -191,7 +202,18 @@ Page({
   backToInput: function() { this.setData({ step: 'input' }) },
 
   resetInput: function() {
-    this.setData({ step: 'input', text: '', ctx: this.data.initialCtx, imgs: [], err: null, hasInput: false, res: null, profileSynced: false })
+    this.setData({
+      step: 'input',
+      text: '',
+      ctx: this.data.initialCtx,
+      ctxEnabled: this.data.initialCtxEnabled,
+      ctxPreviewOpen: false,
+      imgs: [],
+      err: null,
+      hasInput: false,
+      res: null,
+      profileSynced: false
+    })
   },
 
   submit: function() {
@@ -205,7 +227,8 @@ Page({
     var n = 0
     self._timer = setInterval(function() { n++; self.setData({ loadingMsg: MSGS[n % MSGS.length] }) }, 1200)
 
-    var um = (self.data.ctx ? '关系背景：' + self.data.ctx + '\n\n' : '') +
+    var ctx = (!self.data.contextTip || self.data.ctxEnabled) ? self.data.ctx : ''
+    var um = (ctx ? '关系背景：' + ctx + '\n\n' : '') +
       (self.data.text.trim() ? '聊天记录：\n' + self.data.text : '请分析这些聊天记录截图')
 
     readImagesAsBase64(self.data.imgs).then(function(images) {

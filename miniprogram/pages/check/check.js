@@ -19,6 +19,7 @@ Page({
   data: {
     statusBarHeight: 0, step: 'input', text: '', pType: '', ctx: '', err: null,
     initialPType: '', profileId: '', profileName: '', profileHistoryCount: 0, contextTip: '',
+    ctxEnabled: false, initialCtxEnabled: false, ctxPreviewOpen: false,
     hasInput: false, loadingMsg: '', res: null,
     typeOptions: [
       { key:'avoidant', emoji:'🧊', label:'回避型', color:'#0984E3', bg:'rgba(9,132,227,0.08)' },
@@ -39,6 +40,8 @@ Page({
       pType: pType,
       initialPType: pType,
       ctx: ctx,
+      ctxEnabled: !!ctx,
+      initialCtxEnabled: !!ctx,
       profileId: profileId,
       profileName: profileName,
       profileHistoryCount: historyCount,
@@ -54,7 +57,20 @@ Page({
   },
   onInput: function(e) { this.setData({ text: e.detail.value, hasInput: !!e.detail.value.trim() }) },
   pickType: function(e) { this.setData({ pType: e.currentTarget.dataset.key }) },
-  resetInput: function() { this.setData({ step: 'input', text: '', pType: this.data.initialPType, err: null, res: null, hasInput: false }) },
+  toggleCtxEnabled: function(e) { this.setData({ ctxEnabled: e.detail.value }) },
+  toggleCtxPreview: function() { this.setData({ ctxPreviewOpen: !this.data.ctxPreviewOpen }) },
+  resetInput: function() {
+    this.setData({
+      step: 'input',
+      text: '',
+      pType: this.data.initialPType,
+      ctxEnabled: this.data.initialCtxEnabled,
+      ctxPreviewOpen: false,
+      err: null,
+      res: null,
+      hasInput: false
+    })
+  },
 
   submit: function() {
     if (!this.data.text.trim()) return
@@ -65,7 +81,8 @@ Page({
     self._timer = setInterval(function() { n++; self.setData({ loadingMsg: MSGS[n % MSGS.length] }) }, 1200)
 
     var typeLabel = self.data.pType ? (D.TI[self.data.pType] || {}).label || '未知' : '未知'
-    var um = (self.data.ctx ? '关系背景：' + self.data.ctx + '\n\n' : '') +
+    var ctx = (!self.data.contextTip || self.data.ctxEnabled) ? self.data.ctx : ''
+    var um = (ctx ? '关系背景：' + ctx + '\n\n' : '') +
       '对方类型：' + typeLabel + '\n\n我想发：' + self.data.text
 
     API.callAI(D.P.check, um, null).then(function(res) {
