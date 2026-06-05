@@ -10,6 +10,10 @@
       <view class="notice-title">先救消息，再救关系</view>
       <view>别贴隐私信息。这里给的是沟通风险提示，不是让 AI 替你谈恋爱，最后按不按发送还是你负责。</view>
     </view>
+    <view wx:if="{{contextTip}}" class="context-tip">
+      <view class="context-tip-title">已带入关系背景</view>
+      <view>{{contextTip}}，提交时会随这条消息一起给 AI。</view>
+    </view>
     <view class="card" style="padding: 52rpx;">
       <view style="margin-bottom: 36rpx;">
         <view class="serif" style="font-size: 30rpx; font-weight: 700; color: #1A1A2E; margin-bottom: 24rpx;">Ta的依恋类型</view>

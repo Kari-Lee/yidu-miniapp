@@ -2,6 +2,7 @@ var D = require('../../utils/data')
 var Profiles = require('../../utils/profiles')
 var H = require('../../utils/history')
 var Share = require('../../utils/share')
+var ProfileContext = require('../../utils/profileContext')
 
 var EMPTY_FORM = { name: '', relation: '暧昧对象', type: '', note: '' }
 
@@ -119,20 +120,6 @@ Page({
     })
   },
 
-  profileContext: function(profile) {
-    return [
-      '关系档案：' + profile.name,
-      '关系：' + profile.relation,
-      'Ta的疑似依恋类型：' + (profile.typeLabel || '未知'),
-      profile.note ? '备注：' + profile.note : ''
-    ].filter(Boolean).join('\n')
-  },
-
-  profileParams: function(profile) {
-    return 'profileId=' + encodeURIComponent(profile.id) +
-      '&profileName=' + encodeURIComponent(profile.name)
-  },
-
   editProfile: function(e) {
     this.openEditor(e.currentTarget.dataset.id)
   },
@@ -145,21 +132,21 @@ Page({
     var profile = this.findProfile(e.currentTarget.dataset.id)
     if (!profile) return
     Profiles.touchProfile(profile.id)
-    wx.navigateTo({ url: '/pages/diagnose/diagnose?ctx=' + encodeURIComponent(this.profileContext(profile)) + '&' + this.profileParams(profile) })
+    wx.navigateTo({ url: '/pages/diagnose/diagnose?' + ProfileContext.query(profile) })
   },
 
   goPredict: function(e) {
     var profile = this.findProfile(e.currentTarget.dataset.id)
     if (!profile) return
     Profiles.touchProfile(profile.id)
-    wx.navigateTo({ url: '/pages/predict/predict?ctx=' + encodeURIComponent(this.profileContext(profile)) + '&' + this.profileParams(profile) })
+    wx.navigateTo({ url: '/pages/predict/predict?' + ProfileContext.query(profile) })
   },
 
   goCheck: function(e) {
     var profile = this.findProfile(e.currentTarget.dataset.id)
     if (!profile) return
     Profiles.touchProfile(profile.id)
-    wx.navigateTo({ url: '/pages/check/check?pType=' + (profile.type || '') + '&' + this.profileParams(profile) })
+    wx.navigateTo({ url: '/pages/check/check?pType=' + (profile.type || '') + '&' + ProfileContext.query(profile) })
   },
 
   deleteProfile: function(e) {

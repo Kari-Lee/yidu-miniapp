@@ -10,10 +10,15 @@ function safeDecode(v) {
   try { return decodeURIComponent(v) } catch(e) { return v || '' }
 }
 
+function makeContextTip(name, count) {
+  var n = parseInt(count || 0, 10) || 0
+  return '已带入' + (name || '这段关系') + '的档案' + (n ? '和' + n + '条历史摘要' : '')
+}
+
 Page({
   data: {
-    statusBarHeight: 0, step: 'input', text: '', pType: '', err: null,
-    profileId: '', profileName: '',
+    statusBarHeight: 0, step: 'input', text: '', pType: '', ctx: '', err: null,
+    initialPType: '', profileId: '', profileName: '', profileHistoryCount: 0, contextTip: '',
     hasInput: false, loadingMsg: '', res: null,
     typeOptions: [
       { key:'avoidant', emoji:'🧊', label:'回避型', color:'#0984E3', bg:'rgba(9,132,227,0.08)' },
@@ -24,11 +29,20 @@ Page({
   },
   _timer: null,
   onLoad: function(options) {
+    var profileId = options && options.profileId ? safeDecode(options.profileId) : ''
+    var profileName = options && options.profileName ? safeDecode(options.profileName) : ''
+    var historyCount = parseInt(options && options.profileHistoryCount || 0, 10) || 0
+    var ctx = options && options.ctx ? safeDecode(options.ctx) : ''
+    var pType = options && options.pType ? options.pType : ''
     this.setData({
       statusBarHeight: getApp().globalData.statusBarHeight,
-      pType: options && options.pType ? options.pType : '',
-      profileId: options && options.profileId ? safeDecode(options.profileId) : '',
-      profileName: options && options.profileName ? safeDecode(options.profileName) : ''
+      pType: pType,
+      initialPType: pType,
+      ctx: ctx,
+      profileId: profileId,
+      profileName: profileName,
+      profileHistoryCount: historyCount,
+      contextTip: profileId && ctx ? makeContextTip(profileName, historyCount) : ''
     })
   },
   onUnload: function() { this.stopLoading() },
@@ -40,7 +54,7 @@ Page({
   },
   onInput: function(e) { this.setData({ text: e.detail.value, hasInput: !!e.detail.value.trim() }) },
   pickType: function(e) { this.setData({ pType: e.currentTarget.dataset.key }) },
-  resetInput: function() { this.setData({ step: 'input', text: '', pType: '', err: null, res: null, hasInput: false }) },
+  resetInput: function() { this.setData({ step: 'input', text: '', pType: this.data.initialPType, err: null, res: null, hasInput: false }) },
 
   submit: function() {
     if (!this.data.text.trim()) return
@@ -51,7 +65,8 @@ Page({
     self._timer = setInterval(function() { n++; self.setData({ loadingMsg: MSGS[n % MSGS.length] }) }, 1200)
 
     var typeLabel = self.data.pType ? (D.TI[self.data.pType] || {}).label || '未知' : '未知'
-    var um = '对方类型：' + typeLabel + '\n\n我想发：' + self.data.text
+    var um = (self.data.ctx ? '关系背景：' + self.data.ctx + '\n\n' : '') +
+      '对方类型：' + typeLabel + '\n\n我想发：' + self.data.text
 
     API.callAI(D.P.check, um, null).then(function(res) {
       self.stopLoading()

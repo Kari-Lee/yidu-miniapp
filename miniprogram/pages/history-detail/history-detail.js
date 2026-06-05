@@ -2,6 +2,7 @@ var H = require('../../utils/history')
 var Format = require('../../utils/format')
 var D = require('../../utils/data')
 var Profiles = require('../../utils/profiles')
+var ProfileContext = require('../../utils/profileContext')
 
 Page({
   data: {
@@ -68,8 +69,7 @@ Page({
 
   profileParams: function(record) {
     if (!record.profileId) return ''
-    return 'profileId=' + encodeURIComponent(record.profileId) +
-      '&profileName=' + encodeURIComponent(record.profileName || '')
+    return ProfileContext.queryById(record.profileId, record.profileName || '')
   },
 
   reAnalyze: function() {
@@ -84,7 +84,9 @@ Page({
     } else if (record.kind === 'translate') {
       wx.navigateTo({ url: '/pages/translate/translate' })
     } else if (record.kind === 'check') {
-      wx.navigateTo({ url: '/pages/check/check' + joiner })
+      var profile = record.profileId ? ProfileContext.findProfile(record.profileId) : null
+      var checkParams = profile && profile.type ? 'pType=' + profile.type + (params ? '&' + params : '') : params
+      wx.navigateTo({ url: '/pages/check/check' + (checkParams ? '?' + checkParams : '') })
     } else if (record.kind === 'predict') {
       wx.navigateTo({ url: '/pages/predict/predict' + joiner })
     }

@@ -25,6 +25,11 @@ function safeDecode(v) {
   try { return decodeURIComponent(v) } catch(e) { return v || '' }
 }
 
+function makeContextTip(name, count) {
+  var n = parseInt(count || 0, 10) || 0
+  return '已带入' + (name || '这段关系') + '的档案' + (n ? '和' + n + '条历史摘要' : '')
+}
+
 function sizeText(bytes) {
   if (!bytes) return '未知大小'
   if (bytes >= 1024 * 1024) return (bytes / 1024 / 1024).toFixed(1) + 'MB'
@@ -96,7 +101,7 @@ function hasInput(text, imgs) {
 Page({
   data: {
     statusBarHeight: 0, step: 'input', text: '', ctx: '', imgs: [], err: null,
-    profileId: '', profileName: '',
+    initialCtx: '', profileId: '', profileName: '', profileHistoryCount: 0, contextTip: '',
     hasInput: false, loadingMsg: '', res: null,
     userTI: null, partnerTI: null, userGrad: '', partnerGrad: '', userBg: '', partnerBg: '',
     profileSynced: false
@@ -104,11 +109,18 @@ Page({
   _timer: null,
 
   onLoad: function(options) {
+    var profileId = options && options.profileId ? safeDecode(options.profileId) : ''
+    var profileName = options && options.profileName ? safeDecode(options.profileName) : ''
+    var historyCount = parseInt(options && options.profileHistoryCount || 0, 10) || 0
+    var ctx = options && options.ctx ? safeDecode(options.ctx) : ''
     this.setData({
       statusBarHeight: getApp().globalData.statusBarHeight,
-      ctx: options && options.ctx ? safeDecode(options.ctx) : '',
-      profileId: options && options.profileId ? safeDecode(options.profileId) : '',
-      profileName: options && options.profileName ? safeDecode(options.profileName) : ''
+      ctx: ctx,
+      initialCtx: ctx,
+      profileId: profileId,
+      profileName: profileName,
+      profileHistoryCount: historyCount,
+      contextTip: profileId && ctx ? makeContextTip(profileName, historyCount) : ''
     })
   },
 
@@ -179,7 +191,7 @@ Page({
   backToInput: function() { this.setData({ step: 'input' }) },
 
   resetInput: function() {
-    this.setData({ step: 'input', text: '', ctx: '', imgs: [], err: null, hasInput: false, res: null, profileSynced: false })
+    this.setData({ step: 'input', text: '', ctx: this.data.initialCtx, imgs: [], err: null, hasInput: false, res: null, profileSynced: false })
   },
 
   submit: function() {

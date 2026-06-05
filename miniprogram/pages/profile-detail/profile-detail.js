@@ -2,6 +2,7 @@ var D = require('../../utils/data')
 var Profiles = require('../../utils/profiles')
 var H = require('../../utils/history')
 var Share = require('../../utils/share')
+var ProfileContext = require('../../utils/profileContext')
 
 function safeDecode(v) {
   try { return decodeURIComponent(v) } catch(e) { return v || '' }
@@ -50,25 +51,6 @@ Page({
     wx.navigateBack()
   },
 
-  profileContext: function() {
-    var profile = this.data.profile
-    if (!profile) return ''
-    return [
-      '关系档案：' + profile.name,
-      '关系：' + profile.relation,
-      'Ta的疑似依恋类型：' + (profile.typeLabel || '未知'),
-      profile.note ? '备注：' + profile.note : '',
-      this.data.latest ? '最近一次分析：' + this.data.latest.kindLabel + '，' + this.data.latest.summary : ''
-    ].filter(Boolean).join('\n')
-  },
-
-  profileParams: function() {
-    var profile = this.data.profile
-    if (!profile) return ''
-    return 'profileId=' + encodeURIComponent(profile.id) +
-      '&profileName=' + encodeURIComponent(profile.name)
-  },
-
   touchAndGo: function(url) {
     var profile = this.data.profile
     if (!profile) return
@@ -77,19 +59,21 @@ Page({
   },
 
   goDiagnose: function() {
-    var params = this.profileParams()
-    this.touchAndGo('/pages/diagnose/diagnose?ctx=' + encodeURIComponent(this.profileContext()) + '&' + params)
+    var profile = this.data.profile
+    if (!profile) return
+    this.touchAndGo('/pages/diagnose/diagnose?' + ProfileContext.query(profile))
   },
 
   goCheck: function() {
     var profile = this.data.profile
     if (!profile) return
-    this.touchAndGo('/pages/check/check?pType=' + (profile.type || '') + '&' + this.profileParams())
+    this.touchAndGo('/pages/check/check?pType=' + (profile.type || '') + '&' + ProfileContext.query(profile))
   },
 
   goPredict: function() {
-    var params = this.profileParams()
-    this.touchAndGo('/pages/predict/predict?ctx=' + encodeURIComponent(this.profileContext()) + '&' + params)
+    var profile = this.data.profile
+    if (!profile) return
+    this.touchAndGo('/pages/predict/predict?' + ProfileContext.query(profile))
   },
 
   goEdit: function() {

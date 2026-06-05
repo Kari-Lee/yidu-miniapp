@@ -10,20 +10,32 @@ function safeDecode(v) {
   try { return decodeURIComponent(v) } catch(e) { return v || '' }
 }
 
+function makeContextTip(name, count) {
+  var n = parseInt(count || 0, 10) || 0
+  return '已带入' + (name || '这段关系') + '的档案' + (n ? '和' + n + '条历史摘要' : '')
+}
+
 Page({
   data: {
     statusBarHeight: 0, step: 'input', text: '', ctx: '', err: null,
-    profileId: '', profileName: '',
+    initialCtx: '', profileId: '', profileName: '', profileHistoryCount: 0, contextTip: '',
     hasInput: false, loadingMsg: '', res: null,
     predBgs: ['#FFF5F3', '#FFF9E6', '#F0FFF4']
   },
   _timer: null,
   onLoad: function(options) {
+    var profileId = options && options.profileId ? safeDecode(options.profileId) : ''
+    var profileName = options && options.profileName ? safeDecode(options.profileName) : ''
+    var historyCount = parseInt(options && options.profileHistoryCount || 0, 10) || 0
+    var ctx = options && options.ctx ? safeDecode(options.ctx) : ''
     this.setData({
       statusBarHeight: getApp().globalData.statusBarHeight,
-      ctx: options && options.ctx ? safeDecode(options.ctx) : '',
-      profileId: options && options.profileId ? safeDecode(options.profileId) : '',
-      profileName: options && options.profileName ? safeDecode(options.profileName) : ''
+      ctx: ctx,
+      initialCtx: ctx,
+      profileId: profileId,
+      profileName: profileName,
+      profileHistoryCount: historyCount,
+      contextTip: profileId && ctx ? makeContextTip(profileName, historyCount) : ''
     })
   },
   onUnload: function() { this.stopLoading() },
@@ -37,7 +49,7 @@ Page({
   onCtxInput: function(e) { this.setData({ ctx: e.detail.value }) },
   nextStep: function() { if (this.data.hasInput) this.setData({ step: 'context' }) },
   backToInput: function() { this.setData({ step: 'input' }) },
-  resetInput: function() { this.setData({ step: 'input', text: '', ctx: '', err: null, res: null, hasInput: false }) },
+  resetInput: function() { this.setData({ step: 'input', text: '', ctx: this.data.initialCtx, err: null, res: null, hasInput: false }) },
 
   submit: function() {
     var self = this

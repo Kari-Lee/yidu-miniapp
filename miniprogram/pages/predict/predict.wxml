@@ -11,6 +11,10 @@
       <view class="notice-title">预测不是判命</view>
       <view>请删掉隐私信息。AI 会根据聊天模式推测关系走向，结果只供参考，别把概率当圣旨。</view>
     </view>
+    <view wx:if="{{contextTip}}" class="context-tip">
+      <view class="context-tip-title">已带入关系背景</view>
+      <view>{{contextTip}}，提交时会随本次内容一起给 AI。</view>
+    </view>
     <view class="card" style="padding: 52rpx;">
       <textarea style="width: 100%; padding: 28rpx 8rpx; background: transparent; border: none; color: #1A1A2E; font-size: 30rpx; line-height: 1.9;" maxlength="-1" auto-height placeholder="粘贴聊天记录..." placeholder-style="color: #C8D6E5" value="{{text}}" bindinput="onInput"></textarea>
     </view>
@@ -22,6 +26,10 @@
     <view class="card" style="padding: 56rpx;">
       <view class="serif" style="font-size: 44rpx; font-weight: 700; color: #1A1A2E; margin-bottom: 16rpx;">Ta是你的什么人？</view>
       <view style="font-size: 26rpx; color: #8395A7; margin-bottom: 40rpx;">比如：暧昧三个月 / 同事 / Ta总是已读不回</view>
+      <view wx:if="{{contextTip}}" class="context-tip" style="margin-bottom: 26rpx;">
+        <view class="context-tip-title">已带入关系背景</view>
+        <view>{{contextTip}}，你也可以继续补充。</view>
+      </view>
       <textarea style="width: 100%; padding: 28rpx 8rpx; background: transparent; border: none; border-top: 2rpx solid rgba(0,0,0,0.04); color: #1A1A2E; font-size: 30rpx; line-height: 1.9;" auto-height placeholder="正在折磨我的人..." placeholder-style="color: #C8D6E5" value="{{ctx}}" bindinput="onCtxInput"></textarea>
     </view>
     <view style="display: flex; gap: 20rpx; margin-top: 28rpx;">
