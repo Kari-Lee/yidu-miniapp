@@ -47,7 +47,7 @@
     <button class="btn-main" style="margin-top: 32rpx;" bindtap="toggleForm">新建档案</button>
   </view>
 
-  <view wx:for="{{profiles}}" wx:key="id" class="card profile-card">
+  <view wx:for="{{profiles}}" wx:key="id" class="card profile-card" data-id="{{item.id}}" bindtap="goDetail">
     <view style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16rpx;">
       <view style="padding: 8rpx 20rpx; border-radius: 999rpx; background: #F8FAFB; color: #B8860B; font-size: 22rpx; font-weight: 800;">{{item.relation}}</view>
       <view style="font-size: 22rpx; color: #C8D6E5;">{{item.timeText}}</view>
@@ -59,13 +59,14 @@
       <view style="font-size: 22rpx; color: #B8860B; font-weight: 900; margin-bottom: 8rpx;">最近分析 · {{item.latest.kindLabel}} · {{item.latest.timeText}}</view>
       <view style="font-size: 25rpx; color: rgba(26,26,46,0.76); line-height: 1.7;">{{item.latest.title}}</view>
     </view>
+    <view class="detail-link">查看档案详情 ›</view>
 
     <view class="action-grid">
-      <button bindtap="goDiagnose" data-id="{{item.id}}">分析</button>
-      <button bindtap="goCheck" data-id="{{item.id}}">发不发</button>
-      <button bindtap="goPredict" data-id="{{item.id}}">预测</button>
-      <button bindtap="editProfile" data-id="{{item.id}}">编辑</button>
-      <button class="danger" bindtap="deleteProfile" data-id="{{item.id}}">删除</button>
+      <button catchtap="goDiagnose" data-id="{{item.id}}">分析</button>
+      <button catchtap="goCheck" data-id="{{item.id}}">发不发</button>
+      <button catchtap="goPredict" data-id="{{item.id}}">预测</button>
+      <button catchtap="editProfile" data-id="{{item.id}}">编辑</button>
+      <button class="danger" catchtap="deleteProfile" data-id="{{item.id}}">删除</button>
     </view>
   </view>
 </view>

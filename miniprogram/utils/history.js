@@ -29,6 +29,13 @@ function getLatestByProfile(profileId) {
   })[0] || null
 }
 
+function getRecordsByProfile(profileId) {
+  if (!profileId) return []
+  return getRecords().filter(function(item) {
+    return item.profileId === profileId
+  })
+}
+
 function addRecord(record) {
   var ts = Date.now()
   var item = Object.assign({
@@ -54,6 +61,7 @@ module.exports = {
   addRecord: addRecord,
   getRecords: getRecords,
   getRecord: getRecord,
+  getRecordsByProfile: getRecordsByProfile,
   getLatestByProfile: getLatestByProfile,
   clearRecords: clearRecords,
   removeRecord: removeRecord

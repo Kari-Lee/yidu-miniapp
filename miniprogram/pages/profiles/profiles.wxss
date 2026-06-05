@@ -61,6 +61,13 @@
   background: rgba(184,134,11,0.08);
 }
 
+.detail-link {
+  margin-top: 20rpx;
+  color: #B8860B;
+  font-size: 24rpx;
+  font-weight: 900;
+}
+
 .action-grid {
   display: grid;
   grid-template-columns: repeat(3, 1fr);

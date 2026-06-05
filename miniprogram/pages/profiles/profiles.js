@@ -5,6 +5,10 @@ var Share = require('../../utils/share')
 
 var EMPTY_FORM = { name: '', relation: '暧昧对象', type: '', note: '' }
 
+function safeDecode(v) {
+  try { return decodeURIComponent(v) } catch(e) { return v || '' }
+}
+
 Page({
   data: {
     statusBarHeight: 0,
@@ -22,9 +26,12 @@ Page({
     ]
   },
 
-  onLoad: function() {
+  onLoad: function(options) {
     this.setData({ statusBarHeight: getApp().globalData.statusBarHeight })
     this.loadProfiles()
+    if (options && options.editId) {
+      this.openEditor(safeDecode(options.editId))
+    }
   },
 
   onShow: function() {
@@ -97,6 +104,21 @@ Page({
     return this.data.profiles.filter(function(item) { return item.id === id })[0]
   },
 
+  openEditor: function(id) {
+    var profile = this.findProfile(id)
+    if (!profile) return
+    this.setData({
+      showForm: true,
+      editingId: profile.id,
+      form: {
+        name: profile.name || '',
+        relation: profile.relation || '暧昧对象',
+        type: profile.type || '',
+        note: profile.note || ''
+      }
+    })
+  },
+
   profileContext: function(profile) {
     return [
       '关系档案：' + profile.name,
@@ -112,18 +134,11 @@ Page({
   },
 
   editProfile: function(e) {
-    var profile = this.findProfile(e.currentTarget.dataset.id)
-    if (!profile) return
-    this.setData({
-      showForm: true,
-      editingId: profile.id,
-      form: {
-        name: profile.name || '',
-        relation: profile.relation || '暧昧对象',
-        type: profile.type || '',
-        note: profile.note || ''
-      }
-    })
+    this.openEditor(e.currentTarget.dataset.id)
+  },
+
+  goDetail: function(e) {
+    wx.navigateTo({ url: '/pages/profile-detail/profile-detail?id=' + encodeURIComponent(e.currentTarget.dataset.id) })
   },
 
   goDiagnose: function(e) {

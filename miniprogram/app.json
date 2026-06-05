@@ -8,6 +8,7 @@
     "pages/predict/predict",
     "pages/history/history",
     "pages/profiles/profiles",
+    "pages/profile-detail/profile-detail",
     "pages/history-detail/history-detail"
   ],
   "window": {
