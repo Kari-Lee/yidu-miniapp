@@ -268,6 +268,28 @@ Page({
     return Share.diagnose()
   },
 
+  goReply: function() {
+    var res = this.data.res
+    if (!res) return
+    var task = [
+      '来源：聊天确诊',
+      '你：' + (res.user_label || '未知') + '，Ta：' + (res.partner_label || '未知'),
+      res.match ? '互动模式：' + res.match : '',
+      res.partner_advice ? '应对Ta：' + res.partner_advice : ''
+    ].filter(Boolean).join('\n')
+    var query = [
+      'mode=reply',
+      'replyTask=' + encodeURIComponent(task),
+      'pType=' + encodeURIComponent(res.partner_type || ''),
+      'profileId=' + encodeURIComponent(this.data.profileId || ''),
+      'profileName=' + encodeURIComponent(this.data.profileName || ''),
+      'profileHistoryCount=' + encodeURIComponent(this.data.profileHistoryCount || 0),
+      'ctxEnabled=' + (this.data.ctxEnabled ? '1' : '0'),
+      'ctx=' + encodeURIComponent(this.data.ctx || '')
+    ].join('&')
+    wx.navigateTo({ url: '/pages/check/check?' + query })
+  },
+
   copyResult: function() {
     if (!this.data.res) return
     wx.setClipboardData({ data: Format.diagnose(this.data.res) })

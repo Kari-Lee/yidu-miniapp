@@ -41,6 +41,11 @@
       <view>「{{item.result.alternative}}」</view>
     </view>
 
+    <view wx:if="{{item.kind === 'reply' && item.result.drafts && item.result.drafts.length}}" class="result-block">
+      <view style="color: #00B894; font-weight: 800; margin-bottom: 8rpx;">推荐回复</view>
+      <view>「{{item.result.drafts[0].text}}」</view>
+    </view>
+
     <view wx:if="{{item.kind === 'predict' && item.result.todo}}" class="result-block">
       <view style="color: #B8860B; font-weight: 800; margin-bottom: 8rpx;">现在该做</view>
       <view>{{item.result.todo}}</view>

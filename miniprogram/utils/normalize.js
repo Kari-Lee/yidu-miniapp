@@ -116,6 +116,32 @@ function normalizeCheck(res) {
   }
 }
 
+function normalizeReplyDrafts(list) {
+  return safeArray(list, [
+    { label: '稳一点', text: '我想把这件事说清楚，但不想用情绪逼你。你方便的时候，我们认真聊一下。', why: '不追问、不控诉，但把需求放到桌面上。' },
+    { label: '直一点', text: '我在意的是你的态度，不是你每次都必须立刻回复。你可以慢，但别让我一直猜。', why: '把真实需求说出来，减少试探。' },
+    { label: '收手版', text: '我先不继续追这个话题了。等你也愿意认真聊的时候再说。', why: '停止消耗，把主动权拿回来。' }
+  ]).slice(0, 3).map(function(item, idx) {
+    item = item || {}
+    return {
+      label: item.label || ['稳一点','直一点','收手版'][idx] || '版本',
+      text: item.text || '我想先冷静一下，等我们都能好好说话的时候再聊。',
+      why: item.why || '这版会比情绪化输出更稳。'
+    }
+  })
+}
+
+function normalizeReply(res) {
+  res = res || {}
+  var t = textOf(res, '先别用长篇大论赌对方会突然变清醒。短一点，稳一点。')
+  return {
+    strategy: res.strategy || t,
+    drafts: normalizeReplyDrafts(res.drafts),
+    avoid: res.avoid || '别发小作文、别连环追问、别用反话测试对方。',
+    note: res.note || ''
+  }
+}
+
 function normalizePredict(res) {
   res = res || {}
   var t = textOf(res, 'AI 已完成预测，但这次返回结构不完整。')
@@ -134,5 +160,6 @@ module.exports = {
   normalizeDiagnose: normalizeDiagnose,
   normalizeTranslate: normalizeTranslate,
   normalizeCheck: normalizeCheck,
+  normalizeReply: normalizeReply,
   normalizePredict: normalizePredict
 }

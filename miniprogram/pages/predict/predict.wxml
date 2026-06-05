@@ -127,6 +127,8 @@
       <view style="font-size: 30rpx; font-weight: 600; color: #1A1A2E; line-height: 1.9;">{{res.todo}}</view>
     </view>
 
+    <button class="btn-main" style="margin-top: 20rpx; background: #00B894;" bindtap="goReply">帮我写回复 ✍️</button>
+
     <view style="display: flex; gap: 20rpx; margin-top: 16rpx;">
       <button class="btn-reset" style="flex: 1;" bindtap="resetInput">再来一次 ↻</button>
       <button class="btn-reset" style="flex: 1;" bindtap="copyResult">复制</button>

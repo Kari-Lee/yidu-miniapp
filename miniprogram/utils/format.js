@@ -58,6 +58,25 @@ function check(res) {
   ])
 }
 
+function reply(res) {
+  res = res || {}
+  var drafts = (res.drafts || []).map(function(item, idx) {
+    item = item || {}
+    return joinLines([
+      (idx + 1) + '. ' + (item.label || '版本'),
+      item.text ? '「' + item.text + '」' : '',
+      item.why ? '理由：' + item.why : ''
+    ])
+  })
+  return joinLines([
+    '已读 Yidu 下一句怎么回',
+    res.strategy ? '策略：' + res.strategy : '',
+    drafts.length ? '可发送版本：\n' + drafts.join('\n') : '',
+    res.avoid ? '别发：' + res.avoid : '',
+    res.note ? '提醒：' + res.note : ''
+  ])
+}
+
 function predict(res) {
   res = res || {}
   var predictions = (res.predictions || []).map(function(item) {
@@ -90,6 +109,7 @@ function record(item) {
   if (item.kind === 'diagnose') return joinLines([prefix, diagnose(item.result || {})])
   if (item.kind === 'translate') return joinLines([prefix, translate(item.result || {})])
   if (item.kind === 'check') return joinLines([prefix, check(item.result || {})])
+  if (item.kind === 'reply') return joinLines([prefix, reply(item.result || {})])
   if (item.kind === 'predict') return joinLines([prefix, predict(item.result || {})])
   return joinLines([item.kindLabel, prefix, item.title, item.summary])
 }
@@ -99,6 +119,7 @@ module.exports = {
   diagnose: diagnose,
   translate: translate,
   check: check,
+  reply: reply,
   predict: predict,
   record: record
 }

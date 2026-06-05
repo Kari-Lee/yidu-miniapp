@@ -87,6 +87,13 @@ Page({
       var profile = record.profileId ? ProfileContext.findProfile(record.profileId) : null
       var checkParams = profile && profile.type ? 'pType=' + profile.type + (params ? '&' + params : '') : params
       wx.navigateTo({ url: '/pages/check/check' + (checkParams ? '?' + checkParams : '') })
+    } else if (record.kind === 'reply') {
+      var task = record.result && record.result.strategy ? '上一版回复策略：' + record.result.strategy : '请重新生成下一句回复。'
+      var replyProfile = record.profileId ? ProfileContext.findProfile(record.profileId) : null
+      var replyParams = 'mode=reply&replyTask=' + encodeURIComponent(task) +
+        (replyProfile && replyProfile.type ? '&pType=' + replyProfile.type : '') +
+        (params ? '&' + params : '')
+      wx.navigateTo({ url: '/pages/check/check?' + replyParams })
     } else if (record.kind === 'predict') {
       wx.navigateTo({ url: '/pages/predict/predict' + joiner })
     }

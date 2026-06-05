@@ -41,10 +41,22 @@
 
 .signal-row,
 .poss-row,
+.reply-row,
 .timeline-row {
   display: flex;
+}
+
+.signal-row,
+.poss-row,
+.timeline-row {
   gap: 18rpx;
   padding: 22rpx 0;
+  border-bottom: 2rpx solid rgba(0,0,0,0.04);
+}
+
+.reply-row {
+  display: block;
+  padding: 24rpx 0;
   border-bottom: 2rpx solid rgba(0,0,0,0.04);
 }
 

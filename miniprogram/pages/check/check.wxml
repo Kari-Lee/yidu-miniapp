@@ -7,8 +7,8 @@
   <view wx:if="{{step === 'input'}}" class="fu">
     <view wx:if="{{err}}" style="padding: 28rpx 36rpx; background: #FFF5F5; border-radius: 28rpx; margin-bottom: 28rpx; font-size: 26rpx; color: #E17055;">{{err}}</view>
     <view class="notice">
-      <view class="notice-title">先救消息，再救关系</view>
-      <view>别贴隐私信息。这里给的是沟通风险提示，不是让 AI 替你谈恋爱，最后按不按发送还是你负责。</view>
+      <view class="notice-title">{{isReplyMode ? '下一句怎么回' : '先救消息，再救关系'}}</view>
+      <view>{{isReplyMode ? '给你生成能发出去的话。不是帮你赢吵架，是帮你别输掉体面。' : '别贴隐私信息。这里给的是沟通风险提示，不是让 AI 替你谈恋爱，最后按不按发送还是你负责。'}}</view>
     </view>
     <view wx:if="{{contextTip}}" class="context-tip">
       <view class="context-tip-head">
@@ -39,9 +39,9 @@
           </view>
         </view>
       </view>
-      <textarea style="width: 100%; padding: 28rpx 8rpx; background: transparent; border: none; color: #1A1A2E; font-size: 30rpx; line-height: 1.9;" maxlength="-1" auto-height placeholder="你想发的消息..." placeholder-style="color: #C8D6E5" value="{{text}}" bindinput="onInput"></textarea>
+      <textarea style="width: 100%; padding: 28rpx 8rpx; background: transparent; border: none; color: #1A1A2E; font-size: 30rpx; line-height: 1.9;" maxlength="-1" auto-height placeholder="{{isReplyMode ? '你想表达什么？不填也可以直接生成...' : '你想发的消息...'}}" placeholder-style="color: #C8D6E5" value="{{text}}" bindinput="onInput"></textarea>
     </view>
-    <button class="btn-main" style="margin-top: 32rpx; background: {{hasInput ? '#00B894' : '#ddd'}};" disabled="{{!hasInput}}" bindtap="submit">检测 💊</button>
+    <button class="btn-main" style="margin-top: 32rpx; background: {{hasInput ? '#00B894' : '#ddd'}};" disabled="{{!hasInput}}" bindtap="submit">{{isReplyMode ? '生成回复 ✍️' : '检测 💊'}}</button>
   </view>
 
   <view wx:if="{{step === 'loading'}}" class="fu" style="text-align: center;">
@@ -55,7 +55,7 @@
     </view>
   </view>
 
-  <view wx:if="{{step === 'result' && res}}" class="fu">
+  <view wx:if="{{step === 'result' && res && !isReplyMode}}" class="fu">
     <view class="card" style="padding: 48rpx;">
       <view style="text-align: center; padding: 64rpx 40rpx 56rpx; margin-bottom: 40rpx; border-radius: 44rpx; background: {{res.danger ? 'linear-gradient(135deg,#FFF5F3,#FFE3E3)' : 'linear-gradient(135deg,#F0FFF4,#D3F9D8)'}};">
         <view style="font-size: 104rpx; margin-bottom: 20rpx;">{{res.danger ? '🚨' : '✅'}}</view>
@@ -89,5 +89,38 @@
       <button class="btn-main" style="flex: 1; background: #00B894;" open-type="share">分享</button>
     </view>
     <view class="disclaimer">发送建议只基于当前文本和你选择的类型，不代表对方一定会这样反应。冲动发言前，先喝口水。</view>
+  </view>
+
+  <view wx:if="{{step === 'result' && res && isReplyMode}}" class="fu">
+    <view class="card" style="padding: 44rpx;">
+      <view style="font-size: 24rpx; color: #B8860B; font-weight: 900; margin-bottom: 12rpx;">回复策略</view>
+      <view class="serif" style="font-size: 34rpx; font-weight: 900; color: #1A1A2E; line-height: 1.55;">{{res.strategy}}</view>
+    </view>
+
+    <view wx:for="{{res.drafts}}" wx:key="label" class="reply-card">
+      <view style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 18rpx;">
+        <view class="reply-label">{{item.label}}</view>
+        <view style="font-size: 22rpx; color: #C8D6E5; font-weight: 800;">可直接发</view>
+      </view>
+      <view class="reply-text">「{{item.text}}」</view>
+      <view class="reply-why">{{item.why}}</view>
+    </view>
+
+    <view class="card" style="background: #FFF5F3; border: none;">
+      <view style="font-size: 24rpx; font-weight: 900; color: #E17055; margin-bottom: 10rpx;">别发这种</view>
+      <view style="font-size: 27rpx; color: rgba(26,26,46,0.78); line-height: 1.8;">{{res.avoid}}</view>
+    </view>
+
+    <view wx:if="{{res.note}}" class="card" style="background: #F8FAFB; border: none;">
+      <view style="font-size: 24rpx; font-weight: 900; color: #8395A7; margin-bottom: 10rpx;">类型提醒</view>
+      <view style="font-size: 27rpx; color: rgba(26,26,46,0.78); line-height: 1.8;">{{res.note}}</view>
+    </view>
+
+    <view style="display: flex; gap: 20rpx; margin-top: 16rpx;">
+      <button class="btn-reset" style="flex: 1;" bindtap="resetInput">再来一次 ↻</button>
+      <button class="btn-reset" style="flex: 1;" bindtap="copyResult">复制</button>
+      <button class="btn-main" style="flex: 1; background: #00B894;" open-type="share">分享</button>
+    </view>
+    <view class="disclaimer">回复建议是基于你给出的关系背景和本次分析生成的。别为了显得体面而憋死自己，也别为了爽一下把局面炸了。</view>
   </view>
 </view>

@@ -86,6 +86,18 @@
       <view class="body-text">{{res.reason}}</view>
     </view>
 
+    <view wx:if="{{record.kind === 'reply' && res}}" class="card" style="padding: 40rpx;">
+      <view class="section-title">下一句怎么回</view>
+      <view class="body-text">{{res.strategy}}</view>
+      <view wx:for="{{res.drafts}}" wx:key="label" class="reply-row">
+        <view style="font-size: 24rpx; color: #00B894; font-weight: 900; margin-bottom: 8rpx;">{{item.label}}</view>
+        <view class="serif" style="font-size: 29rpx; font-weight: 900; color: #1A1A2E; line-height: 1.6;">「{{item.text}}」</view>
+        <view style="font-size: 24rpx; color: #8395A7; line-height: 1.7; margin-top: 8rpx;">{{item.why}}</view>
+      </view>
+      <view class="advice-block">别发：{{res.avoid}}</view>
+      <view wx:if="{{res.note}}" class="advice-block">提醒：{{res.note}}</view>
+    </view>
+
     <view wx:if="{{record.kind === 'predict' && res}}" class="card" style="padding: 40rpx;">
       <view class="section-title">走向预测</view>
       <view class="serif" style="font-size: 38rpx; font-weight: 900; color: #1A1A2E;">{{res.stage}}</view>

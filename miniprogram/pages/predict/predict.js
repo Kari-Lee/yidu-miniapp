@@ -102,6 +102,28 @@ Page({
     return Share.predict(this.data.res && this.data.res.stage)
   },
 
+  goReply: function() {
+    var res = this.data.res
+    if (!res) return
+    var task = [
+      '来源：感情预测',
+      res.stage ? '当前阶段：' + res.stage : '',
+      res.stage_desc ? '阶段描述：' + res.stage_desc : '',
+      res.turning ? '转折点：' + res.turning : '',
+      res.todo ? '现在该做：' + res.todo : ''
+    ].filter(Boolean).join('\n')
+    var query = [
+      'mode=reply',
+      'replyTask=' + encodeURIComponent(task),
+      'profileId=' + encodeURIComponent(this.data.profileId || ''),
+      'profileName=' + encodeURIComponent(this.data.profileName || ''),
+      'profileHistoryCount=' + encodeURIComponent(this.data.profileHistoryCount || 0),
+      'ctxEnabled=' + (this.data.ctxEnabled ? '1' : '0'),
+      'ctx=' + encodeURIComponent(this.data.ctx || '')
+    ].join('&')
+    wx.navigateTo({ url: '/pages/check/check?' + query })
+  },
+
   copyResult: function() {
     if (!this.data.res) return
     wx.setClipboardData({ data: Format.predict(this.data.res) })

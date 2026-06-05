@@ -15,3 +15,37 @@
   background: linear-gradient(90deg, rgba(0,0,0,0.04), #F8FAFB, rgba(0,0,0,0.04));
   background-size: 200% 100%; animation: shimmer 1.5s infinite;
 }
+
+.reply-card {
+  padding: 38rpx;
+  border-radius: 36rpx;
+  background: #FFFFFF;
+  box-shadow: 0 4rpx 32rpx rgba(0,0,0,0.04);
+  margin-bottom: 24rpx;
+}
+
+.reply-label {
+  padding: 8rpx 20rpx;
+  border-radius: 999rpx;
+  background: rgba(0,184,148,0.08);
+  color: #00B894;
+  font-size: 22rpx;
+  font-weight: 900;
+}
+
+.reply-text {
+  color: #1A1A2E;
+  font-size: 32rpx;
+  font-weight: 800;
+  line-height: 1.75;
+}
+
+.reply-why {
+  margin-top: 18rpx;
+  padding: 20rpx 24rpx;
+  border-radius: 22rpx;
+  background: #F8FAFB;
+  color: #8395A7;
+  font-size: 24rpx;
+  line-height: 1.7;
+}

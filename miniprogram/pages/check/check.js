@@ -5,6 +5,7 @@ var N = require('../../utils/normalize')
 var Share = require('../../utils/share')
 var Format = require('../../utils/format')
 var MSGS = ["评估杀伤力", "模拟Ta反应"]
+var REPLY_MSGS = ["拆解当前局面", "压低情绪浓度", "生成可发版本"]
 
 function safeDecode(v) {
   try { return decodeURIComponent(v) } catch(e) { return v || '' }
@@ -17,9 +18,10 @@ function makeContextTip(name, count) {
 
 Page({
   data: {
-    statusBarHeight: 0, step: 'input', text: '', pType: '', ctx: '', err: null,
+    statusBarHeight: 0, step: 'input', mode: 'check', text: '', pType: '', ctx: '', replyTask: '', err: null,
     initialPType: '', profileId: '', profileName: '', profileHistoryCount: 0, contextTip: '',
     ctxEnabled: false, initialCtxEnabled: false, ctxPreviewOpen: false,
+    isReplyMode: false,
     hasInput: false, loadingMsg: '', res: null,
     typeOptions: [
       { key:'avoidant', emoji:'🧊', label:'回避型', color:'#0984E3', bg:'rgba(9,132,227,0.08)' },
@@ -35,17 +37,25 @@ Page({
     var historyCount = parseInt(options && options.profileHistoryCount || 0, 10) || 0
     var ctx = options && options.ctx ? safeDecode(options.ctx) : ''
     var pType = options && options.pType ? options.pType : ''
+    var mode = options && options.mode === 'reply' ? 'reply' : 'check'
+    var replyTask = options && options.replyTask ? safeDecode(options.replyTask) : ''
+    var hasCtxEnabledOption = options && options.ctxEnabled !== undefined
+    var ctxEnabled = hasCtxEnabledOption ? options.ctxEnabled === '1' : !!ctx
     this.setData({
       statusBarHeight: getApp().globalData.statusBarHeight,
+      mode: mode,
+      isReplyMode: mode === 'reply',
       pType: pType,
       initialPType: pType,
       ctx: ctx,
-      ctxEnabled: !!ctx,
-      initialCtxEnabled: !!ctx,
+      replyTask: replyTask,
+      ctxEnabled: ctxEnabled,
+      initialCtxEnabled: ctxEnabled,
       profileId: profileId,
       profileName: profileName,
       profileHistoryCount: historyCount,
-      contextTip: profileId && ctx ? makeContextTip(profileName, historyCount) : ''
+      contextTip: profileId && ctx ? makeContextTip(profileName, historyCount) : '',
+      hasInput: mode === 'reply' && !!replyTask
     })
   },
   onUnload: function() { this.stopLoading() },
@@ -55,7 +65,12 @@ Page({
     clearInterval(this._timer)
     this._timer = null
   },
-  onInput: function(e) { this.setData({ text: e.detail.value, hasInput: !!e.detail.value.trim() }) },
+  onInput: function(e) {
+    this.setData({
+      text: e.detail.value,
+      hasInput: !!e.detail.value.trim() || (this.data.isReplyMode && !!this.data.replyTask)
+    })
+  },
   pickType: function(e) { this.setData({ pType: e.currentTarget.dataset.key }) },
   toggleCtxEnabled: function(e) { this.setData({ ctxEnabled: e.detail.value }) },
   toggleCtxPreview: function() { this.setData({ ctxPreviewOpen: !this.data.ctxPreviewOpen }) },
@@ -68,32 +83,42 @@ Page({
       ctxPreviewOpen: false,
       err: null,
       res: null,
-      hasInput: false
+      hasInput: this.data.isReplyMode && !!this.data.replyTask
     })
   },
 
   submit: function() {
-    if (!this.data.text.trim()) return
+    if (!this.data.text.trim() && !(this.data.isReplyMode && this.data.replyTask)) return
     var self = this
     self.stopLoading()
-    self.setData({ step: 'loading', err: null, loadingMsg: MSGS[0] })
+    var msgs = self.data.isReplyMode ? REPLY_MSGS : MSGS
+    self.setData({ step: 'loading', err: null, loadingMsg: msgs[0] })
     var n = 0
-    self._timer = setInterval(function() { n++; self.setData({ loadingMsg: MSGS[n % MSGS.length] }) }, 1200)
+    self._timer = setInterval(function() { n++; self.setData({ loadingMsg: msgs[n % msgs.length] }) }, 1200)
 
     var typeLabel = self.data.pType ? (D.TI[self.data.pType] || {}).label || '未知' : '未知'
     var ctx = (!self.data.contextTip || self.data.ctxEnabled) ? self.data.ctx : ''
-    var um = (ctx ? '关系背景：' + ctx + '\n\n' : '') +
-      '对方类型：' + typeLabel + '\n\n我想发：' + self.data.text
+    var prompt = self.data.isReplyMode ? D.P.reply : D.P.check
+    var um = ''
+    if (self.data.isReplyMode) {
+      um = (ctx ? '关系背景：' + ctx + '\n\n' : '') +
+        (self.data.replyTask ? '来源分析：\n' + self.data.replyTask + '\n\n' : '') +
+        '对方类型：' + typeLabel + '\n\n' +
+        (self.data.text.trim() ? '用户想表达：' + self.data.text : '用户需求：请根据当前局面，写下一句适合发给Ta的话。')
+    } else {
+      um = (ctx ? '关系背景：' + ctx + '\n\n' : '') +
+        '对方类型：' + typeLabel + '\n\n我想发：' + self.data.text
+    }
 
-    API.callAI(D.P.check, um, null).then(function(res) {
+    API.callAI(prompt, um, null).then(function(res) {
       self.stopLoading()
-      res = N.normalizeCheck(res)
+      res = self.data.isReplyMode ? N.normalizeReply(res) : N.normalizeCheck(res)
       H.addRecord({
-        kind: 'check',
-        kindLabel: '发不发',
-        title: res.verdict || '消息检测',
-        summary: res.reason || res.prediction || '已生成发送建议',
-        input: self.data.text.slice(0, 80),
+        kind: self.data.isReplyMode ? 'reply' : 'check',
+        kindLabel: self.data.isReplyMode ? '回复建议' : '发不发',
+        title: self.data.isReplyMode ? '下一句怎么回' : (res.verdict || '消息检测'),
+        summary: self.data.isReplyMode ? (res.strategy || '已生成可发送回复') : (res.reason || res.prediction || '已生成发送建议'),
+        input: self.data.text.slice(0, 80) || (self.data.isReplyMode ? '基于分析结果生成回复' : ''),
         profileId: self.data.profileId,
         profileName: self.data.profileName,
         result: res
@@ -106,11 +131,11 @@ Page({
   },
 
   onShareAppMessage: function() {
-    return Share.check(this.data.res && this.data.res.verdict)
+    return Share.check(this.data.isReplyMode ? '下一句怎么回' : (this.data.res && this.data.res.verdict))
   },
 
   copyResult: function() {
     if (!this.data.res) return
-    wx.setClipboardData({ data: Format.check(this.data.res) })
+    wx.setClipboardData({ data: this.data.isReplyMode ? Format.reply(this.data.res) : Format.check(this.data.res) })
   }
 })
