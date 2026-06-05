@@ -40,6 +40,13 @@
       <view class="kv">你：{{res.user_label}} / Ta：{{res.partner_label}}</view>
       <view class="kv">置信度：{{res.confidence}}%</view>
       <view class="body-text">{{res.match}}</view>
+      <view wx:if="{{record.profileId}}" class="profile-sync">
+        <view style="flex: 1;">
+          <view class="profile-sync-title">写回关系档案</view>
+          <view class="profile-sync-desc">{{record.profileName || '这段关系'}}：Ta 标记为 {{res.partner_label}}</view>
+        </view>
+        <button class="profile-sync-btn {{profileSynced ? 'done' : ''}}" disabled="{{profileSynced}}" bindtap="syncPartnerType">{{profileSynced ? '已更新' : '写入'}}</button>
+      </view>
       <view class="section-title" style="margin-top: 32rpx;">暴露信号</view>
       <view wx:for="{{res.signals}}" wx:key="index" class="signal-row">
         <view style="font-size: 34rpx; width: 48rpx;">{{item.icon}}</view>

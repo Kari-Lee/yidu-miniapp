@@ -86,3 +86,49 @@
   background: #F0FFF4;
   color: #00B894;
 }
+
+.profile-sync {
+  display: flex;
+  align-items: center;
+  gap: 20rpx;
+  margin-top: 22rpx;
+  padding: 24rpx 26rpx;
+  border-radius: 24rpx;
+  background: #F8FAFB;
+}
+
+.profile-sync-title {
+  color: #1A1A2E;
+  font-size: 26rpx;
+  font-weight: 900;
+  margin-bottom: 6rpx;
+}
+
+.profile-sync-desc {
+  color: #8395A7;
+  font-size: 23rpx;
+  line-height: 1.5;
+}
+
+.profile-sync-btn {
+  flex-shrink: 0;
+  min-width: 118rpx;
+  height: 62rpx;
+  margin: 0;
+  padding: 0 22rpx;
+  border-radius: 999rpx;
+  background: #2D3436;
+  color: #FFFFFF;
+  font-size: 24rpx;
+  font-weight: 900;
+  line-height: 62rpx;
+}
+
+.profile-sync-btn.done {
+  background: #F0FFF4;
+  color: #00B894;
+}
+
+.profile-sync-btn::after {
+  border: none;
+}

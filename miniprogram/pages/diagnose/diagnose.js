@@ -4,6 +4,7 @@ var H = require('../../utils/history')
 var N = require('../../utils/normalize')
 var Share = require('../../utils/share')
 var Format = require('../../utils/format')
+var Profiles = require('../../utils/profiles')
 
 var GRADS = {
   anxious: "linear-gradient(135deg,#E17055,#D63031,#C0392B)",
@@ -97,7 +98,8 @@ Page({
     statusBarHeight: 0, step: 'input', text: '', ctx: '', imgs: [], err: null,
     profileId: '', profileName: '',
     hasInput: false, loadingMsg: '', res: null,
-    userTI: null, partnerTI: null, userGrad: '', partnerGrad: '', userBg: '', partnerBg: ''
+    userTI: null, partnerTI: null, userGrad: '', partnerGrad: '', userBg: '', partnerBg: '',
+    profileSynced: false
   },
   _timer: null,
 
@@ -177,7 +179,7 @@ Page({
   backToInput: function() { this.setData({ step: 'input' }) },
 
   resetInput: function() {
-    this.setData({ step: 'input', text: '', ctx: '', imgs: [], err: null, hasInput: false, res: null })
+    this.setData({ step: 'input', text: '', ctx: '', imgs: [], err: null, hasInput: false, res: null, profileSynced: false })
   },
 
   submit: function() {
@@ -219,6 +221,7 @@ Page({
         partnerGrad: GRADS[res.partner_type] || GRADS.secure,
         userBg: BGS[res.user_type] || BGS.secure,
         partnerBg: BGS[res.partner_type] || BGS.secure,
+        profileSynced: false
       })
     }).catch(function(e) {
       self.stopLoading()
@@ -233,5 +236,25 @@ Page({
   copyResult: function() {
     if (!this.data.res) return
     wx.setClipboardData({ data: Format.diagnose(this.data.res) })
+  },
+
+  syncPartnerType: function() {
+    var res = this.data.res
+    if (!this.data.profileId || !res) return
+    var ti = D.TI[res.partner_type]
+    if (!ti) {
+      wx.showToast({ title: '暂时无法识别类型', icon: 'none' })
+      return
+    }
+    var updated = Profiles.updateProfile(this.data.profileId, {
+      type: res.partner_type,
+      typeLabel: res.partner_label || ti.label
+    })
+    if (!updated) {
+      wx.showToast({ title: '档案不存在', icon: 'none' })
+      return
+    }
+    this.setData({ profileSynced: true })
+    wx.showToast({ title: '已更新档案', icon: 'success' })
   }
 })

@@ -1,11 +1,14 @@
 var H = require('../../utils/history')
 var Format = require('../../utils/format')
+var D = require('../../utils/data')
+var Profiles = require('../../utils/profiles')
 
 Page({
   data: {
     statusBarHeight: 0,
     record: null,
-    res: null
+    res: null,
+    profileSynced: false
   },
 
   onLoad: function(options) {
@@ -15,7 +18,7 @@ Page({
 
   loadRecord: function(id) {
     var record = H.getRecord(id)
-    this.setData({ record: record, res: record && record.result || null })
+    this.setData({ record: record, res: record && record.result || null, profileSynced: false })
   },
 
   goBack: function() {
@@ -25,6 +28,27 @@ Page({
   copyRecord: function() {
     if (!this.data.record) return
     wx.setClipboardData({ data: Format.record(this.data.record) })
+  },
+
+  syncPartnerType: function() {
+    var record = this.data.record
+    var res = this.data.res
+    if (!record || !record.profileId || record.kind !== 'diagnose' || !res) return
+    var ti = D.TI[res.partner_type]
+    if (!ti) {
+      wx.showToast({ title: '暂时无法识别类型', icon: 'none' })
+      return
+    }
+    var updated = Profiles.updateProfile(record.profileId, {
+      type: res.partner_type,
+      typeLabel: res.partner_label || ti.label
+    })
+    if (!updated) {
+      wx.showToast({ title: '档案不存在', icon: 'none' })
+      return
+    }
+    this.setData({ profileSynced: true })
+    wx.showToast({ title: '已更新档案', icon: 'success' })
   },
 
   deleteRecord: function() {

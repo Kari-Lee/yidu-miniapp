@@ -124,6 +124,14 @@
       <view style="font-size: 28rpx; line-height: 1.9; color: rgba(26,26,46,0.87);">{{res.partner_advice}}</view>
     </view>
 
+    <view wx:if="{{profileId}}" class="profile-sync">
+      <view style="flex: 1;">
+        <view class="profile-sync-title">写回关系档案</view>
+        <view class="profile-sync-desc">{{profileName || '这段关系'}}：Ta 标记为 {{res.partner_label}}</view>
+      </view>
+      <button class="profile-sync-btn {{profileSynced ? 'done' : ''}}" disabled="{{profileSynced}}" bindtap="syncPartnerType">{{profileSynced ? '已更新' : '写入'}}</button>
+    </view>
+
     <view style="display: flex; gap: 20rpx; margin-top: 16rpx;">
       <button class="btn-reset" style="flex: 1;" bindtap="resetInput">再来一次 ↻</button>
       <button class="btn-reset" style="flex: 1;" bindtap="copyResult">复制</button>
