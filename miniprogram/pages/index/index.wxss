@@ -142,7 +142,7 @@
 
 .quote-line {
   position: relative;
-  margin-top: 78rpx;
+  margin-top: 48rpx;
   padding-left: 42rpx;
   color: rgba(45,47,51,0.54);
   font-size: 25rpx;
@@ -157,6 +157,79 @@
   font-size: 70rpx;
   font-weight: 900;
   line-height: 1;
+}
+
+.test-preview {
+  margin-top: 52rpx;
+  padding: 32rpx 0 8rpx;
+  border-top: 2rpx solid rgba(45,47,51,0.08);
+  border-bottom: 2rpx solid rgba(45,47,51,0.08);
+}
+
+.preview-head {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 24rpx;
+  margin-bottom: 22rpx;
+}
+
+.preview-kicker {
+  color: #B8BDC8;
+  font-size: 18rpx;
+  font-weight: 900;
+  letter-spacing: 4rpx;
+}
+
+.preview-title {
+  color: #2D2F33;
+  font-size: 27rpx;
+  font-weight: 900;
+  margin-top: 8rpx;
+}
+
+.preview-index {
+  color: rgba(45,47,51,0.22);
+  font-size: 34rpx;
+  font-weight: 900;
+  letter-spacing: 2rpx;
+}
+
+.preview-row {
+  display: grid;
+  grid-template-columns: 128rpx 1fr;
+  align-items: center;
+  gap: 22rpx;
+  padding: 18rpx 0;
+  border-bottom: 2rpx solid rgba(45,47,51,0.05);
+}
+
+.preview-row.last {
+  border-bottom: none;
+}
+
+.preview-row text {
+  color: rgba(45,47,51,0.66);
+  font-size: 22rpx;
+  font-weight: 800;
+}
+
+.preview-track {
+  height: 5rpx;
+  background: rgba(45,47,51,0.08);
+  overflow: hidden;
+}
+
+.preview-track view {
+  height: 100%;
+  background: #2D2F33;
+}
+
+.preview-note {
+  padding: 18rpx 0 12rpx;
+  color: #B8BDC8;
+  font-size: 19rpx;
+  text-align: right;
 }
 
 .step-list,

@@ -29,6 +29,33 @@
       <view class="quote-mark">“</view>
       <view>{{dailyQuote}}</view>
     </view>
+
+    <view class="test-preview">
+      <view class="preview-head">
+        <view>
+          <view class="preview-kicker">YOUR REPORT</view>
+          <view class="preview-title">测完生成四维关系画像</view>
+        </view>
+        <view class="preview-index">24Q</view>
+      </view>
+      <view class="preview-row">
+        <text>焦虑依恋</text>
+        <view class="preview-track"><view style="width: 72%;"></view></view>
+      </view>
+      <view class="preview-row">
+        <text>回避依恋</text>
+        <view class="preview-track"><view style="width: 46%;"></view></view>
+      </view>
+      <view class="preview-row">
+        <text>安全依恋</text>
+        <view class="preview-track"><view style="width: 61%;"></view></view>
+      </view>
+      <view class="preview-row last">
+        <text>混乱依恋</text>
+        <view class="preview-track"><view style="width: 34%;"></view></view>
+      </view>
+      <view class="preview-note">示意图 · 实际结果根据你的答案生成</view>
+    </view>
   </view>
 
   <view wx:if="{{activeTab === 'relation'}}" class="panel relation-panel">
