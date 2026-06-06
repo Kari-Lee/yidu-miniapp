@@ -11,10 +11,11 @@ function getErrorMessage(r) {
   return '服务暂时不可用'
 }
 
-function callAI(sys, message, images) {
+function callAI(sys, message, images, imageKeys) {
   return new Promise(function(resolve, reject) {
     var body = { system: sys, message: message }
     if (images && images.length > 0) body.images = images
+    if (imageKeys && imageKeys.length > 0) body.imageKeys = imageKeys
 
     wx.request({
       url: app.globalData.apiBaseUrl + '/chat',

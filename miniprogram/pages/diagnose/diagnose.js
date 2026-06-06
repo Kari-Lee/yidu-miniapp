@@ -5,6 +5,7 @@ var N = require('../../utils/normalize')
 var Share = require('../../utils/share')
 var Format = require('../../utils/format')
 var Profiles = require('../../utils/profiles')
+var OSS = require('../../utils/oss')
 
 var GRADS = {
   anxious: "linear-gradient(135deg,#E17055,#D63031,#C0392B)",
@@ -133,6 +134,18 @@ function totalBase64Chars(images) {
   return (images || []).reduce(function(sum, image) {
     return sum + (image ? image.length : 0)
   }, 0)
+}
+
+function callWithBase64Fallback(self, um, uploadError) {
+  if (uploadError && uploadError.code !== 'OSS_UNAVAILABLE') {
+    self.setData({ loadingMsg: '切换备用分析通道' })
+  }
+  return readImagesAsBase64(self.data.imgs).then(function(images) {
+    if (totalBase64Chars(images) > MAX_TOTAL_BASE64_CHARS) {
+      throw new Error('图片通道繁忙，请直接再试一次')
+    }
+    return API.callAI(D.P.diagnose, um, images)
+  })
 }
 
 function hasInput(text, imgs) {
@@ -276,12 +289,15 @@ Page({
 
     uploadImages.then(function(imgs) {
       if (imgs !== self.data.imgs) self.setData({ imgs: imgs })
-      return readImagesAsBase64(imgs)
-    }).then(function(images) {
-      if (totalBase64Chars(images) > MAX_TOTAL_BASE64_CHARS) {
-        throw new Error('截图优化没有完成，请直接再试一次')
-      }
-      return API.callAI(D.P.diagnose, um, images)
+      if (!imgs.length) return API.callAI(D.P.diagnose, um, null)
+      return OSS.uploadImages(imgs, function(done, total) {
+        self.setData({ loadingMsg: '上传截图 ' + done + '/' + total })
+      }).then(function(imageKeys) {
+        self.setData({ loadingMsg: '识别聊天内容' })
+        return API.callAI(D.P.diagnose, um, null, imageKeys)
+      }).catch(function(err) {
+        return callWithBase64Fallback(self, um, err)
+      })
     }).then(function(res) {
       self.stopLoading()
       res = N.normalizeDiagnose(res)
