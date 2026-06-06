@@ -30,31 +30,25 @@
       <view>{{dailyQuote}}</view>
     </view>
 
-    <view class="test-preview">
-      <view class="preview-head">
-        <view>
-          <view class="preview-kicker">YOUR REPORT</view>
-          <view class="preview-title">测完生成四维关系画像</view>
+    <view class="type-poster" bindtap="goQuiz">
+      <view class="poster-number">04</view>
+      <view class="poster-copy">
+        <view class="preview-kicker">WHICH ONE ARE YOU?</view>
+        <view class="poster-title">
+          <view>你以为你在恋爱，</view>
+          <view>其实是依恋人格在接管。</view>
         </view>
-        <view class="preview-index">24Q</view>
       </view>
-      <view class="preview-row">
-        <text>焦虑依恋</text>
-        <view class="preview-track"><view style="width: 72%;"></view></view>
+      <view class="poster-types">
+        <view><text>01</text>焦虑型</view>
+        <view><text>02</text>回避型</view>
+        <view><text>03</text>安全型</view>
+        <view><text>04</text>混乱型</view>
       </view>
-      <view class="preview-row">
-        <text>回避依恋</text>
-        <view class="preview-track"><view style="width: 46%;"></view></view>
+      <view class="poster-footer">
+        <text>答案不在直觉里</text>
+        <view>开始识别 ↗</view>
       </view>
-      <view class="preview-row">
-        <text>安全依恋</text>
-        <view class="preview-track"><view style="width: 61%;"></view></view>
-      </view>
-      <view class="preview-row last">
-        <text>混乱依恋</text>
-        <view class="preview-track"><view style="width: 34%;"></view></view>
-      </view>
-      <view class="preview-note">示意图 · 实际结果根据你的答案生成</view>
     </view>
   </view>
 
