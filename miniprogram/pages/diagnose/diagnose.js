@@ -17,14 +17,19 @@ var BGS = {
   secure: "rgba(0,184,148,0.08)", disorganized: "rgba(108,92,231,0.08)"
 }
 var MSGS = ["扫描互动模式", "分析依恋信号", "生成双人报告"]
-var MAX_IMAGES = 8
-var COMPRESS_QUALITY = 52
-var RETRY_COMPRESS_QUALITY = 32
-var COMPRESS_WIDTH = 1440
-var RETRY_COMPRESS_WIDTH = 1080
-var MAX_IMAGE_BYTES = 1.4 * 1024 * 1024
-var MAX_TOTAL_BYTES = 2.8 * 1024 * 1024
-var MAX_TOTAL_BASE64_CHARS = 3.8 * 1024 * 1024
+var MAX_IMAGES = 12
+var MAX_TOTAL_BYTES = 2.7 * 1024 * 1024
+var MAX_TOTAL_BASE64_CHARS = 3.7 * 1024 * 1024
+var MAX_IMAGE_TARGET_BYTES = 1.1 * 1024 * 1024
+var MIN_IMAGE_TARGET_BYTES = 190 * 1024
+var COMPRESS_STEPS = [
+  { quality: 62, width: 1600 },
+  { quality: 50, width: 1400 },
+  { quality: 40, width: 1200 },
+  { quality: 32, width: 1000 },
+  { quality: 26, width: 860 },
+  { quality: 22, width: 760 }
+]
 
 function safeDecode(v) {
   try { return decodeURIComponent(v) } catch(e) { return v || '' }
@@ -74,15 +79,30 @@ function makeImageItem(path, originalPath) {
   })
 }
 
-function prepareImage(path) {
-  return compressImage(path, COMPRESS_QUALITY, COMPRESS_WIDTH).then(function(compressedPath) {
-    return makeImageItem(compressedPath, path)
-  }).then(function(item) {
-    if (!item.size || item.size <= MAX_IMAGE_BYTES) return item
-    return compressImage(path, RETRY_COMPRESS_QUALITY, RETRY_COMPRESS_WIDTH).then(function(compressedPath) {
+function compressToTarget(path, targetBytes) {
+  var best = null
+  function run(index) {
+    var step = COMPRESS_STEPS[index]
+    return compressImage(path, step.quality, step.width).then(function(compressedPath) {
       return makeImageItem(compressedPath, path)
+    }).then(function(item) {
+      if (!best || (item.size && item.size < best.size)) best = item
+      if ((item.size && item.size <= targetBytes) || index >= COMPRESS_STEPS.length - 1) {
+        return best || item
+      }
+      return run(index + 1)
     })
-  })
+  }
+  return run(0)
+}
+
+function optimizeImages(paths) {
+  if (!paths.length) return Promise.resolve([])
+  var targetBytes = Math.floor(MAX_TOTAL_BYTES * 0.96 / paths.length)
+  targetBytes = Math.max(MIN_IMAGE_TARGET_BYTES, Math.min(MAX_IMAGE_TARGET_BYTES, targetBytes))
+  return Promise.all(paths.map(function(path) {
+    return compressToTarget(path, targetBytes)
+  }))
 }
 
 function totalImageBytes(imgs) {
@@ -104,35 +124,15 @@ function readImageAsBase64(path) {
 
 function readImagesAsBase64(paths) {
   if (!paths || paths.length === 0) return Promise.resolve(null)
-  var results = []
-  return paths.reduce(function(chain, item) {
-    return chain.then(function() {
-      return readImageAsBase64(item.path || item).then(function(base64) {
-        results.push(base64)
-      })
-    })
-  }, Promise.resolve()).then(function() { return results })
+  return Promise.all(paths.map(function(item) {
+    return readImageAsBase64(item.path || item)
+  }))
 }
 
 function totalBase64Chars(images) {
   return (images || []).reduce(function(sum, image) {
     return sum + (image ? image.length : 0)
   }, 0)
-}
-
-function fitImages(existing, incoming) {
-  var kept = existing.slice()
-  var bytes = totalImageBytes(kept)
-  var skipped = 0
-  incoming.forEach(function(item) {
-    if ((item.size && item.size > MAX_IMAGE_BYTES) || bytes + (item.size || 0) > MAX_TOTAL_BYTES) {
-      skipped++
-      return
-    }
-    kept.push(item)
-    bytes += item.size || 0
-  })
-  return { images: kept, skipped: skipped }
 }
 
 function hasInput(text, imgs) {
@@ -196,20 +196,19 @@ Page({
     var self = this
     var remaining = MAX_IMAGES - self.data.imgs.length
     if (remaining <= 0) {
-      wx.showToast({ title: '最多上传8张截图', icon: 'none' })
+      wx.showToast({ title: '这组截图已经够完整了', icon: 'none' })
       return
     }
     wx.chooseImage({
-      count: remaining, sizeType: ['compressed'],
+      count: Math.min(9, remaining), sizeType: ['compressed'],
       success: function(r) {
-        wx.showLoading({ title: '压缩中' })
-        Promise.all(r.tempFilePaths.map(prepareImage)).then(function(items) {
+        var paths = self.data.imgs.map(function(item) {
+          return item.originalPath || item.path
+        }).concat(r.tempFilePaths)
+        wx.showLoading({ title: '优化截图中' })
+        optimizeImages(paths).then(function(imgs) {
           wx.hideLoading()
-          var fitted = fitImages(self.data.imgs, items)
-          self.setData({ imgs: fitted.images, hasInput: hasInput(self.data.text, fitted.images) })
-          if (fitted.skipped) {
-            wx.showToast({ title: '部分截图过大，已自动跳过', icon: 'none' })
-          }
+          self.setData({ imgs: imgs, hasInput: hasInput(self.data.text, imgs) })
         }).catch(function() {
           wx.hideLoading()
           wx.showToast({ title: '图片处理失败，请重选', icon: 'none' })
@@ -262,10 +261,6 @@ Page({
 
   submit: function() {
     var self = this
-    if (totalImageBytes(self.data.imgs) > MAX_TOTAL_BYTES) {
-      self.setData({ err: '截图总大小超过2.8MB，请删除几张或裁剪后再试' })
-      return
-    }
     self.stopLoading()
     self.setData({ step: 'loading', err: null, loadingMsg: MSGS[0] })
     var n = 0
@@ -275,9 +270,16 @@ Page({
     var um = (ctx ? '关系背景：' + ctx + '\n\n' : '') +
       (self.data.text.trim() ? '聊天记录：\n' + self.data.text : '请分析这些聊天记录截图')
 
-    readImagesAsBase64(self.data.imgs).then(function(images) {
+    var uploadImages = totalImageBytes(self.data.imgs) > MAX_TOTAL_BYTES
+      ? optimizeImages(self.data.imgs.map(function(item) { return item.originalPath || item.path }))
+      : Promise.resolve(self.data.imgs)
+
+    uploadImages.then(function(imgs) {
+      if (imgs !== self.data.imgs) self.setData({ imgs: imgs })
+      return readImagesAsBase64(imgs)
+    }).then(function(images) {
       if (totalBase64Chars(images) > MAX_TOTAL_BASE64_CHARS) {
-        throw new Error('截图编码后仍然太大，请删除一两张再试')
+        throw new Error('截图优化没有完成，请直接再试一次')
       }
       return API.callAI(D.P.diagnose, um, images)
     }).then(function(res) {
