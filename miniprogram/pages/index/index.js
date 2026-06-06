@@ -4,6 +4,7 @@ var Share = require('../../utils/share')
 Page({
   data: {
     statusBarHeight: 0,
+    activeTab: 'test',
     dailyQuote: '',
     types: [
       { key:'anxious', emoji:'🔥', label:'焦虑型', color:'#E17055', desc:'恋爱中的人形追踪器' },
@@ -27,5 +28,6 @@ Page({
   goPredict: function() { wx.navigateTo({ url: '/pages/predict/predict' }) },
   goHistory: function() { wx.navigateTo({ url: '/pages/history/history' }) },
   goProfiles: function() { wx.navigateTo({ url: '/pages/profiles/profiles' }) },
+  switchHomeTab: function(e) { this.setData({ activeTab: e.currentTarget.dataset.tab }) },
   onShareAppMessage: function() { return Share.home() },
 })

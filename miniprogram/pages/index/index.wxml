@@ -1,124 +1,155 @@
-<view class="container fu" style="padding: 0 32rpx 120rpx;">
+<view class="home-page">
   <view style="height: {{statusBarHeight + 10}}px"></view>
 
-  <view class="home-hero">
-    <view style="font-size: 18rpx; color: #B8860B; font-weight: 800; letter-spacing: 6rpx; margin-bottom: 18rpx;">YIDU</view>
-    <view class="serif" style="font-size: 78rpx; font-weight: 900; color: #1A1A2E; letter-spacing: 8rpx; line-height: 1.2;">已读</view>
-    <view class="gold-line"></view>
-    <view style="font-size: 22rpx; color: #8395A7; letter-spacing: 2rpx;">别只截图发疯，先把这个 Ta 建档</view>
+  <view class="poster-word">YIDU</view>
+  <view class="topbar">
+    <view class="brand">YIDU</view>
+    <view class="top-dot"></view>
   </view>
 
-  <view class="primary-card" bindtap="goProfiles">
-    <view style="display: flex; justify-content: space-between; align-items: flex-start; gap: 28rpx;">
-      <view style="flex: 1;">
-        <view style="font-size: 20rpx; color: #B8860B; font-weight: 900; letter-spacing: 3rpx; margin-bottom: 16rpx;">START HERE</view>
-        <view class="serif" style="font-size: 46rpx; font-weight: 900; color: #1A1A2E; line-height: 1.3;">先建一个 Ta</view>
-        <view style="font-size: 25rpx; color: rgba(26,26,46,0.72); line-height: 1.75; margin-top: 12rpx;">把聊天、预测、回复建议都挂到同一个人身上，别让前任和暧昧对象互相污染。</view>
-      </view>
-      <view class="primary-icon">🗃️</view>
+  <view wx:if="{{activeTab === 'test'}}" class="panel test-panel">
+    <view class="kicker">ATTACHMENT TEST</view>
+    <view class="headline">
+      <view>测出你的</view>
+      <view>依恋人格</view>
     </view>
-    <view class="primary-cta">进入关系档案 ›</view>
-  </view>
+    <view class="subline">24 道题，看清你在关系里为什么反复上头。</view>
 
-  <view class="path-card">
-    <view class="section-kicker">第一次用，照这个顺序</view>
-    <view class="path-row" bindtap="goQuiz">
-      <view class="path-no">1</view>
-      <view style="flex: 1;">
-        <view class="path-title">测自己</view>
-        <view class="path-desc">先知道你是怎么被关系拿捏的</view>
-      </view>
-      <view class="path-arrow">›</view>
-    </view>
-    <view class="path-row" bindtap="goProfiles">
-      <view class="path-no">2</view>
-      <view style="flex: 1;">
-        <view class="path-title">建 Ta 档案</view>
-        <view class="path-desc">之后每次分析都能带入历史</view>
-      </view>
-      <view class="path-arrow">›</view>
-    </view>
-    <view class="path-row last" bindtap="goDiagnose">
-      <view class="path-no">3</view>
-      <view style="flex: 1;">
-        <view class="path-title">上传聊天确诊</view>
-        <view class="path-desc">看你们到底在拉扯什么</view>
-      </view>
-      <view class="path-arrow">›</view>
-    </view>
-  </view>
-
-  <view class="card-sm quote-card">
-    <view class="serif" style="font-size: 25rpx; color: rgba(26,26,46,0.73); line-height: 1.9; font-style: italic;">"{{dailyQuote}}"</view>
-    <view style="font-size: 18rpx; color: #B8860B; margin-top: 12rpx; font-weight: 800; letter-spacing: 4rpx;">DAILY QUOTE</view>
-  </view>
-
-  <view class="section-head">
-    <view>
-      <view class="serif" style="font-size: 34rpx; font-weight: 900; color: #1A1A2E;">常用入口</view>
-      <view style="font-size: 22rpx; color: #8395A7; margin-top: 4rpx;">先看关系，再决定怎么回</view>
-    </view>
-  </view>
-
-  <view class="main-grid">
-    <view class="feature-card strong" bindtap="goDiagnose">
-      <view class="feature-icon">🩺</view>
-      <view class="feature-title">聊天确诊</view>
-      <view class="feature-desc">上传聊天，看双方依恋模式</view>
-    </view>
-    <view class="feature-card strong" bindtap="goReply">
-      <view class="feature-icon">✍️</view>
-      <view class="feature-title">下一句怎么回</view>
-      <view class="feature-desc">生成能发出去的话</view>
-    </view>
-  </view>
-
-  <view class="tool-grid">
-    <view class="tool-card" bindtap="goCheck">
-      <view class="tool-icon">💊</view>
-      <view class="tool-title">发不发</view>
-      <view class="tool-desc">拦住冲动</view>
-    </view>
-    <view class="tool-card" bindtap="goPredict">
-      <view class="tool-icon">🔭</view>
-      <view class="tool-title">预测</view>
-      <view class="tool-desc">看关系走向</view>
-    </view>
-    <view class="tool-card" bindtap="goTranslate">
-      <view class="tool-icon">🔮</view>
-      <view class="tool-title">潜台词</view>
-      <view class="tool-desc">翻译人话</view>
-    </view>
-  </view>
-
-  <view class="support-row">
-    <view class="support-card" bindtap="goQuiz">
-      <view style="font-size: 30rpx;">🔥</view>
+    <view class="hero-action" bindtap="goQuiz">
       <view>
-        <view class="support-title">依恋测试</view>
-        <view class="support-desc">24题看清你自己</view>
+        <view class="action-title">开始测试</view>
+        <view class="action-desc">生成你的四维关系画像</view>
       </view>
+      <view class="action-arrow">↗</view>
     </view>
-    <view class="support-card" bindtap="goHistory">
-      <view style="font-size: 30rpx;">🗂️</view>
+
+    <view class="quiet-link" bindtap="goProfiles">已有 Ta？去建关系档案</view>
+
+    <view class="quote-line">
+      <view class="quote-mark">“</view>
+      <view>{{dailyQuote}}</view>
+    </view>
+  </view>
+
+  <view wx:if="{{activeTab === 'relation'}}" class="panel relation-panel">
+    <view class="kicker">RELATION FILE</view>
+    <view class="headline small">
+      <view>把每个 Ta</view>
+      <view>分开观察</view>
+    </view>
+    <view class="subline">档案会记住历史分析、Ta 的疑似类型，以及你们每次拉扯的证据。</view>
+
+    <view class="hero-action dark" bindtap="goProfiles">
       <view>
-        <view class="support-title">最近分析</view>
-        <view class="support-desc">复看历史结果</view>
+        <view class="action-title">进入关系档案</view>
+        <view class="action-desc">长期观察同一个人</view>
+      </view>
+      <view class="action-arrow">↗</view>
+    </view>
+
+    <view class="step-list">
+      <view class="step-row">
+        <text>01</text>
+        <view>建 Ta 的档案</view>
+      </view>
+      <view class="step-row">
+        <text>02</text>
+        <view>上传聊天确诊</view>
+      </view>
+      <view class="step-row last">
+        <text>03</text>
+        <view>让下一次分析带上历史</view>
       </view>
     </view>
   </view>
 
-  <view class="types-card">
-    <view style="font-size: 21rpx; color: #8395A7; letter-spacing: 3rpx; font-weight: 800; margin-bottom: 20rpx;">ATTACHMENT STYLES</view>
-    <view class="type-grid">
-      <view wx:for="{{types}}" wx:key="key" class="type-chip">
-        <text style="font-size: 30rpx; margin-right: 10rpx;">{{item.emoji}}</text>
-        <text style="font-size: 22rpx; font-weight: 900; color: {{item.color}};">{{item.label}}</text>
+  <view wx:if="{{activeTab === 'tools'}}" class="panel tools-panel">
+    <view class="kicker">TOOLS</view>
+    <view class="headline small">
+      <view>关系急救</view>
+      <view>工具箱</view>
+    </view>
+    <view class="subline">只在需要的时候打开，不把首页塞成按钮仓库。</view>
+
+    <view class="tool-list">
+      <view class="tool-row" bindtap="goDiagnose">
+        <view>
+          <view class="tool-title">聊天确诊</view>
+          <view class="tool-desc">看双方依恋模式</view>
+        </view>
+        <view class="tool-go">↗</view>
+      </view>
+      <view class="tool-row" bindtap="goReply">
+        <view>
+          <view class="tool-title">下一句怎么回</view>
+          <view class="tool-desc">生成能发出去的话</view>
+        </view>
+        <view class="tool-go">↗</view>
+      </view>
+      <view class="tool-row" bindtap="goCheck">
+        <view>
+          <view class="tool-title">发不发</view>
+          <view class="tool-desc">先别让情绪替你按发送</view>
+        </view>
+        <view class="tool-go">↗</view>
+      </view>
+      <view class="tool-row" bindtap="goPredict">
+        <view>
+          <view class="tool-title">感情预测</view>
+          <view class="tool-desc">看这段关系会往哪走</view>
+        </view>
+        <view class="tool-go">↗</view>
+      </view>
+      <view class="tool-row last" bindtap="goTranslate">
+        <view>
+          <view class="tool-title">翻译潜台词</view>
+          <view class="tool-desc">把 Ta 的话翻译成人话</view>
+        </view>
+        <view class="tool-go">↗</view>
       </view>
     </view>
   </view>
 
-  <view style="text-align: center; padding: 52rpx 0 32rpx;">
-    <view style="font-size: 20rpx; color: #CCC; letter-spacing: 4rpx;">YIDU</view>
+  <view wx:if="{{activeTab === 'record'}}" class="panel record-panel">
+    <view class="kicker">RECORDS</view>
+    <view class="headline small">
+      <view>你的关系</view>
+      <view>观察记录</view>
+    </view>
+    <view class="subline">历史记录只保存在本机。复看，不是复吸。</view>
+
+    <view class="hero-action dark" bindtap="goHistory">
+      <view>
+        <view class="action-title">查看最近分析</view>
+        <view class="action-desc">回看确诊、预测和回复建议</view>
+      </view>
+      <view class="action-arrow">↗</view>
+    </view>
+
+    <view class="type-strip">
+      <view wx:for="{{types}}" wx:key="key" class="type-row">
+        <view style="color: {{item.color}};">{{item.label}}</view>
+        <text>{{item.desc}}</text>
+      </view>
+    </view>
+  </view>
+
+  <view class="bottom-tabs">
+    <view class="tab-item {{activeTab === 'test' ? 'active' : ''}}" data-tab="test" bindtap="switchHomeTab">
+      <view class="tab-line"></view>
+      <text>测试</text>
+    </view>
+    <view class="tab-item {{activeTab === 'relation' ? 'active' : ''}}" data-tab="relation" bindtap="switchHomeTab">
+      <view class="tab-line"></view>
+      <text>关系</text>
+    </view>
+    <view class="tab-item {{activeTab === 'tools' ? 'active' : ''}}" data-tab="tools" bindtap="switchHomeTab">
+      <view class="tab-line"></view>
+      <text>工具</text>
+    </view>
+    <view class="tab-item {{activeTab === 'record' ? 'active' : ''}}" data-tab="record" bindtap="switchHomeTab">
+      <view class="tab-line"></view>
+      <text>记录</text>
+    </view>
   </view>
 </view>
