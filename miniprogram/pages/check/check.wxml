@@ -39,7 +39,7 @@
           </view>
         </view>
       </view>
-      <textarea style="width: 100%; padding: 28rpx 8rpx; background: transparent; border: none; color: #1A1A2E; font-size: 30rpx; line-height: 1.9;" maxlength="-1" auto-height placeholder="{{isReplyMode ? '你想表达什么？不填也可以直接生成...' : '你想发的消息...'}}" placeholder-style="color: #C8D6E5" value="{{text}}" bindinput="onInput"></textarea>
+      <textarea style="width: 100%; padding: 28rpx 8rpx; background: transparent; border: none; color: #1A1A2E; font-size: 30rpx; line-height: 1.9;" maxlength="-1" auto-height placeholder="{{isReplyMode ? '你想表达什么？比如：我不想再一直猜了' : '你想发的消息...'}}" placeholder-style="color: #C8D6E5" value="{{text}}" bindinput="onInput"></textarea>
     </view>
     <button class="btn-main" style="margin-top: 32rpx; background: {{hasInput ? '#00B894' : '#ddd'}};" disabled="{{!hasInput}}" bindtap="submit">{{isReplyMode ? '生成回复 ✍️' : '检测 💊'}}</button>
   </view>

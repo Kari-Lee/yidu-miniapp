@@ -23,6 +23,7 @@ Page({
   goDiagnose: function() { wx.navigateTo({ url: '/pages/diagnose/diagnose' }) },
   goTranslate: function() { wx.navigateTo({ url: '/pages/translate/translate' }) },
   goCheck: function() { wx.navigateTo({ url: '/pages/check/check' }) },
+  goReply: function() { wx.navigateTo({ url: '/pages/check/check?mode=reply' }) },
   goPredict: function() { wx.navigateTo({ url: '/pages/predict/predict' }) },
   goHistory: function() { wx.navigateTo({ url: '/pages/history/history' }) },
   goProfiles: function() { wx.navigateTo({ url: '/pages/profiles/profiles' }) },

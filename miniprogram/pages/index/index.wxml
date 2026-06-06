@@ -1,73 +1,124 @@
 <view class="container fu" style="padding: 0 32rpx 120rpx;">
   <view style="height: {{statusBarHeight + 10}}px"></view>
 
-  <view style="text-align: center; padding: 60rpx 0 24rpx;">
-    <view style="font-size: 18rpx; color: #B8860B; font-weight: 700; letter-spacing: 6rpx; margin-bottom: 20rpx;">YIDU</view>
-    <view class="serif" style="font-size: 80rpx; font-weight: 900; color: #1A1A2E; letter-spacing: 10rpx; line-height: 1.2;">已读</view>
+  <view class="home-hero">
+    <view style="font-size: 18rpx; color: #B8860B; font-weight: 800; letter-spacing: 6rpx; margin-bottom: 18rpx;">YIDU</view>
+    <view class="serif" style="font-size: 78rpx; font-weight: 900; color: #1A1A2E; letter-spacing: 8rpx; line-height: 1.2;">已读</view>
     <view class="gold-line"></view>
-    <view style="font-size: 22rpx; color: #8395A7; letter-spacing: 3rpx;">Ta不是不爱你 — 是你们都有病</view>
+    <view style="font-size: 22rpx; color: #8395A7; letter-spacing: 2rpx;">别只截图发疯，先把这个 Ta 建档</view>
   </view>
 
-  <view class="card" style="padding: 48rpx 40rpx; margin-bottom: 24rpx;" bindtap="goQuiz">
-    <view style="font-size: 20rpx; color: #B8860B; font-weight: 700; letter-spacing: 4rpx; margin-bottom: 16rpx;">START HERE</view>
-    <view class="serif" style="font-size: 44rpx; font-weight: 900; color: #1A1A2E; line-height: 1.3; margin-bottom: 8rpx;">依恋类型测试</view>
-    <view style="font-size: 24rpx; color: #8395A7;">24道专业题 · 3分钟 · 毒舌解读</view>
+  <view class="primary-card" bindtap="goProfiles">
+    <view style="display: flex; justify-content: space-between; align-items: flex-start; gap: 28rpx;">
+      <view style="flex: 1;">
+        <view style="font-size: 20rpx; color: #B8860B; font-weight: 900; letter-spacing: 3rpx; margin-bottom: 16rpx;">START HERE</view>
+        <view class="serif" style="font-size: 46rpx; font-weight: 900; color: #1A1A2E; line-height: 1.3;">先建一个 Ta</view>
+        <view style="font-size: 25rpx; color: rgba(26,26,46,0.72); line-height: 1.75; margin-top: 12rpx;">把聊天、预测、回复建议都挂到同一个人身上，别让前任和暧昧对象互相污染。</view>
+      </view>
+      <view class="primary-icon">🗃️</view>
+    </view>
+    <view class="primary-cta">进入关系档案 ›</view>
   </view>
 
-  <view class="card-sm" style="padding: 32rpx 40rpx; margin-bottom: 24rpx;">
-    <view class="serif" style="font-size: 26rpx; color: rgba(26,26,46,0.73); line-height: 2; font-style: italic;">"{{dailyQuote}}"</view>
-    <view style="font-size: 18rpx; color: #B8860B; margin-top: 12rpx; font-weight: 700; letter-spacing: 4rpx;">DAILY QUOTE</view>
-  </view>
-
-  <view style="display: flex; gap: 20rpx; margin-bottom: 24rpx;">
-    <view class="mini-entry" style="flex: 1;" bindtap="goProfiles">
-      <view style="font-size: 34rpx; margin-bottom: 8rpx;">🗃️</view>
-      <view style="font-size: 26rpx; font-weight: 800; color: #1A1A2E;">关系档案</view>
-      <view style="font-size: 20rpx; color: #8395A7; margin-top: 4rpx;">分开管理每个Ta</view>
+  <view class="path-card">
+    <view class="section-kicker">第一次用，照这个顺序</view>
+    <view class="path-row" bindtap="goQuiz">
+      <view class="path-no">1</view>
+      <view style="flex: 1;">
+        <view class="path-title">测自己</view>
+        <view class="path-desc">先知道你是怎么被关系拿捏的</view>
+      </view>
+      <view class="path-arrow">›</view>
     </view>
-    <view class="mini-entry" style="flex: 1;" bindtap="goHistory">
-      <view style="font-size: 34rpx; margin-bottom: 8rpx;">🗂️</view>
-      <view style="font-size: 26rpx; font-weight: 800; color: #1A1A2E;">最近分析</view>
-      <view style="font-size: 20rpx; color: #8395A7; margin-top: 4rpx;">复看历史结果</view>
+    <view class="path-row" bindtap="goProfiles">
+      <view class="path-no">2</view>
+      <view style="flex: 1;">
+        <view class="path-title">建 Ta 档案</view>
+        <view class="path-desc">之后每次分析都能带入历史</view>
+      </view>
+      <view class="path-arrow">›</view>
     </view>
-  </view>
-
-  <view style="display: flex; margin-bottom: 20rpx;">
-    <view class="func-card" style="flex: 1; margin-right: 20rpx;" bindtap="goDiagnose">
-      <view style="font-size: 48rpx; margin-bottom: 12rpx;">🩺</view>
-      <view style="font-size: 28rpx; font-weight: 700; color: #1A1A2E; margin-bottom: 4rpx;">聊天记录确诊</view>
-      <view style="font-size: 22rpx; color: #8395A7;">AI观察互动模式</view>
-    </view>
-    <view class="func-card" style="flex: 1;" bindtap="goTranslate">
-      <view style="font-size: 48rpx; margin-bottom: 12rpx;">🔮</view>
-      <view style="font-size: 28rpx; font-weight: 700; color: #1A1A2E; margin-bottom: 4rpx;">翻译潜台词</view>
-      <view style="font-size: 22rpx; color: #8395A7;">Ta到底什么意思</view>
-    </view>
-  </view>
-
-  <view style="display: flex; margin-bottom: 36rpx;">
-    <view class="func-card-sm" style="flex: 1; margin-right: 20rpx;" bindtap="goCheck">
-      <view style="font-size: 40rpx; margin-bottom: 8rpx;">💊</view>
-      <view style="font-size: 26rpx; font-weight: 700; color: #1A1A2E;">发不发</view>
-      <view style="font-size: 20rpx; color: #C8D6E5; margin-top: 4rpx;">拦住冲动</view>
-    </view>
-    <view class="func-card-sm" style="flex: 1;" bindtap="goPredict">
-      <view style="font-size: 40rpx; margin-bottom: 8rpx;">🔭</view>
-      <view style="font-size: 26rpx; font-weight: 700; color: #1A1A2E;">预测</view>
-      <view style="font-size: 20rpx; color: #C8D6E5; margin-top: 4rpx;">感情走向</view>
+    <view class="path-row last" bindtap="goDiagnose">
+      <view class="path-no">3</view>
+      <view style="flex: 1;">
+        <view class="path-title">上传聊天确诊</view>
+        <view class="path-desc">看你们到底在拉扯什么</view>
+      </view>
+      <view class="path-arrow">›</view>
     </view>
   </view>
 
-  <view class="card" style="padding: 40rpx 36rpx;">
-    <view style="font-size: 22rpx; color: #8395A7; letter-spacing: 4rpx; font-weight: 600; margin-bottom: 24rpx;">ATTACHMENT STYLES</view>
-    <view wx:for="{{types}}" wx:key="key" style="display: flex; align-items: center; padding: 18rpx 0; {{index < 3 ? 'border-bottom: 2rpx solid rgba(0,0,0,0.04);' : ''}}">
-      <text style="font-size: 36rpx; margin-right: 16rpx;">{{item.emoji}}</text>
-      <text class="serif" style="font-size: 24rpx; font-weight: 700; color: {{item.color}}; width: 86rpx; margin-right: 12rpx;">{{item.label}}</text>
-      <text style="font-size: 22rpx; color: #8395A7; flex: 1;">{{item.desc}}</text>
+  <view class="card-sm quote-card">
+    <view class="serif" style="font-size: 25rpx; color: rgba(26,26,46,0.73); line-height: 1.9; font-style: italic;">"{{dailyQuote}}"</view>
+    <view style="font-size: 18rpx; color: #B8860B; margin-top: 12rpx; font-weight: 800; letter-spacing: 4rpx;">DAILY QUOTE</view>
+  </view>
+
+  <view class="section-head">
+    <view>
+      <view class="serif" style="font-size: 34rpx; font-weight: 900; color: #1A1A2E;">常用入口</view>
+      <view style="font-size: 22rpx; color: #8395A7; margin-top: 4rpx;">先看关系，再决定怎么回</view>
     </view>
   </view>
 
-  <view style="text-align: center; padding: 60rpx 0 32rpx;">
+  <view class="main-grid">
+    <view class="feature-card strong" bindtap="goDiagnose">
+      <view class="feature-icon">🩺</view>
+      <view class="feature-title">聊天确诊</view>
+      <view class="feature-desc">上传聊天，看双方依恋模式</view>
+    </view>
+    <view class="feature-card strong" bindtap="goReply">
+      <view class="feature-icon">✍️</view>
+      <view class="feature-title">下一句怎么回</view>
+      <view class="feature-desc">生成能发出去的话</view>
+    </view>
+  </view>
+
+  <view class="tool-grid">
+    <view class="tool-card" bindtap="goCheck">
+      <view class="tool-icon">💊</view>
+      <view class="tool-title">发不发</view>
+      <view class="tool-desc">拦住冲动</view>
+    </view>
+    <view class="tool-card" bindtap="goPredict">
+      <view class="tool-icon">🔭</view>
+      <view class="tool-title">预测</view>
+      <view class="tool-desc">看关系走向</view>
+    </view>
+    <view class="tool-card" bindtap="goTranslate">
+      <view class="tool-icon">🔮</view>
+      <view class="tool-title">潜台词</view>
+      <view class="tool-desc">翻译人话</view>
+    </view>
+  </view>
+
+  <view class="support-row">
+    <view class="support-card" bindtap="goQuiz">
+      <view style="font-size: 30rpx;">🔥</view>
+      <view>
+        <view class="support-title">依恋测试</view>
+        <view class="support-desc">24题看清你自己</view>
+      </view>
+    </view>
+    <view class="support-card" bindtap="goHistory">
+      <view style="font-size: 30rpx;">🗂️</view>
+      <view>
+        <view class="support-title">最近分析</view>
+        <view class="support-desc">复看历史结果</view>
+      </view>
+    </view>
+  </view>
+
+  <view class="types-card">
+    <view style="font-size: 21rpx; color: #8395A7; letter-spacing: 3rpx; font-weight: 800; margin-bottom: 20rpx;">ATTACHMENT STYLES</view>
+    <view class="type-grid">
+      <view wx:for="{{types}}" wx:key="key" class="type-chip">
+        <text style="font-size: 30rpx; margin-right: 10rpx;">{{item.emoji}}</text>
+        <text style="font-size: 22rpx; font-weight: 900; color: {{item.color}};">{{item.label}}</text>
+      </view>
+    </view>
+  </view>
+
+  <view style="text-align: center; padding: 52rpx 0 32rpx;">
     <view style="font-size: 20rpx; color: #CCC; letter-spacing: 4rpx;">YIDU</view>
   </view>
 </view>
