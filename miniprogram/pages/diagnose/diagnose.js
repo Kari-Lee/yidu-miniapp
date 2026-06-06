@@ -136,7 +136,7 @@ function totalBase64Chars(images) {
   }, 0)
 }
 
-function callWithBase64Fallback(self, um, uploadError) {
+function callWithBase64Fallback(self, um, uploadError, requestOptions) {
   if (uploadError && uploadError.code !== 'OSS_UNAVAILABLE') {
     self.setData({ loadingMsg: '切换备用分析通道' })
   }
@@ -144,7 +144,7 @@ function callWithBase64Fallback(self, um, uploadError) {
     if (totalBase64Chars(images) > MAX_TOTAL_BASE64_CHARS) {
       throw new Error('图片通道繁忙，请直接再试一次')
     }
-    return API.callAI(D.P.diagnose, um, images)
+    return API.callAI(D.P.diagnose, um, images, null, requestOptions)
   })
 }
 
@@ -157,7 +157,7 @@ Page({
     statusBarHeight: 0, step: 'input', text: '', ctx: '', imgs: [], err: null,
     initialCtx: '', profileId: '', profileName: '', profileHistoryCount: 0, contextTip: '',
     ctxEnabled: false, initialCtxEnabled: false, ctxPreviewOpen: false,
-    hasInput: false, loadingMsg: '', res: null,
+    hasInput: false, submitting: false, loadingMsg: '', res: null,
     userTI: null, partnerTI: null, userGrad: '', partnerGrad: '', userBg: '', partnerBg: '',
     profileSynced: false
   },
@@ -258,6 +258,7 @@ Page({
   backToInput: function() { this.setData({ step: 'input' }) },
 
   resetInput: function() {
+    this._submitting = false
     this.setData({
       step: 'input',
       text: '',
@@ -268,20 +269,26 @@ Page({
       err: null,
       hasInput: false,
       res: null,
+      submitting: false,
       profileSynced: false
     })
   },
 
   submit: function() {
+    if (this._submitting) return
     var self = this
+    self._submitting = true
     self.stopLoading()
-    self.setData({ step: 'loading', err: null, loadingMsg: MSGS[0] })
+    self.setData({ step: 'loading', err: null, submitting: true, loadingMsg: MSGS[0] })
     var n = 0
     self._timer = setInterval(function() { n++; self.setData({ loadingMsg: MSGS[n % MSGS.length] }) }, 1200)
 
     var ctx = (!self.data.contextTip || self.data.ctxEnabled) ? self.data.ctx : ''
     var um = (ctx ? '关系背景：' + ctx + '\n\n' : '') +
       (self.data.text.trim() ? '聊天记录：\n' + self.data.text : '请分析这些聊天记录截图')
+    var requestOptions = {
+      onRetry: function() { self.setData({ loadingMsg: '连接波动，正在自动重试' }) }
+    }
 
     var uploadImages = totalImageBytes(self.data.imgs) > MAX_TOTAL_BYTES
       ? optimizeImages(self.data.imgs.map(function(item) { return item.originalPath || item.path }))
@@ -289,17 +296,18 @@ Page({
 
     uploadImages.then(function(imgs) {
       if (imgs !== self.data.imgs) self.setData({ imgs: imgs })
-      if (!imgs.length) return API.callAI(D.P.diagnose, um, null)
+      if (!imgs.length) return API.callAI(D.P.diagnose, um, null, null, requestOptions)
       return OSS.uploadImages(imgs, function(done, total) {
         self.setData({ loadingMsg: '上传截图 ' + done + '/' + total })
       }).then(function(imageKeys) {
         self.setData({ loadingMsg: '识别聊天内容' })
-        return API.callAI(D.P.diagnose, um, null, imageKeys)
-      }).catch(function(err) {
-        return callWithBase64Fallback(self, um, err)
+        return API.callAI(D.P.diagnose, um, null, imageKeys, requestOptions)
+      }, function(err) {
+        return callWithBase64Fallback(self, um, err, requestOptions)
       })
     }).then(function(res) {
       self.stopLoading()
+      self._submitting = false
       res = N.normalizeDiagnose(res)
       var ut = D.TI[res.user_type] || D.TI.secure
       var pt = D.TI[res.partner_type] || D.TI.secure
@@ -321,11 +329,13 @@ Page({
         partnerGrad: GRADS[res.partner_type] || GRADS.secure,
         userBg: BGS[res.user_type] || BGS.secure,
         partnerBg: BGS[res.partner_type] || BGS.secure,
-        profileSynced: false
+        profileSynced: false,
+        submitting: false
       })
     }).catch(function(e) {
       self.stopLoading()
-      self.setData({ step: 'input', err: e.message || '出错了' })
+      self._submitting = false
+      self.setData({ step: 'input', err: e.message || '出错了', submitting: false })
     })
   },
 

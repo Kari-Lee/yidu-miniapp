@@ -22,7 +22,7 @@ Page({
     initialPType: '', profileId: '', profileName: '', profileHistoryCount: 0, contextTip: '',
     ctxEnabled: false, initialCtxEnabled: false, ctxPreviewOpen: false,
     isReplyMode: false,
-    hasInput: false, loadingMsg: '', res: null,
+    hasInput: false, submitting: false, loadingMsg: '', res: null,
     typeOptions: [
       { key:'avoidant', emoji:'🧊', label:'回避型', color:'#0984E3', bg:'rgba(9,132,227,0.08)' },
       { key:'anxious', emoji:'🔥', label:'焦虑型', color:'#E17055', bg:'rgba(225,112,85,0.08)' },
@@ -75,6 +75,7 @@ Page({
   toggleCtxEnabled: function(e) { this.setData({ ctxEnabled: e.detail.value }) },
   toggleCtxPreview: function() { this.setData({ ctxPreviewOpen: !this.data.ctxPreviewOpen }) },
   resetInput: function() {
+    this._submitting = false
     this.setData({
       step: 'input',
       text: '',
@@ -83,16 +84,19 @@ Page({
       ctxPreviewOpen: false,
       err: null,
       res: null,
+      submitting: false,
       hasInput: this.data.isReplyMode && !!this.data.replyTask
     })
   },
 
   submit: function() {
+    if (this._submitting) return
     if (!this.data.text.trim() && !(this.data.isReplyMode && this.data.replyTask)) return
     var self = this
+    self._submitting = true
     self.stopLoading()
     var msgs = self.data.isReplyMode ? REPLY_MSGS : MSGS
-    self.setData({ step: 'loading', err: null, loadingMsg: msgs[0] })
+    self.setData({ step: 'loading', err: null, submitting: true, loadingMsg: msgs[0] })
     var n = 0
     self._timer = setInterval(function() { n++; self.setData({ loadingMsg: msgs[n % msgs.length] }) }, 1200)
 
@@ -110,8 +114,11 @@ Page({
         '对方类型：' + typeLabel + '\n\n我想发：' + self.data.text
     }
 
-    API.callAI(prompt, um, null).then(function(res) {
+    API.callAI(prompt, um, null, null, {
+      onRetry: function() { self.setData({ loadingMsg: '连接波动，正在自动重试' }) }
+    }).then(function(res) {
       self.stopLoading()
+      self._submitting = false
       res = self.data.isReplyMode ? N.normalizeReply(res) : N.normalizeCheck(res)
       H.addRecord({
         kind: self.data.isReplyMode ? 'reply' : 'check',
@@ -123,10 +130,11 @@ Page({
         profileName: self.data.profileName,
         result: res
       })
-      self.setData({ step: 'result', res: res })
+      self.setData({ step: 'result', res: res, submitting: false })
     }).catch(function(e) {
       self.stopLoading()
-      self.setData({ step: 'input', err: e.message || '出错了' })
+      self._submitting = false
+      self.setData({ step: 'input', err: e.message || '出错了', submitting: false })
     })
   },
 

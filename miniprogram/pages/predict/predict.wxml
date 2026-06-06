@@ -64,7 +64,7 @@
     </view>
     <view style="display: flex; gap: 20rpx; margin-top: 28rpx;">
       <button class="btn-reset" style="flex: 1;" bindtap="backToInput">返回</button>
-      <button class="btn-main" style="flex: 2; background: #5B8FB9;" bindtap="submit">预测 🔭</button>
+      <button class="btn-main" style="flex: 2; background: #5B8FB9;" disabled="{{submitting}}" bindtap="submit">预测 🔭</button>
     </view>
   </view>
 

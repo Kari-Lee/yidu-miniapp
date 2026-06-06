@@ -20,7 +20,7 @@ Page({
     statusBarHeight: 0, step: 'input', text: '', ctx: '', err: null,
     initialCtx: '', profileId: '', profileName: '', profileHistoryCount: 0, contextTip: '',
     ctxEnabled: false, initialCtxEnabled: false, ctxPreviewOpen: false,
-    hasInput: false, loadingMsg: '', res: null,
+    hasInput: false, submitting: false, loadingMsg: '', res: null,
     predBgs: ['#FFF5F3', '#FFF9E6', '#F0FFF4']
   },
   _timer: null,
@@ -55,6 +55,7 @@ Page({
   nextStep: function() { if (this.data.hasInput) this.setData({ step: 'context' }) },
   backToInput: function() { this.setData({ step: 'input' }) },
   resetInput: function() {
+    this._submitting = false
     this.setData({
       step: 'input',
       text: '',
@@ -63,14 +64,17 @@ Page({
       ctxPreviewOpen: false,
       err: null,
       res: null,
+      submitting: false,
       hasInput: false
     })
   },
 
   submit: function() {
+    if (this._submitting) return
     var self = this
+    self._submitting = true
     self.stopLoading()
-    self.setData({ step: 'loading', err: null, loadingMsg: MSGS[0] })
+    self.setData({ step: 'loading', err: null, submitting: true, loadingMsg: MSGS[0] })
     var n = 0
     self._timer = setInterval(function() { n++; self.setData({ loadingMsg: MSGS[n % MSGS.length] }) }, 1200)
 
@@ -78,8 +82,11 @@ Page({
     var um = (ctx ? '关系背景：' + ctx + '\n\n' : '') +
       (self.data.text.trim() ? '聊天记录：\n' + self.data.text : '')
 
-    API.callAI(D.P.predict, um, null).then(function(res) {
+    API.callAI(D.P.predict, um, null, null, {
+      onRetry: function() { self.setData({ loadingMsg: '连接波动，正在自动重试' }) }
+    }).then(function(res) {
       self.stopLoading()
+      self._submitting = false
       res = N.normalizePredict(res)
       H.addRecord({
         kind: 'predict',
@@ -91,10 +98,11 @@ Page({
         profileName: self.data.profileName,
         result: res
       })
-      self.setData({ step: 'result', res: res })
+      self.setData({ step: 'result', res: res, submitting: false })
     }).catch(function(e) {
       self.stopLoading()
-      self.setData({ step: 'input', err: e.message || '出错了' })
+      self._submitting = false
+      self.setData({ step: 'input', err: e.message || '出错了', submitting: false })
     })
   },
 
