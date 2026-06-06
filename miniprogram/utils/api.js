@@ -1,11 +1,12 @@
 var app = getApp()
-var REQUEST_TIMEOUT = 60000
+var REQUEST_TIMEOUT = 70000
 
 function getErrorMessage(r) {
   var data = r.data || {}
   if (data.error) return data.error
   if (r.statusCode === 413) return '截图太大了，少传几张或裁剪后再试'
   if (r.statusCode === 429) return '分析太频繁了，稍等一下再试'
+  if (r.statusCode === 504) return '分析超时了，减少截图后再试'
   if (r.statusCode >= 500) return 'AI服务暂时不稳定，等会再试'
   return '服务暂时不可用'
 }

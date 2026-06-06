@@ -18,8 +18,13 @@ var BGS = {
 }
 var MSGS = ["扫描互动模式", "分析依恋信号", "生成双人报告"]
 var MAX_IMAGES = 8
-var COMPRESS_QUALITY = 65
-var MAX_TOTAL_BYTES = 7 * 1024 * 1024
+var COMPRESS_QUALITY = 52
+var RETRY_COMPRESS_QUALITY = 32
+var COMPRESS_WIDTH = 1440
+var RETRY_COMPRESS_WIDTH = 1080
+var MAX_IMAGE_BYTES = 1.4 * 1024 * 1024
+var MAX_TOTAL_BYTES = 2.8 * 1024 * 1024
+var MAX_TOTAL_BASE64_CHARS = 3.8 * 1024 * 1024
 
 function safeDecode(v) {
   try { return decodeURIComponent(v) } catch(e) { return v || '' }
@@ -46,26 +51,36 @@ function getFileInfo(path) {
   })
 }
 
-function compressImage(path) {
+function compressImage(path, quality, width) {
   return new Promise(function(resolve) {
     wx.compressImage({
       src: path,
-      quality: COMPRESS_QUALITY,
+      quality: quality,
+      compressedWidth: width,
       success: function(r) { resolve(r.tempFilePath || path) },
       fail: function() { resolve(path) }
     })
   })
 }
 
+function makeImageItem(path, originalPath) {
+  return getFileInfo(path).then(function(info) {
+    return {
+      path: path,
+      originalPath: originalPath,
+      size: info.size,
+      sizeText: info.sizeText
+    }
+  })
+}
+
 function prepareImage(path) {
-  return compressImage(path).then(function(compressedPath) {
-    return getFileInfo(compressedPath).then(function(info) {
-      return {
-        path: compressedPath,
-        originalPath: path,
-        size: info.size,
-        sizeText: info.sizeText
-      }
+  return compressImage(path, COMPRESS_QUALITY, COMPRESS_WIDTH).then(function(compressedPath) {
+    return makeImageItem(compressedPath, path)
+  }).then(function(item) {
+    if (!item.size || item.size <= MAX_IMAGE_BYTES) return item
+    return compressImage(path, RETRY_COMPRESS_QUALITY, RETRY_COMPRESS_WIDTH).then(function(compressedPath) {
+      return makeImageItem(compressedPath, path)
     })
   })
 }
@@ -89,9 +104,35 @@ function readImageAsBase64(path) {
 
 function readImagesAsBase64(paths) {
   if (!paths || paths.length === 0) return Promise.resolve(null)
-  return Promise.all(paths.map(function(item) {
-    return readImageAsBase64(item.path || item)
-  }))
+  var results = []
+  return paths.reduce(function(chain, item) {
+    return chain.then(function() {
+      return readImageAsBase64(item.path || item).then(function(base64) {
+        results.push(base64)
+      })
+    })
+  }, Promise.resolve()).then(function() { return results })
+}
+
+function totalBase64Chars(images) {
+  return (images || []).reduce(function(sum, image) {
+    return sum + (image ? image.length : 0)
+  }, 0)
+}
+
+function fitImages(existing, incoming) {
+  var kept = existing.slice()
+  var bytes = totalImageBytes(kept)
+  var skipped = 0
+  incoming.forEach(function(item) {
+    if ((item.size && item.size > MAX_IMAGE_BYTES) || bytes + (item.size || 0) > MAX_TOTAL_BYTES) {
+      skipped++
+      return
+    }
+    kept.push(item)
+    bytes += item.size || 0
+  })
+  return { images: kept, skipped: skipped }
 }
 
 function hasInput(text, imgs) {
@@ -164,8 +205,11 @@ Page({
         wx.showLoading({ title: '压缩中' })
         Promise.all(r.tempFilePaths.map(prepareImage)).then(function(items) {
           wx.hideLoading()
-          var imgs = self.data.imgs.concat(items)
-          self.setData({ imgs: imgs, hasInput: true })
+          var fitted = fitImages(self.data.imgs, items)
+          self.setData({ imgs: fitted.images, hasInput: hasInput(self.data.text, fitted.images) })
+          if (fitted.skipped) {
+            wx.showToast({ title: '部分截图过大，已自动跳过', icon: 'none' })
+          }
         }).catch(function() {
           wx.hideLoading()
           wx.showToast({ title: '图片处理失败，请重选', icon: 'none' })
@@ -219,7 +263,7 @@ Page({
   submit: function() {
     var self = this
     if (totalImageBytes(self.data.imgs) > MAX_TOTAL_BYTES) {
-      self.setData({ err: '截图总大小超过7MB，请删除几张或裁剪后再试' })
+      self.setData({ err: '截图总大小超过2.8MB，请删除几张或裁剪后再试' })
       return
     }
     self.stopLoading()
@@ -232,6 +276,9 @@ Page({
       (self.data.text.trim() ? '聊天记录：\n' + self.data.text : '请分析这些聊天记录截图')
 
     readImagesAsBase64(self.data.imgs).then(function(images) {
+      if (totalBase64Chars(images) > MAX_TOTAL_BASE64_CHARS) {
+        throw new Error('截图编码后仍然太大，请删除一两张再试')
+      }
       return API.callAI(D.P.diagnose, um, images)
     }).then(function(res) {
       self.stopLoading()
