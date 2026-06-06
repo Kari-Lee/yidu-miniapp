@@ -29,48 +29,78 @@
     </view>
   </view>
 
-  <view wx:if="{{result}}" class="fu">
-    <view style="border-radius: 48rpx; padding: 80rpx 48rpx 64rpx; text-align: center; position: relative; overflow: hidden; background: {{typeGrad}};">
-      <view style="font-size: 120rpx; margin-bottom: 24rpx;">{{typeInfo.emoji}}</view>
-      <view class="serif" style="font-size: 20rpx; letter-spacing: 6rpx; opacity: 0.6; margin-bottom: 20rpx; font-style: italic;">your attachment style</view>
-      <view class="serif" style="font-size: 72rpx; font-weight: 900; margin-bottom: 16rpx;">{{typeInfo.label}}</view>
-      <view style="font-size: 28rpx; opacity: 0.8;">{{typeInfo.desc}}</view>
-    </view>
-
-    <view style="display: flex; gap: 12rpx; justify-content: center; margin: 32rpx 0; flex-wrap: wrap;">
-      <text wx:for="{{typeInfo.traits}}" wx:key="index" style="padding: 10rpx 24rpx; border-radius: 999rpx; font-size: 22rpx; font-weight: 600; background: rgba(0,0,0,0.04); color: rgba(26,26,46,0.8);">#{{item}}</text>
-    </view>
-
-    <view class="card" style="padding: 40rpx;">
-      <view class="serif" style="font-size: 28rpx; font-weight: 700; color: #1A1A2E; margin-bottom: 16rpx;">🔍 你的画像</view>
-      <view style="font-size: 28rpx; line-height: 2; color: rgba(26,26,46,0.87);">{{typeInfo.detail}}</view>
-    </view>
-
-    <view class="card" style="padding: 40rpx;">
-      <view style="font-size: 26rpx; font-weight: 700; color: #8395A7; margin-bottom: 24rpx;">各维度得分</view>
-      <view wx:for="{{scoreList}}" wx:key="key" style="display: flex; align-items: center; gap: 16rpx; margin-bottom: 20rpx;">
-        <text style="font-size: 32rpx; width: 44rpx;">{{item.emoji}}</text>
-        <text style="font-size: 24rpx; width: 80rpx; color: #8395A7; font-weight: 600;">{{item.label}}</text>
-        <view style="flex: 1; height: 12rpx; background: rgba(0,0,0,0.04); border-radius: 99rpx; overflow: hidden;">
-          <view style="height: 100%; width: {{item.pct}}%; background: {{item.grad}}; border-radius: 99rpx;"></view>
-        </view>
-        <text style="font-size: 26rpx; color: {{item.color}}; font-weight: 700; width: 64rpx; text-align: right;">{{item.pct}}%</text>
+  <view wx:if="{{result}}" class="fu result-page">
+    <view class="result-hero">
+      <view class="result-watermark">YIDU</view>
+      <view class="result-topline">
+        <text>{{posterData.en}}</text>
+        <view style="background: {{typeInfo.color}};"></view>
+      </view>
+      <view class="result-number">{{posterData.no}}</view>
+      <view class="result-label" style="color: {{typeInfo.color}};">你的依恋人格｜{{typeInfo.label}}</view>
+      <view class="result-headline">
+        <view>{{posterData.headlineTop}}</view>
+        <view>{{posterData.headlineBottom}}</view>
+      </view>
+      <view class="result-verdict">{{posterData.verdict}}</view>
+      <view class="result-warning">
+        <view class="warning-kicker" style="color: {{typeInfo.color}};">RELATIONSHIP WARNING</view>
+        <view>{{posterData.warning}}</view>
       </view>
     </view>
 
-    <view class="card" style="padding: 40rpx; background: {{typeBg}}; box-shadow: none;">
-      <view class="serif" style="font-size: 28rpx; font-weight: 700; color: #1A1A2E; margin-bottom: 16rpx;">💡 给你的话</view>
-      <view style="font-size: 28rpx; line-height: 2; color: rgba(26,26,46,0.87);">{{typeInfo.advice}}</view>
+    <view class="trait-row">
+      <text wx:for="{{typeInfo.traits}}" wx:key="index">#{{item}}</text>
     </view>
 
-    <view style="display: flex; gap: 20rpx; margin-top: 16rpx;">
-      <button class="btn-reset" style="flex: 1;" bindtap="retry">重测 ↻</button>
-      <button class="btn-reset" style="flex: 1;" bindtap="copyResult">复制</button>
+    <view class="result-section">
+      <view class="section-index">01 / PERSONA</view>
+      <view class="section-title">你在关系里的样子</view>
+      <view class="section-copy">{{typeInfo.detail}}</view>
     </view>
-    <view style="display: flex; gap: 20rpx; margin-top: 16rpx;">
-      <button class="btn-reset" style="flex: 1;" open-type="share">分享</button>
-      <button class="btn-main" style="flex: 1;" bindtap="goDiagnose">继续分析 🩺</button>
+
+    <view class="score-section">
+      <view class="section-index">02 / FOUR-DIMENSION SCORE</view>
+      <view class="section-title">你的关系人格配方</view>
+      <view wx:for="{{scoreList}}" wx:key="key" class="score-row">
+        <view class="score-meta">
+          <text>{{item.label}}</text>
+          <text style="color: {{item.color}};">{{item.pct}}%</text>
+        </view>
+        <view class="score-track">
+          <view style="width: {{item.pct}}%; background: {{item.color}};"></view>
+        </view>
+      </view>
+    </view>
+
+    <view class="advice-section" style="border-color: {{typeInfo.color}};">
+      <view class="section-index" style="color: {{typeInfo.color}};">03 / WHAT NOW</view>
+      <view class="section-title">别急着改，先别再骗自己</view>
+      <view class="section-copy">{{typeInfo.advice}}</view>
+    </view>
+
+    <view class="share-preview">
+      <view class="share-preview-kicker">朋友圈人格海报</view>
+      <view class="share-preview-title">{{posterData.caption}}</view>
+      <view class="share-preview-foot">
+        <text>保存海报，再配这句文案</text>
+        <text>24Q</text>
+      </view>
+    </view>
+
+    <button class="poster-save-btn" disabled="{{posterSaving}}" bindtap="savePoster">保存朋友圈海报</button>
+    <view class="share-actions">
+      <button bindtap="copyShareCaption">复制朋友圈文案</button>
+      <button open-type="share">发给朋友</button>
+    </view>
+
+    <view class="result-actions">
+      <button bindtap="retry">重新测试</button>
+      <button bindtap="copyResult">复制完整结果</button>
+      <button class="dark" bindtap="goDiagnose">继续分析关系</button>
     </view>
     <view class="disclaimer">测试结果基于你选择的答案生成，只适合自我觉察，不构成心理诊断。你不是一个标签，最多是暂时被这个标签说中了。</view>
   </view>
+
+  <canvas type="2d" id="sharePoster" class="poster-canvas"></canvas>
 </view>

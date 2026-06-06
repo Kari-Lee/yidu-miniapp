@@ -12,7 +12,7 @@ function home() {
 }
 
 function quiz(label) {
-  return page(label ? '我测出是' + label + '，你也来试试' : '3分钟测出你的依恋类型', '/pages/quiz/quiz')
+  return page(label ? '我测出了' + label + '。有些话，测试比前任诚实' : '24题测出你的依恋人格，看完别急着嘴硬', '/pages/quiz/quiz')
 }
 
 function diagnose() {
