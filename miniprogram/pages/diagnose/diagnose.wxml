@@ -1,165 +1,131 @@
-<view class="container" style="padding-bottom: 120rpx;">
+<view class="tool-page">
   <view style="height: {{statusBarHeight}}px"></view>
-  <view style="padding: 24rpx 0;">
-    <text bindtap="goBack" style="font-size: 24rpx; color: #B8860B; font-weight: 600;">‹ 返回</text>
+  <view class="tool-topbar">
+    <text class="tool-back" bindtap="goBack">← 返回</text>
+    <text class="tool-brand">YIDU</text>
   </view>
 
-  <!-- ═══ INPUT ═══ -->
   <view wx:if="{{step === 'input'}}" class="fu">
-    <view wx:if="{{err}}" style="padding: 28rpx 36rpx; background: #FFF5F5; border-radius: 28rpx; margin-bottom: 28rpx; font-size: 26rpx; color: #E17055; border: 2rpx solid #FFE3E3;">{{err}}</view>
-    <view class="notice">
-      <view class="notice-title">上传前先打码</view>
-      <view>聊天截图会用于本次 AI 分析。建议隐藏头像、昵称、手机号和地址；结果只供关系观察参考，不是心理诊断。</view>
+    <view class="tool-head">
+      <view class="tool-head-no">02</view>
+      <view class="tool-kicker">CHAT DIAGNOSIS</view>
+      <view class="tool-title"><view>上传聊天</view><view>看清你们怎么拉扯</view></view>
+      <view class="tool-intro">支持多张截图。系统会自动优化并快速分析，不需要你手动裁剪文件大小。</view>
     </view>
+    <view wx:if="{{err}}" class="tool-error">{{err}}</view>
     <view wx:if="{{contextTip}}" class="context-tip">
       <view class="context-tip-head">
         <view style="flex: 1;">
           <view class="context-tip-title">带入关系历史</view>
-          <view class="context-tip-sub">{{ctxEnabled ? '本次会随聊天内容一起给 AI' : '已关闭，本次只分析你提交的新内容'}}</view>
+          <view class="context-tip-sub">{{ctxEnabled ? '档案与最近记录会参与分析' : '本次只分析新内容'}}</view>
         </view>
-        <switch checked="{{ctxEnabled}}" color="#00B894" bindchange="toggleCtxEnabled" style="transform: scale(0.78); transform-origin: right center;"></switch>
-      </view>
-      <view class="context-summary">
-        <view wx:if="{{ctxEnabled}}">已带入：关系档案</view>
-        <view wx:if="{{ctxEnabled}}">已带入：最近 {{profileHistoryCount}} 条历史摘要</view>
-        <view wx:if="{{!ctxEnabled}}">未带入：关系档案和历史摘要</view>
+        <switch checked="{{ctxEnabled}}" color="#2D2F33" bindchange="toggleCtxEnabled" style="transform: scale(0.78);"></switch>
       </view>
       <view class="context-actions">
-        <text class="context-link" bindtap="toggleCtxPreview">{{ctxPreviewOpen ? '收起带入内容' : '查看带入内容'}}</text>
-        <text class="context-muted">不会自动上传，只在本次提交时发送</text>
+        <text class="context-link" bindtap="toggleCtxPreview">{{ctxPreviewOpen ? '收起内容' : '查看内容'}}</text>
+        <text class="context-muted">{{profileHistoryCount}} 条历史摘要</text>
       </view>
       <view wx:if="{{ctxPreviewOpen}}" class="context-preview">{{ctx}}</view>
     </view>
-    <view class="card" style="padding: 52rpx;">
-      <!-- 图片上传 -->
-      <view style="margin-bottom: 32rpx;">
-        <view bindtap="chooseImg" style="display: flex; align-items: center; justify-content: center; gap: 16rpx; padding: 32rpx; border-radius: 32rpx; border: 4rpx dashed {{imgs.length ? 'rgba(0,184,148,0.5)' : 'rgba(0,0,0,0.04)'}}; background: {{imgs.length ? '#F0FFF4' : '#F4F8FB'}}; color: {{imgs.length ? '#00B894' : '#C8D6E5'}}; font-size: 28rpx; font-weight: 600;">
-          <text style="font-size: 44rpx;">{{imgs.length ? '📎' : '📷'}}</text>
-          <text>{{imgs.length ? imgs.length + '张截图已自动优化' : '上传聊天截图（可多选）'}}</text>
-        </view>
-        <view wx:if="{{imgs.length}}" class="shot-panel">
-          <view style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 18rpx;">
-            <text style="font-size: 22rpx; color: #8395A7; font-weight: 700;">已自动压缩 · 点击预览</text>
-            <text bindtap="clearImgs" style="font-size: 22rpx; color: #E17055; font-weight: 800;">清空</text>
-          </view>
-          <view class="shot-grid">
-            <view wx:for="{{imgs}}" wx:key="path" class="shot-tile" data-index="{{index}}" bindtap="previewImg">
-              <image class="shot-img" src="{{item.path}}" mode="aspectFill"></image>
-              <view class="shot-remove" data-index="{{index}}" catchtap="removeImg">×</view>
-              <view class="shot-order">{{index + 1}}</view>
-              <view class="shot-size">{{item.sizeText}}</view>
-            </view>
-          </view>
-        </view>
-        <view style="text-align: center; font-size: 24rpx; color: #C8D6E5; margin: 24rpx 0 12rpx;">—— 或 ——</view>
+
+    <view class="upload-zone {{imgs.length ? 'has-files' : ''}}" bindtap="chooseImg">
+      <view class="upload-no">{{imgs.length ? imgs.length : '+'}}</view>
+      <view>
+        <view class="upload-title">{{imgs.length ? '截图已自动优化' : '选择聊天截图'}}</view>
+        <view class="upload-sub">{{imgs.length ? '继续添加或点击下方预览' : '可一次多选，上传前请隐藏隐私'}}</view>
       </view>
-      <textarea style="width: 100%; padding: 28rpx 8rpx; background: transparent; border: none; color: #1A1A2E; font-size: 30rpx; line-height: 1.9;" maxlength="-1" auto-height placeholder="粘贴聊天记录..." placeholder-style="color: #C8D6E5" value="{{text}}" bindinput="onInput"></textarea>
+      <view class="upload-arrow">↗</view>
     </view>
-    <button class="btn-main" style="margin-top: 32rpx; background: {{hasInput ? '#2D3436' : '#ddd'}};" disabled="{{!hasInput}}" bindtap="nextStep">开始确诊 🩺</button>
+
+    <view wx:if="{{imgs.length}}" class="shot-panel">
+      <view class="shot-head"><text>SCREENSHOTS / {{imgs.length}}</text><text bindtap="clearImgs">清空</text></view>
+      <view class="shot-grid">
+        <view wx:for="{{imgs}}" wx:key="path" class="shot-tile" data-index="{{index}}" bindtap="previewImg">
+          <image class="shot-img" src="{{item.path}}" mode="aspectFill"></image>
+          <view class="shot-remove" data-index="{{index}}" catchtap="removeImg">×</view>
+          <view class="shot-order">0{{index + 1}}</view>
+        </view>
+      </view>
+    </view>
+
+    <view class="or-line"><text>或粘贴聊天文字</text></view>
+    <view class="tool-surface">
+      <textarea class="tool-textarea" maxlength="-1" auto-height placeholder="粘贴聊天记录…" placeholder-style="color: #B7BBC4" value="{{text}}" bindinput="onInput"></textarea>
+    </view>
+    <button class="tool-primary" disabled="{{!hasInput}}" bindtap="nextStep"><text>继续补充背景</text><text>↗</text></button>
   </view>
 
-  <!-- ═══ CONTEXT ═══ -->
   <view wx:if="{{step === 'context'}}" class="fu">
-    <view class="card" style="padding: 56rpx;">
-      <view class="serif" style="font-size: 44rpx; font-weight: 700; color: #1A1A2E; margin-bottom: 16rpx;">Ta是你的什么人？</view>
-      <view style="font-size: 26rpx; color: #8395A7; margin-bottom: 40rpx;">比如：暧昧三个月 / 同事 / Ta总是已读不回</view>
-      <view wx:if="{{contextTip}}" class="context-tip" style="margin-bottom: 26rpx;">
-        <view class="context-tip-head">
-          <view style="flex: 1;">
-            <view class="context-tip-title">带入关系历史</view>
-            <view class="context-tip-sub">{{ctxEnabled ? '你可以继续补充，提交时会一起发送' : '已关闭，本次只分析你提交的新内容'}}</view>
-          </view>
-          <switch checked="{{ctxEnabled}}" color="#00B894" bindchange="toggleCtxEnabled" style="transform: scale(0.78); transform-origin: right center;"></switch>
-        </view>
-        <view class="context-summary">
-          <view wx:if="{{ctxEnabled}}">已带入：关系档案</view>
-          <view wx:if="{{ctxEnabled}}">已带入：最近 {{profileHistoryCount}} 条历史摘要</view>
-          <view wx:if="{{!ctxEnabled}}">未带入：关系档案和历史摘要</view>
-        </view>
-        <view class="context-actions">
-          <text class="context-link" bindtap="toggleCtxPreview">{{ctxPreviewOpen ? '收起带入内容' : '查看带入内容'}}</text>
-          <text class="context-muted">不会自动上传，只在本次提交时发送</text>
-        </view>
-        <view wx:if="{{ctxPreviewOpen}}" class="context-preview">{{ctx}}</view>
-      </view>
-      <textarea style="width: 100%; padding: 28rpx 8rpx; background: transparent; border: none; border-top: 2rpx solid rgba(0,0,0,0.04); color: #1A1A2E; font-size: 30rpx; line-height: 1.9;" auto-height placeholder="正在折磨我的人..." placeholder-style="color: #C8D6E5" value="{{ctx}}" bindinput="onCtxInput"></textarea>
+    <view class="tool-head compact">
+      <view class="tool-kicker">RELATION CONTEXT</view>
+      <view class="tool-title"><view>Ta 是你的</view><view>什么人</view></view>
+      <view class="tool-intro">补充关系、时长和最常出现的拉扯模式。</view>
     </view>
-    <view style="display: flex; gap: 20rpx; margin-top: 28rpx;">
-      <button class="btn-reset" style="flex: 1;" bindtap="backToInput">返回</button>
-      <button class="btn-main" style="flex: 2;" disabled="{{submitting}}" bindtap="submit">确诊 🩺</button>
+    <view class="tool-surface">
+      <textarea class="tool-textarea context-area" auto-height placeholder="例如：暧昧三个月，Ta 每次靠近后又消失…" placeholder-style="color: #B7BBC4" value="{{ctx}}" bindinput="onCtxInput"></textarea>
+      <view wx:if="{{contextTip}}" class="context-inline">
+        <text>{{ctxEnabled ? '历史档案已开启' : '历史档案已关闭'}}</text>
+        <switch checked="{{ctxEnabled}}" color="#2D2F33" bindchange="toggleCtxEnabled" style="transform: scale(0.72);"></switch>
+      </view>
+    </view>
+    <view class="tool-button-row">
+      <button class="tool-secondary" bindtap="backToInput">返回修改</button>
+      <button class="tool-primary no-margin" disabled="{{submitting}}" bindtap="submit"><text>开始分析</text><text>↗</text></button>
     </view>
   </view>
 
-  <!-- ═══ LOADING ═══ -->
-  <view wx:if="{{step === 'loading'}}" class="fu" style="text-align: center;">
-    <view style="display: inline-flex; align-items: center; gap: 20rpx; padding: 28rpx 56rpx; border-radius: 999rpx; background: #fff; box-shadow: 0 8rpx 48rpx rgba(0,0,0,0.06); margin-bottom: 40rpx;">
-      <view class="loading-dots"><view></view><view></view><view></view></view>
-      <text style="font-size: 26rpx; color: #8395A7;">{{loadingMsg}}</text>
-    </view>
-    <view style="opacity: 0.5;">
-      <view style="display: flex; gap: 24rpx; margin-bottom: 28rpx;">
-        <view class="skeleton" style="flex: 1; height: 280rpx;"></view>
-        <view class="skeleton" style="flex: 1; height: 280rpx;"></view>
-      </view>
-      <view class="skeleton" style="height: 160rpx; margin-bottom: 28rpx;"></view>
-      <view class="skeleton" style="height: 240rpx;"></view>
-    </view>
+  <view wx:if="{{step === 'loading'}}" class="fu loading-stage">
+    <view class="loading-index">02</view>
+    <view class="loading-title">{{loadingMsg}}</view>
+    <view class="loading-sub">正在识别谁在追、谁在躲，以及谁嘴上没事心里已经演完三季。</view>
+    <view class="loading-bar"><view></view></view>
   </view>
 
-  <!-- ═══ RESULT ═══ -->
   <view wx:if="{{step === 'result' && res}}" class="fu">
-    <!-- 双方类型卡片 -->
-    <view style="display: flex; gap: 24rpx; margin-bottom: 28rpx;">
-      <view class="type-mini" style="background: {{userGrad}}; flex: 1;">
-        <text style="font-size: 80rpx; margin-bottom: 16rpx;">{{userTI.emoji}}</text>
-        <text class="serif" style="font-size: 44rpx; font-weight: 900;">你：{{res.user_label}}</text>
-        <text style="font-size: 24rpx; opacity: 0.8;">{{userTI.desc}}</text>
+    <view class="result-lead">
+      <view class="result-kicker">DUAL ATTACHMENT REPORT</view>
+      <view class="result-title"><view>你们不是没感情</view><view>是模式在互相点火</view></view>
+    </view>
+
+    <view class="type-duo">
+      <view class="type-panel">
+        <view class="type-role">YOU / 你</view>
+        <view class="type-name" style="color: {{userTI.color}};">{{res.user_label}}</view>
+        <view class="type-desc">{{userTI.desc}}</view>
       </view>
-      <view class="type-mini" style="background: {{partnerGrad}}; flex: 1;">
-        <text style="font-size: 80rpx; margin-bottom: 16rpx;">{{partnerTI.emoji}}</text>
-        <text class="serif" style="font-size: 44rpx; font-weight: 900;">Ta：{{res.partner_label}}</text>
-        <text style="font-size: 24rpx; opacity: 0.8;">{{partnerTI.desc}}</text>
+      <view class="type-panel dark">
+        <view class="type-role">THEM / Ta</view>
+        <view class="type-name" style="color: {{partnerTI.color}};">{{res.partner_label}}</view>
+        <view class="type-desc">{{partnerTI.desc}}</view>
       </view>
     </view>
 
-    <!-- 互动模式 -->
-    <view class="card" style="background: linear-gradient(135deg, #F8FAFB, #F0E6F6); border: none;">
-      <view class="serif" style="font-size: 28rpx; font-weight: 700; margin-bottom: 16rpx;">🔗 互动模式</view>
-      <view style="font-size: 30rpx; line-height: 1.9; color: rgba(26,26,46,0.87);">{{res.match}}</view>
+    <view class="result-section">
+      <view class="result-section-label">INTERACTION LOOP</view>
+      <view class="result-section-title">你们的互动循环</view>
+      <view class="result-copy">{{res.match}}</view>
+      <view class="confidence-line">
+        <text>分析置信度</text><text>{{res.confidence}}%</text>
+      </view>
+      <view class="confidence-track"><view style="width: {{res.confidence}}%;"></view></view>
     </view>
 
-    <!-- 置信度 -->
-    <view class="card">
-      <view style="display: flex; justify-content: space-between;">
-        <text style="font-size: 26rpx; color: #8395A7; font-weight: 700;">置信度</text>
-        <text style="font-size: 48rpx; font-weight: 900; color: #2D3436;">{{res.confidence}}%</text>
-      </view>
-      <view style="height: 10rpx; background: rgba(0,0,0,0.04); border-radius: 99rpx; overflow: hidden; margin-top: 20rpx;">
-        <view style="height: 100%; width: {{res.confidence}}%; background: linear-gradient(90deg, #2D3436, #636E72); border-radius: 99rpx;"></view>
-      </view>
-    </view>
-
-    <!-- 暴露信号 -->
-    <view class="card" style="padding: 48rpx;">
-      <view style="font-size: 26rpx; color: #8395A7; font-weight: 700; margin-bottom: 28rpx;">暴露信号</view>
-      <view wx:for="{{res.signals}}" wx:key="index" style="display: flex; gap: 24rpx; padding: 24rpx 0; {{index < 2 ? 'border-bottom: 2rpx solid rgba(0,0,0,0.04);' : ''}}">
-        <view style="width: 72rpx; height: 72rpx; border-radius: 24rpx; background: {{item.who === '用户' ? '#FFF5F3' : '#F0F6FA'}}; display: flex; align-items: center; justify-content: center; font-size: 32rpx; flex-shrink: 0;">{{item.icon}}</view>
-        <view style="flex: 1;">
-          <view style="font-size: 24rpx; color: #8395A7; margin-bottom: 4rpx;">{{item.who}}</view>
-          <view class="serif" style="font-size: 28rpx; font-weight: 700; color: #1A1A2E; margin-bottom: 8rpx;">「{{item.msg}}」</view>
-          <view style="font-size: 26rpx; color: #8395A7;">→ {{item.meaning}}</view>
+    <view class="result-section">
+      <view class="result-section-label">EXPOSED SIGNALS</view>
+      <view class="result-section-title">聊天里已经暴露的信号</view>
+      <view wx:for="{{res.signals}}" wx:key="index" class="signal-row">
+        <view class="signal-no">0{{index + 1}}</view>
+        <view class="signal-body">
+          <view class="signal-who">{{item.who}}</view>
+          <view class="signal-msg">「{{item.msg}}」</view>
+          <view class="signal-meaning">{{item.meaning}}</view>
         </view>
       </view>
     </view>
 
-    <!-- 建议 -->
-    <view class="card" style="background: {{userBg}}; border: none;">
-      <view class="serif" style="font-size: 28rpx; font-weight: 700; margin-bottom: 16rpx;">💡 给你</view>
-      <view style="font-size: 28rpx; line-height: 1.9; color: rgba(26,26,46,0.87);">{{res.user_advice}}</view>
-    </view>
-    <view class="card" style="background: {{partnerBg}}; border: none;">
-      <view class="serif" style="font-size: 28rpx; font-weight: 700; margin-bottom: 16rpx;">🎯 应对Ta</view>
-      <view style="font-size: 28rpx; line-height: 1.9; color: rgba(26,26,46,0.87);">{{res.partner_advice}}</view>
+    <view class="advice-grid">
+      <view><text>给你</text><view>{{res.user_advice}}</view></view>
+      <view><text>应对 Ta</text><view>{{res.partner_advice}}</view></view>
     </view>
 
     <view wx:if="{{profileId}}" class="profile-sync">
@@ -170,13 +136,12 @@
       <button class="profile-sync-btn {{profileSynced ? 'done' : ''}}" disabled="{{profileSynced}}" bindtap="syncPartnerType">{{profileSynced ? '已更新' : '写入'}}</button>
     </view>
 
-    <button class="btn-main" style="margin-top: 20rpx; background: #00B894;" bindtap="goReply">帮我写回复 ✍️</button>
-
-    <view style="display: flex; gap: 20rpx; margin-top: 16rpx;">
-      <button class="btn-reset" style="flex: 1;" bindtap="resetInput">再来一次 ↻</button>
-      <button class="btn-reset" style="flex: 1;" bindtap="copyResult">复制</button>
-      <button class="btn-main" style="flex: 1;" open-type="share">分享</button>
+    <button class="tool-primary" bindtap="goReply"><text>帮我写下一句</text><text>↗</text></button>
+    <view class="result-action-grid">
+      <button class="result-action" bindtap="resetInput">重新分析</button>
+      <button class="result-action" bindtap="copyResult">复制结果</button>
+      <button class="result-action dark" open-type="share">分享</button>
     </view>
-    <view class="disclaimer">以上分析由 AI 根据你提供的内容生成，只适合做自我觉察和沟通参考。别拿它当判决书，更别替代专业心理咨询。</view>
+    <view class="disclaimer">分析只适合做自我觉察和沟通参考。别拿它当判决书，更别替代专业心理咨询。</view>
   </view>
 </view>

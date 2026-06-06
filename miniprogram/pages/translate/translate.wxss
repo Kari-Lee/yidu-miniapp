@@ -1,20 +1,120 @@
-.loading-dots {
-  display: flex; gap: 8rpx;
+.surface-label {
+  color: #A3A8B2;
+  font-size: 17rpx;
+  font-weight: 900;
+  letter-spacing: 3rpx;
+  margin-bottom: 16rpx;
 }
-.loading-dots view {
-  width: 14rpx; height: 14rpx; border-radius: 50%;
-  background: linear-gradient(135deg, #636E72, #8395A7);
-  animation: bounce 0.9s ease infinite;
+
+.surface-note {
+  margin-top: 22rpx;
+  padding-top: 20rpx;
+  border-top: 2rpx solid rgba(45,47,51,0.07);
+  color: #9BA0AA;
+  font-size: 21rpx;
 }
-.loading-dots view:nth-child(2) { animation-delay: 0.15s; }
-.loading-dots view:nth-child(3) { animation-delay: 0.3s; }
-@keyframes bounce {
-  0%, 100% { transform: translateY(0); opacity: 0.4; }
-  50% { transform: translateY(-6px); opacity: 1; }
+
+.translation-block {
+  padding: 34rpx 0 42rpx;
+  border-top: 2rpx solid rgba(45,47,51,0.08);
 }
-.skeleton {
-  border-radius: 40rpx;
-  background: linear-gradient(90deg, rgba(0,0,0,0.04), #F8FAFB, rgba(0,0,0,0.04));
-  background-size: 200% 100%;
-  animation: shimmer 1.5s infinite;
+
+.original-line {
+  padding-left: 24rpx;
+  border-left: 6rpx solid #2D2F33;
+}
+
+.original-line text {
+  color: #A3A8B2;
+  font-size: 17rpx;
+  font-weight: 900;
+  letter-spacing: 3rpx;
+}
+
+.original-line view {
+  margin-top: 8rpx;
+  color: rgba(45,47,51,0.66);
+  font-size: 27rpx;
+  line-height: 1.7;
+}
+
+.translation-verdict {
+  margin: 32rpx 0 24rpx;
+  color: #2D2F33;
+  font-size: 38rpx;
+  font-weight: 900;
+  line-height: 1.45;
+}
+
+.possibility-list {
+  border-top: 2rpx solid rgba(45,47,51,0.07);
+}
+
+.possibility-row {
+  display: flex;
+  gap: 20rpx;
+  padding: 25rpx 0;
+  border-bottom: 2rpx solid rgba(45,47,51,0.07);
+  opacity: 0.56;
+}
+
+.possibility-row.primary {
+  opacity: 1;
+}
+
+.possibility-rank {
+  width: 46rpx;
+  height: 46rpx;
+  border-radius: 50%;
+  background: #E3E5EA;
+  color: #2D2F33;
+  font-size: 20rpx;
+  line-height: 46rpx;
+  text-align: center;
+  font-weight: 900;
+  flex-shrink: 0;
+}
+
+.possibility-row.primary .possibility-rank {
+  background: #2D2F33;
+  color: #FFFFFF;
+}
+
+.possibility-body {
+  flex: 1;
+}
+
+.possibility-head {
+  display: flex;
+  justify-content: space-between;
+  gap: 18rpx;
+  color: #2D2F33;
+  font-size: 25rpx;
+  font-weight: 900;
+}
+
+.possibility-reason {
+  margin-top: 7rpx;
+  color: #8D929D;
+  font-size: 22rpx;
+  line-height: 1.65;
+}
+
+.likely-line {
+  margin-top: 24rpx;
+  padding: 24rpx 26rpx;
+  background: #2D2F33;
+  color: #FFFFFF;
+}
+
+.likely-line text {
+  color: #10A8E8;
+  font-size: 20rpx;
+  font-weight: 900;
+}
+
+.likely-line view {
+  margin-top: 8rpx;
+  font-size: 24rpx;
+  line-height: 1.65;
 }

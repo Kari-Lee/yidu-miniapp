@@ -1,138 +1,106 @@
-<view class="container" style="padding-bottom: 120rpx;">
+<view class="tool-page">
   <view style="height: {{statusBarHeight}}px"></view>
-  <view style="padding: 24rpx 0;">
-    <text bindtap="goBack" style="font-size: 24rpx; color: #B8860B; font-weight: 600;">‹ 返回</text>
+  <view class="tool-topbar">
+    <text class="tool-back" bindtap="goBack">← 返回</text>
+    <text class="tool-brand">YIDU</text>
   </view>
 
-  <!-- INPUT -->
   <view wx:if="{{step === 'input'}}" class="fu">
-    <view wx:if="{{err}}" style="padding: 28rpx 36rpx; background: #FFF5F5; border-radius: 28rpx; margin-bottom: 28rpx; font-size: 26rpx; color: #E17055;">{{err}}</view>
-    <view class="notice">
-      <view class="notice-title">预测不是判命</view>
-      <view>请删掉隐私信息。AI 会根据聊天模式推测关系走向，结果只供参考，别把概率当圣旨。</view>
+    <view class="tool-head">
+      <view class="tool-head-no">04</view>
+      <view class="tool-kicker">RELATION FORECAST</view>
+      <view class="tool-title"><view>这段关系</view><view>会走到哪里</view></view>
+      <view class="tool-intro">不是算命。根据互动模式推演最可能的走向，重点看你们正在重复什么。</view>
     </view>
+    <view wx:if="{{err}}" class="tool-error">{{err}}</view>
     <view wx:if="{{contextTip}}" class="context-tip">
       <view class="context-tip-head">
         <view style="flex: 1;">
           <view class="context-tip-title">带入关系历史</view>
-          <view class="context-tip-sub">{{ctxEnabled ? '本次会随聊天内容一起给 AI' : '已关闭，本次只分析你提交的新内容'}}</view>
+          <view class="context-tip-sub">{{ctxEnabled ? '本次会带入档案与最近记录' : '本次只分析新内容'}}</view>
         </view>
-        <switch checked="{{ctxEnabled}}" color="#00B894" bindchange="toggleCtxEnabled" style="transform: scale(0.78); transform-origin: right center;"></switch>
-      </view>
-      <view class="context-summary">
-        <view wx:if="{{ctxEnabled}}">已带入：关系档案</view>
-        <view wx:if="{{ctxEnabled}}">已带入：最近 {{profileHistoryCount}} 条历史摘要</view>
-        <view wx:if="{{!ctxEnabled}}">未带入：关系档案和历史摘要</view>
+        <switch checked="{{ctxEnabled}}" color="#2D2F33" bindchange="toggleCtxEnabled" style="transform: scale(0.78); transform-origin: right center;"></switch>
       </view>
       <view class="context-actions">
-        <text class="context-link" bindtap="toggleCtxPreview">{{ctxPreviewOpen ? '收起带入内容' : '查看带入内容'}}</text>
-        <text class="context-muted">不会自动上传，只在本次提交时发送</text>
+        <text class="context-link" bindtap="toggleCtxPreview">{{ctxPreviewOpen ? '收起内容' : '查看内容'}}</text>
+        <text class="context-muted">{{profileHistoryCount}} 条历史摘要</text>
       </view>
       <view wx:if="{{ctxPreviewOpen}}" class="context-preview">{{ctx}}</view>
     </view>
-    <view class="card" style="padding: 52rpx;">
-      <textarea style="width: 100%; padding: 28rpx 8rpx; background: transparent; border: none; color: #1A1A2E; font-size: 30rpx; line-height: 1.9;" maxlength="-1" auto-height placeholder="粘贴聊天记录..." placeholder-style="color: #C8D6E5" value="{{text}}" bindinput="onInput"></textarea>
+    <view class="tool-surface">
+      <view class="surface-label">CHAT HISTORY</view>
+      <textarea class="tool-textarea" maxlength="-1" auto-height placeholder="粘贴聊天记录，越完整越接近真实走向…" placeholder-style="color: #B7BBC4" value="{{text}}" bindinput="onInput"></textarea>
     </view>
-    <button class="btn-main" style="margin-top: 32rpx; background: {{hasInput ? '#5B8FB9' : '#ddd'}};" disabled="{{!hasInput}}" bindtap="nextStep">预测 🔭</button>
+    <button class="tool-primary" disabled="{{!hasInput}}" bindtap="nextStep">
+      <text>继续补充关系背景</text><text class="tool-primary-arrow">↗</text>
+    </button>
   </view>
 
-  <!-- CONTEXT -->
   <view wx:if="{{step === 'context'}}" class="fu">
-    <view class="card" style="padding: 56rpx;">
-      <view class="serif" style="font-size: 44rpx; font-weight: 700; color: #1A1A2E; margin-bottom: 16rpx;">Ta是你的什么人？</view>
-      <view style="font-size: 26rpx; color: #8395A7; margin-bottom: 40rpx;">比如：暧昧三个月 / 同事 / Ta总是已读不回</view>
-      <view wx:if="{{contextTip}}" class="context-tip" style="margin-bottom: 26rpx;">
-        <view class="context-tip-head">
-          <view style="flex: 1;">
-            <view class="context-tip-title">带入关系历史</view>
-            <view class="context-tip-sub">{{ctxEnabled ? '你可以继续补充，提交时会一起发送' : '已关闭，本次只分析你提交的新内容'}}</view>
-          </view>
-          <switch checked="{{ctxEnabled}}" color="#00B894" bindchange="toggleCtxEnabled" style="transform: scale(0.78); transform-origin: right center;"></switch>
-        </view>
-        <view class="context-summary">
-          <view wx:if="{{ctxEnabled}}">已带入：关系档案</view>
-          <view wx:if="{{ctxEnabled}}">已带入：最近 {{profileHistoryCount}} 条历史摘要</view>
-          <view wx:if="{{!ctxEnabled}}">未带入：关系档案和历史摘要</view>
-        </view>
-        <view class="context-actions">
-          <text class="context-link" bindtap="toggleCtxPreview">{{ctxPreviewOpen ? '收起带入内容' : '查看带入内容'}}</text>
-          <text class="context-muted">不会自动上传，只在本次提交时发送</text>
-        </view>
-        <view wx:if="{{ctxPreviewOpen}}" class="context-preview">{{ctx}}</view>
+    <view class="tool-head compact">
+      <view class="tool-kicker">RELATION CONTEXT</view>
+      <view class="tool-title"><view>Ta 是你的</view><view>什么人</view></view>
+      <view class="tool-intro">例如：暧昧三个月、同事、每次靠近后又消失。</view>
+    </view>
+    <view class="tool-surface">
+      <textarea class="tool-textarea context-area" auto-height placeholder="补充关系、时长和最困扰你的模式…" placeholder-style="color: #B7BBC4" value="{{ctx}}" bindinput="onCtxInput"></textarea>
+      <view wx:if="{{contextTip}}" class="context-inline">
+        <text>{{ctxEnabled ? '历史档案已开启' : '历史档案已关闭'}}</text>
+        <switch checked="{{ctxEnabled}}" color="#2D2F33" bindchange="toggleCtxEnabled" style="transform: scale(0.72);"></switch>
       </view>
-      <textarea style="width: 100%; padding: 28rpx 8rpx; background: transparent; border: none; border-top: 2rpx solid rgba(0,0,0,0.04); color: #1A1A2E; font-size: 30rpx; line-height: 1.9;" auto-height placeholder="正在折磨我的人..." placeholder-style="color: #C8D6E5" value="{{ctx}}" bindinput="onCtxInput"></textarea>
     </view>
-    <view style="display: flex; gap: 20rpx; margin-top: 28rpx;">
-      <button class="btn-reset" style="flex: 1;" bindtap="backToInput">返回</button>
-      <button class="btn-main" style="flex: 2; background: #5B8FB9;" disabled="{{submitting}}" bindtap="submit">预测 🔭</button>
-    </view>
-  </view>
-
-  <!-- LOADING -->
-  <view wx:if="{{step === 'loading'}}" class="fu" style="text-align: center;">
-    <view style="display: inline-flex; align-items: center; gap: 20rpx; padding: 28rpx 56rpx; border-radius: 999rpx; background: #fff; box-shadow: 0 8rpx 48rpx rgba(0,0,0,0.06); margin-bottom: 40rpx;">
-      <view class="loading-dots"><view></view><view></view><view></view></view>
-      <text style="font-size: 26rpx; color: #8395A7;">{{loadingMsg}}</text>
-    </view>
-    <view style="opacity: 0.5;">
-      <view class="skeleton" style="height: 200rpx; margin-bottom: 28rpx;"></view>
-      <view class="skeleton" style="height: 160rpx; margin-bottom: 28rpx;"></view>
-      <view class="skeleton" style="height: 160rpx;"></view>
+    <view class="tool-button-row">
+      <button class="tool-secondary" bindtap="backToInput">返回修改</button>
+      <button class="tool-primary no-margin" disabled="{{submitting}}" bindtap="submit"><text>生成预测</text><text>↗</text></button>
     </view>
   </view>
 
-  <!-- RESULT -->
+  <view wx:if="{{step === 'loading'}}" class="fu loading-stage">
+    <view class="loading-index">04</view>
+    <view class="loading-title">{{loadingMsg}}</view>
+    <view class="loading-sub">正在把互动模式放进时间线，不替你美化结果。</view>
+    <view class="loading-bar"><view></view></view>
+  </view>
+
   <view wx:if="{{step === 'result' && res}}" class="fu">
-    <!-- 阶段 -->
-    <view class="card" style="background: linear-gradient(135deg,#EDF2FF,#F0E6F6); border: none;">
-      <view style="font-size: 24rpx; color: #B8860B; font-weight: 700; margin-bottom: 12rpx; letter-spacing: 1rpx;">当前阶段</view>
-      <view class="serif" style="font-size: 44rpx; font-weight: 900; color: #1A1A2E; margin-bottom: 16rpx;">{{res.stage}}</view>
-      <view style="font-size: 28rpx; color: rgba(26,26,46,0.8); line-height: 1.8;">{{res.stage_desc}}</view>
+    <view class="result-lead">
+      <view class="result-kicker">CURRENT STAGE</view>
+      <view class="result-title">{{res.stage}}</view>
+      <view class="result-copy">{{res.stage_desc}}</view>
     </view>
 
-    <!-- 时间线 -->
-    <view class="serif" style="font-size: 28rpx; color: #B8860B; font-style: italic; margin-bottom: 24rpx;">🔮 时间线预测</view>
-    <view wx:for="{{res.predictions}}" wx:key="index" class="card" style="display: flex; gap: 28rpx; align-items: flex-start;">
-      <view style="width: 92rpx; height: 92rpx; border-radius: 28rpx; background: {{predBgs[index]}}; display: flex; align-items: center; justify-content: center; font-size: 48rpx; flex-shrink: 0;">{{item.emoji}}</view>
-      <view style="flex: 1;">
-        <view style="display: flex; justify-content: space-between; margin-bottom: 8rpx;">
-          <text style="font-size: 28rpx; font-weight: 800; color: #1A1A2E;">{{item.time}}</text>
-          <text style="font-size: 24rpx; color: #8395A7; font-weight: 700;">{{item.prob}}%</text>
+    <view class="result-section">
+      <view class="result-section-label">TIMELINE / 未来轨迹</view>
+      <view wx:for="{{res.predictions}}" wx:key="index" class="timeline-row">
+        <view class="timeline-index">0{{index + 1}}</view>
+        <view class="timeline-body">
+          <view class="timeline-head"><text>{{item.time}}</text><text>{{item.prob}}%</text></view>
+          <view class="timeline-copy">{{item.scene}}</view>
+          <view class="timeline-track"><view style="width: {{item.prob}}%;"></view></view>
         </view>
-        <view style="font-size: 26rpx; color: rgba(26,26,46,0.8); line-height: 1.7;">{{item.scene}}</view>
       </view>
     </view>
 
-    <!-- 转折点 -->
-    <view class="card" style="background: #FFF5F3; border: none;">
-      <view style="font-size: 26rpx; font-weight: 800; color: #E17055; margin-bottom: 12rpx;">⚠️ 转折点</view>
-      <view style="font-size: 28rpx; color: rgba(26,26,46,0.8); line-height: 1.8;">{{res.turning}}</view>
+    <view class="turning-block">
+      <view class="result-section-label">TURNING POINT</view>
+      <view>{{res.turning}}</view>
     </view>
 
-    <!-- 最好最差 -->
-    <view style="display: flex; gap: 20rpx; margin-bottom: 28rpx;">
-      <view class="card" style="flex: 1; background: #F0FFF4; border: none;">
-        <view style="font-size: 24rpx; font-weight: 700; color: #00B894; margin-bottom: 8rpx;">最好</view>
-        <view style="font-size: 26rpx; color: rgba(26,26,46,0.8);">{{res.best}}</view>
-      </view>
-      <view class="card" style="flex: 1; background: #FFF5F3; border: none;">
-        <view style="font-size: 24rpx; font-weight: 700; color: #E17055; margin-bottom: 8rpx;">最差</view>
-        <view style="font-size: 26rpx; color: rgba(26,26,46,0.8);">{{res.worst}}</view>
-      </view>
+    <view class="scenario-grid">
+      <view><text>BEST CASE</text><view>{{res.best}}</view></view>
+      <view><text>WORST CASE</text><view>{{res.worst}}</view></view>
     </view>
 
-    <!-- 建议 -->
-    <view class="card" style="background: linear-gradient(135deg,#F8FAFB,#F0E6F6); border: none;">
-      <view class="serif" style="font-size: 28rpx; font-weight: 700; color: #1A1A2E; margin-bottom: 16rpx;">💡 你现在应该做的一件事</view>
-      <view style="font-size: 30rpx; font-weight: 600; color: #1A1A2E; line-height: 1.9;">{{res.todo}}</view>
+    <view class="todo-block">
+      <view class="result-section-label">DO THIS NOW</view>
+      <view>{{res.todo}}</view>
     </view>
 
-    <button class="btn-main" style="margin-top: 20rpx; background: #00B894;" bindtap="goReply">帮我写回复 ✍️</button>
-
-    <view style="display: flex; gap: 20rpx; margin-top: 16rpx;">
-      <button class="btn-reset" style="flex: 1;" bindtap="resetInput">再来一次 ↻</button>
-      <button class="btn-reset" style="flex: 1;" bindtap="copyResult">复制</button>
-      <button class="btn-main" style="flex: 1; background: #5B8FB9;" open-type="share">分享</button>
+    <button class="tool-primary" bindtap="goReply"><text>帮我写下一句</text><text>↗</text></button>
+    <view class="result-action-grid">
+      <button class="result-action" bindtap="resetInput">重新预测</button>
+      <button class="result-action" bindtap="copyResult">复制结果</button>
+      <button class="result-action dark" open-type="share">分享</button>
     </view>
     <view class="disclaimer">关系会被新的选择改写。预测结果不是结局通知书，只是提醒你别重复同一个坑。</view>
   </view>

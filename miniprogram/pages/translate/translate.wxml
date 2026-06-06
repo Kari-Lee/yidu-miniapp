@@ -1,55 +1,64 @@
-<view class="container" style="padding: 0 32rpx 120rpx;">
+<view class="tool-page">
   <view style="height: {{statusBarHeight}}px"></view>
-  <view style="padding: 24rpx 0;">
-    <text bindtap="goBack" style="font-size: 24rpx; color: #B8860B; font-weight: 600;">‹ 返回</text>
+  <view class="tool-topbar">
+    <text class="tool-back" bindtap="goBack">← 返回</text>
+    <text class="tool-brand">YIDU</text>
   </view>
 
   <view wx:if="{{step === 'input'}}" class="fu">
-    <view wx:if="{{err}}" style="padding: 28rpx 36rpx; background: #FFF5F5; border-radius: 28rpx; margin-bottom: 28rpx; font-size: 26rpx; color: #E17055;">{{err}}</view>
-    <view class="notice">
-      <view class="notice-title">少贴隐私，多贴上下文</view>
-      <view>请删掉姓名、手机号和地址。AI 会根据你贴的内容推测潜台词，结论只适合参考，不保证 Ta 真这么想。</view>
+    <view class="tool-head">
+      <view class="tool-head-no">01</view>
+      <view class="tool-kicker">SUBTEXT TRANSLATOR</view>
+      <view class="tool-title"><view>Ta 说的话</view><view>翻译成人话</view></view>
+      <view class="tool-intro">一句话不够判断真心，但足够看出回避、敷衍和试探。少贴隐私，多贴上下文。</view>
     </view>
-    <view class="card" style="padding: 52rpx;">
-      <textarea style="width: 100%; padding: 28rpx 8rpx; background: transparent; border: none; color: #1A1A2E; font-size: 30rpx; line-height: 1.9;" maxlength="-1" auto-height placeholder="Ta说的话（可以多条一行一句）..." placeholder-style="color: #C8D6E5" value="{{text}}" bindinput="onInput"></textarea>
+
+    <view wx:if="{{err}}" class="tool-error">{{err}}</view>
+    <view class="tool-surface">
+      <view class="surface-label">PASTE THE MESSAGE</view>
+      <textarea class="tool-textarea" maxlength="-1" auto-height placeholder="把 Ta 的原话贴在这里，可一行一句…" placeholder-style="color: #B7BBC4" value="{{text}}" bindinput="onInput"></textarea>
+      <view class="surface-note">AI 不是读心术，后续行动比一句话更诚实。</view>
     </view>
-    <button class="btn-main" style="margin-top: 32rpx; background: {{hasInput ? '#636E72' : '#ddd'}};" disabled="{{!hasInput || submitting}}" bindtap="submit">翻译 🔮</button>
+    <button class="tool-primary" disabled="{{!hasInput || submitting}}" bindtap="submit">
+      <text>开始翻译</text><text class="tool-primary-arrow">↗</text>
+    </button>
   </view>
 
-  <view wx:if="{{step === 'loading'}}" class="fu" style="text-align: center;">
-    <view style="display: inline-flex; align-items: center; gap: 20rpx; padding: 28rpx 56rpx; border-radius: 999rpx; background: #fff; box-shadow: 0 8rpx 48rpx rgba(0,0,0,0.06); margin-bottom: 40rpx;">
-      <view class="loading-dots"><view></view><view></view><view></view></view>
-      <text style="font-size: 26rpx; color: #8395A7;">{{loadingMsg}}</text>
-    </view>
-    <view style="opacity: 0.5;">
-      <view class="skeleton" style="height: 200rpx; margin-bottom: 28rpx;"></view>
-      <view class="skeleton" style="height: 300rpx;"></view>
-    </view>
+  <view wx:if="{{step === 'loading'}}" class="fu loading-stage">
+    <view class="loading-index">01</view>
+    <view class="loading-title">{{loadingMsg}}</view>
+    <view class="loading-sub">正在拆掉语气、措辞和上下文的伪装。</view>
+    <view class="loading-bar"><view></view></view>
   </view>
 
   <view wx:if="{{step === 'result' && res}}" class="fu">
-    <view wx:for="{{res.translations}}" wx:key="index" class="card" style="padding: 48rpx; margin-bottom: 28rpx;">
-      <view style="padding: 28rpx 36rpx; background: #F8FAFB; border-radius: 28rpx; margin-bottom: 32rpx; border-left: 6rpx solid #636E72;">
-        <view style="font-size: 22rpx; color: #8395A7; font-weight: 700; margin-bottom: 4rpx;">Ta说</view>
-        <view class="serif" style="font-size: 34rpx; font-weight: 700; color: #1A1A2E;">「{{item.original}}」</view>
+    <view class="result-lead">
+      <view class="result-kicker">TRANSLATION REPORT</view>
+      <view class="result-title"><view>人话版本</view><view>已经翻译完了</view></view>
+    </view>
+
+    <view wx:for="{{res.translations}}" wx:key="index" class="translation-block">
+      <view class="original-line">
+        <text>TA SAID</text>
+        <view>「{{item.original}}」</view>
       </view>
-      <view class="serif" style="font-size: 34rpx; font-weight: 700; color: #636E72; margin-bottom: 28rpx;">{{item.verdict}}</view>
-      <view wx:for="{{item.possibilities}}" wx:for-item="p" wx:for-index="pi" wx:key="pi" style="display: flex; gap: 20rpx; padding: 20rpx 0; opacity: {{pi === 0 ? 1 : 0.55}}; {{pi < 2 ? 'border-bottom: 2rpx solid rgba(0,0,0,0.04);' : ''}}">
-        <view style="width: 56rpx; height: 56rpx; border-radius: 16rpx; background: {{colors[pi]}}; display: flex; align-items: center; justify-content: center; font-size: 24rpx; font-weight: 900; flex-shrink: 0; color: #fff;">{{p.label}}</view>
-        <view style="flex: 1;">
-          <view style="font-size: 26rpx; font-weight: 700; color: #1A1A2E;">{{p.meaning}} <text style="font-size: 22rpx; color: #8395A7;">{{p.percent}}%</text></view>
-          <view style="font-size: 24rpx; color: #8395A7;">{{p.reason}}</view>
+      <view class="translation-verdict">{{item.verdict}}</view>
+      <view class="possibility-list">
+        <view wx:for="{{item.possibilities}}" wx:for-item="p" wx:for-index="pi" wx:key="pi" class="possibility-row {{pi === 0 ? 'primary' : ''}}">
+          <view class="possibility-rank">{{p.label}}</view>
+          <view class="possibility-body">
+            <view class="possibility-head"><text>{{p.meaning}}</text><text>{{p.percent}}%</text></view>
+            <view class="possibility-reason">{{p.reason}}</view>
+          </view>
         </view>
       </view>
-      <view style="margin-top: 24rpx; padding: 20rpx 28rpx; background: #FFF5F3; border-radius: 24rpx; font-size: 26rpx;">
-        <text style="font-weight: 800; color: #E17055;">最可能：{{item.most_likely}}</text>
-        <text style="color: #8395A7;"> {{item.why}}</text>
-      </view>
+      <view class="likely-line"><text>最可能是 {{item.most_likely}}</text><view>{{item.why}}</view></view>
     </view>
-    <view style="display: flex; gap: 20rpx;">
-      <button class="btn-reset" style="flex: 1;" bindtap="resetInput">再来一次 ↻</button>
-      <button class="btn-reset" style="flex: 1;" bindtap="copyResult">复制</button>
-      <button class="btn-main" style="flex: 1; background: #636E72;" open-type="share">分享</button>
+
+    <view class="result-action-grid">
+      <button class="result-action" bindtap="resetInput">重新翻译</button>
+      <button class="result-action" bindtap="copyResult">复制结果</button>
+      <button class="result-action dark" open-type="share">分享</button>
     </view>
     <view class="disclaimer">潜台词不是读心术。真正有用的是看 Ta 后续怎么做，而不是把一句话审到天亮。</view>
   </view>
