@@ -20,16 +20,21 @@ var BGS = {
 var MSGS = ["扫描互动模式", "分析依恋信号", "生成双人报告"]
 var MAX_IMAGES = 12
 var MAX_TOTAL_BYTES = 2.7 * 1024 * 1024
+var FALLBACK_TOTAL_BYTES = 1.55 * 1024 * 1024
 var MAX_TOTAL_BASE64_CHARS = 3.7 * 1024 * 1024
 var MAX_IMAGE_TARGET_BYTES = 1.1 * 1024 * 1024
 var MIN_IMAGE_TARGET_BYTES = 190 * 1024
+var FALLBACK_MAX_IMAGE_BYTES = 520 * 1024
+var FALLBACK_MIN_IMAGE_BYTES = 105 * 1024
 var COMPRESS_STEPS = [
   { quality: 62, width: 1600 },
   { quality: 50, width: 1400 },
   { quality: 40, width: 1200 },
   { quality: 32, width: 1000 },
   { quality: 26, width: 860 },
-  { quality: 22, width: 760 }
+  { quality: 22, width: 760 },
+  { quality: 18, width: 680 },
+  { quality: 15, width: 600 }
 ]
 
 function safeDecode(v) {
@@ -97,10 +102,13 @@ function compressToTarget(path, targetBytes) {
   return run(0)
 }
 
-function optimizeImages(paths) {
+function optimizeImages(paths, totalBudget, minTarget, maxTarget) {
   if (!paths.length) return Promise.resolve([])
-  var targetBytes = Math.floor(MAX_TOTAL_BYTES * 0.96 / paths.length)
-  targetBytes = Math.max(MIN_IMAGE_TARGET_BYTES, Math.min(MAX_IMAGE_TARGET_BYTES, targetBytes))
+  totalBudget = totalBudget || MAX_TOTAL_BYTES
+  minTarget = minTarget || MIN_IMAGE_TARGET_BYTES
+  maxTarget = maxTarget || MAX_IMAGE_TARGET_BYTES
+  var targetBytes = Math.floor(totalBudget * 0.96 / paths.length)
+  targetBytes = Math.max(minTarget, Math.min(maxTarget, targetBytes))
   return Promise.all(paths.map(function(path) {
     return compressToTarget(path, targetBytes)
   }))
@@ -138,13 +146,30 @@ function totalBase64Chars(images) {
 
 function callWithBase64Fallback(self, um, uploadError, requestOptions) {
   if (uploadError && uploadError.code !== 'OSS_UNAVAILABLE') {
-    self.setData({ loadingMsg: '切换备用分析通道' })
+    self.setData({ loadingMsg: '优化备用分析通道' })
   }
-  return readImagesAsBase64(self.data.imgs).then(function(images) {
+  var paths = self.data.imgs.map(function(item) { return item.path || item })
+  return optimizeImages(
+    paths,
+    FALLBACK_TOTAL_BYTES,
+    FALLBACK_MIN_IMAGE_BYTES,
+    FALLBACK_MAX_IMAGE_BYTES
+  ).then(function(items) {
+    self.setData({ loadingMsg: '识别聊天内容' })
+    return readImagesAsBase64(items)
+  }).then(function(images) {
     if (totalBase64Chars(images) > MAX_TOTAL_BASE64_CHARS) {
       throw new Error('图片通道繁忙，请直接再试一次')
     }
-    return API.callAI(D.P.diagnose, um, images, null, requestOptions)
+    var fallbackOptions = {
+      onRetry: requestOptions.onRetry,
+      clientMeta: {
+        imageTransport: 'base64-fallback',
+        uploadFallbackCode: uploadError && uploadError.code ? uploadError.code : 'UNKNOWN',
+        uploadFallbackDetail: uploadError && uploadError.detail ? uploadError.detail : ''
+      }
+    }
+    return API.callAI(D.P.diagnose, um, images, null, fallbackOptions)
   })
 }
 
@@ -301,7 +326,10 @@ Page({
         self.setData({ loadingMsg: '上传截图 ' + done + '/' + total })
       }).then(function(imageKeys) {
         self.setData({ loadingMsg: '识别聊天内容' })
-        return API.callAI(D.P.diagnose, um, null, imageKeys, requestOptions)
+        return API.callAI(D.P.diagnose, um, null, imageKeys, {
+          onRetry: requestOptions.onRetry,
+          clientMeta: { imageTransport: 'oss' }
+        })
       }, function(err) {
         return callWithBase64Fallback(self, um, err, requestOptions)
       })

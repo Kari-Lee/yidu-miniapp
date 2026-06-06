@@ -1,5 +1,5 @@
 var app = getApp()
-var REQUEST_TIMEOUT = 70000
+var REQUEST_TIMEOUT = 115000
 var RETRY_DELAY = 800
 var pendingRequests = {}
 
@@ -94,10 +94,11 @@ function callAI(sys, message, images, imageKeys, options) {
   var body = { system: sys, message: message }
   if (images && images.length > 0) body.images = images
   if (imageKeys && imageKeys.length > 0) body.imageKeys = imageKeys
+  options = options || {}
+  if (options.clientMeta) body.clientMeta = options.clientMeta
   var key = makeRequestKey(body)
   if (pendingRequests[key]) return pendingRequests[key]
 
-  options = options || {}
   var promise = requestOnce(body).catch(function(err) {
     if (!err.retryable) throw err
     if (options.onRetry) options.onRetry()

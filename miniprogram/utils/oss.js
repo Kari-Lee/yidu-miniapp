@@ -2,6 +2,7 @@ var app = getApp()
 var POLICY_TIMEOUT = 10000
 var UPLOAD_TIMEOUT = 30000
 var CONCURRENCY = 3
+var RETRY_DELAY = 500
 
 function requestPolicy() {
   return new Promise(function(resolve, reject) {
@@ -20,9 +21,10 @@ function requestPolicy() {
         err.code = r.statusCode === 503 ? 'OSS_UNAVAILABLE' : 'OSS_POLICY_FAILED'
         reject(err)
       },
-      fail: function() {
+      fail: function(e) {
         var err = new Error('图片直传网络失败')
         err.code = 'OSS_NETWORK_FAILED'
+        err.detail = e && e.errMsg ? e.errMsg : ''
         reject(err)
       }
     })
@@ -51,13 +53,31 @@ function uploadOne(item, policy, index) {
         }
         var err = new Error('第' + (index + 1) + '张截图上传失败')
         err.code = 'OSS_UPLOAD_FAILED'
+        err.statusCode = r.statusCode
+        err.retryable = r.statusCode >= 500
+        err.detail = 'HTTP ' + r.statusCode + (r.data ? ' ' + String(r.data).slice(0, 160) : '')
         reject(err)
       },
-      fail: function() {
+      fail: function(e) {
         var err = new Error('第' + (index + 1) + '张截图上传失败')
         err.code = 'OSS_UPLOAD_FAILED'
+        err.retryable = true
+        err.detail = e && e.errMsg ? e.errMsg : ''
         reject(err)
       }
+    })
+  })
+}
+
+function wait(ms) {
+  return new Promise(function(resolve) { setTimeout(resolve, ms) })
+}
+
+function uploadOneWithRetry(item, policy, index) {
+  return uploadOne(item, policy, index).catch(function(err) {
+    if (!err.retryable) throw err
+    return wait(RETRY_DELAY).then(function() {
+      return uploadOne(item, policy, index)
     })
   })
 }
@@ -70,7 +90,7 @@ function uploadWithLimit(items, policy, onProgress) {
   function worker() {
     var index = nextIndex++
     if (index >= items.length) return Promise.resolve()
-    return uploadOne(items[index], policy, index).then(function(key) {
+    return uploadOneWithRetry(items[index], policy, index).then(function(key) {
       results[index] = key
       completed++
       if (onProgress) onProgress(completed, items.length)
