@@ -64,6 +64,27 @@ var POSTERS = {
   }
 }
 
+function shuffleQuizOptions() {
+  return D.QUIZ.map(function(question) {
+    var options = question.a.map(function(text, typeIndex) {
+      return { text: text, typeIndex: typeIndex }
+    })
+
+    for (var i = options.length - 1; i > 0; i--) {
+      var j = Math.floor(Math.random() * (i + 1))
+      var temp = options[i]
+      options[i] = options[j]
+      options[j] = temp
+    }
+
+    return {
+      q: question.q,
+      a: options.map(function(option) { return option.text }),
+      typeMap: options.map(function(option) { return option.typeIndex })
+    }
+  })
+}
+
 Page({
   data: {
     statusBarHeight: 0,
@@ -86,7 +107,11 @@ Page({
 
   onLoad: function() {
     var app = getApp()
-    this.setData({ statusBarHeight: app.globalData.statusBarHeight })
+    this._quiz = shuffleQuizOptions()
+    this.setData({
+      statusBarHeight: app.globalData.statusBarHeight,
+      currentQ: this._quiz[0]
+    })
     wx.showShareMenu({ menus: ['shareAppMessage', 'shareTimeline'] })
   },
 
@@ -100,7 +125,7 @@ Page({
       qi: qi - 1,
       answers: answers,
       picked: -1,
-      currentQ: D.QUIZ[qi - 1],
+      currentQ: this._quiz[qi - 1],
       progress: (qi / D.QUIZ.length) * 100
     })
   },
@@ -110,14 +135,15 @@ Page({
     var self = this
     self.setData({ picked: idx })
     setTimeout(function() {
-      var answers = self.data.answers.concat([idx])
+      var typeIndex = self.data.currentQ.typeMap[idx]
+      var answers = self.data.answers.concat([typeIndex])
       var qi = self.data.qi
       if (qi < D.QUIZ.length - 1) {
         self.setData({
           qi: qi + 1,
           answers: answers,
           picked: -1,
-          currentQ: D.QUIZ[qi + 1],
+          currentQ: self._quiz[qi + 1],
           progress: ((qi + 2) / D.QUIZ.length) * 100
         })
       } else {
@@ -156,11 +182,12 @@ Page({
 
   retry: function() {
     this._posterPromise = null
+    this._quiz = shuffleQuizOptions()
     this.setData({
       qi: 0,
       answers: [],
       picked: -1,
-      currentQ: D.QUIZ[0],
+      currentQ: this._quiz[0],
       progress: (1 / D.QUIZ.length) * 100,
       result: null,
       typeInfo: null,
