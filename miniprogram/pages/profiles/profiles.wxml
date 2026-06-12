@@ -1,72 +1,123 @@
-<view class="container" style="padding: 0 32rpx 120rpx;">
+<view class="profiles-page">
   <view style="height: {{statusBarHeight}}px"></view>
-  <view style="padding: 24rpx 0; display: flex; align-items: center; justify-content: space-between;">
-    <text bindtap="goBack" style="font-size: 24rpx; color: #B8860B; font-weight: 600;">‹ 返回</text>
-    <text bindtap="toggleForm" style="font-size: 24rpx; color: #B8860B; font-weight: 800;">{{showForm ? '收起' : '新建'}}</text>
+
+  <view class="profiles-topbar">
+    <text class="profiles-back" bindtap="goBack">← 返回</text>
+    <text class="profiles-create" bindtap="toggleForm">{{showForm ? '收起' : '新建档案'}}</text>
   </view>
 
-  <view style="padding: 24rpx 0 32rpx;">
-    <view class="serif" style="font-size: 56rpx; font-weight: 900; color: #1A1A2E;">关系档案</view>
-    <view style="font-size: 24rpx; color: #8395A7; margin-top: 8rpx;">把不同的 Ta 分开分析，别让前任和暧昧对象互相污染</view>
+  <view class="profiles-head">
+    <view class="profiles-kicker">RELATION FILES</view>
+    <view class="profiles-title">关系档案</view>
+    <view class="profiles-subtitle">把不同的 Ta 分开观察，别让旧关系干扰新的判断。</view>
   </view>
 
-  <view class="notice">
-    <view class="notice-title">只保存在本机</view>
-    <view>档案用于快速带入关系背景，不会自动上传。真正上传给 AI 的，只有你在分析页提交的内容。</view>
+  <view class="privacy-note">
+    <view class="privacy-title">只保存在本机</view>
+    <view class="privacy-copy">档案只用于带入关系背景。只有你在分析页主动提交的内容，才会发送给 AI。</view>
   </view>
 
-  <view wx:if="{{showForm}}" class="card" style="padding: 44rpx;">
-    <view class="serif" style="font-size: 34rpx; font-weight: 900; color: #1A1A2E; margin-bottom: 28rpx;">{{editingId ? '编辑 Ta 的档案' : '新建 Ta 的档案'}}</view>
-    <input class="profile-input" placeholder="Ta是谁，比如：小王 / 前任 / 那个不回消息的人" placeholder-style="color:#C8D6E5" value="{{form.name}}" bindinput="onNameInput" />
+  <view wx:if="{{showForm}}" class="profile-editor">
+    <view class="editor-kicker">{{editingId ? 'EDIT PROFILE' : 'NEW PROFILE'}}</view>
+    <view class="editor-title">{{editingId ? '编辑 Ta 的档案' : '新建 Ta 的档案'}}</view>
 
-    <view class="field-title">关系</view>
+    <input
+      class="profile-input"
+      placeholder="Ta 是谁？比如：小王 / 前任 / 那个不回消息的人"
+      placeholder-style="color:#B8BDC8"
+      value="{{form.name}}"
+      bindinput="onNameInput"
+    />
+
+    <view class="field-title">你们的关系</view>
     <view class="chip-row">
-      <view wx:for="{{relationOptions}}" wx:key="index" class="chip {{form.relation === item ? 'chip-active' : ''}}" data-relation="{{item}}" bindtap="pickRelation">{{item}}</view>
+      <view
+        wx:for="{{relationOptions}}"
+        wx:key="index"
+        class="chip {{form.relation === item ? 'chip-active' : ''}}"
+        data-relation="{{item}}"
+        bindtap="pickRelation"
+      >{{item}}</view>
     </view>
 
-    <view class="field-title">Ta的疑似依恋类型</view>
+    <view class="field-title">Ta 的疑似依恋类型</view>
     <view class="chip-row">
-      <view wx:for="{{typeOptions}}" wx:key="key" class="type-chip" data-key="{{item.key}}" bindtap="pickType"
-        style="border-color: {{form.type === item.key ? item.color : 'rgba(0,0,0,0.04)'}}; background: {{form.type === item.key ? item.bg : '#fff'}}; color: {{form.type === item.key ? item.color : '#8395A7'}};">
-        {{item.emoji}} {{item.label}}
-      </view>
+      <view
+        wx:for="{{typeOptions}}"
+        wx:key="key"
+        class="chip {{form.type === item.key ? 'chip-active' : ''}}"
+        data-key="{{item.key}}"
+        bindtap="pickType"
+      >{{item.label}}</view>
     </view>
 
-    <textarea class="profile-textarea" auto-height maxlength="-1" placeholder="备注：比如认识多久、最近卡在哪里、Ta最烦人的点..." placeholder-style="color:#C8D6E5" value="{{form.note}}" bindinput="onNoteInput"></textarea>
+    <textarea
+      class="profile-textarea"
+      auto-height
+      maxlength="-1"
+      placeholder="补充认识多久、最近卡在哪里，或任何需要记住的背景……"
+      placeholder-style="color:#B8BDC8"
+      value="{{form.note}}"
+      bindinput="onNoteInput"
+    ></textarea>
 
-    <view style="display: flex; gap: 20rpx; margin-top: 28rpx;">
-      <button class="btn-reset" style="flex: 1;" bindtap="resetForm">取消</button>
-      <button class="btn-main" style="flex: 1;" bindtap="saveProfile">{{editingId ? '更新' : '保存'}}</button>
+    <view class="editor-actions">
+      <view class="editor-cancel" bindtap="resetForm">取消</view>
+      <view class="editor-save" bindtap="saveProfile">{{editingId ? '更新档案' : '保存档案'}} ↗</view>
     </view>
   </view>
 
-  <view wx:if="{{!profiles.length && !showForm}}" class="card" style="text-align: center; padding: 80rpx 40rpx;">
-    <view style="font-size: 72rpx; margin-bottom: 20rpx;">🗃️</view>
-    <view class="serif" style="font-size: 34rpx; font-weight: 800; color: #1A1A2E;">还没有档案</view>
-    <view style="font-size: 26rpx; color: #8395A7; margin-top: 12rpx;">先建一个 Ta，后面分析就不用每次重讲背景</view>
-    <button class="btn-main" style="margin-top: 32rpx;" bindtap="toggleForm">新建档案</button>
+  <view wx:if="{{!profiles.length && !showForm}}" class="profiles-empty">
+    <view class="empty-no">00</view>
+    <view class="empty-title">还没有关系档案</view>
+    <view class="empty-copy">先建一个 Ta，以后分析时就不必反复交代背景。</view>
+    <view class="empty-action" bindtap="toggleForm">新建第一个档案 ↗</view>
   </view>
 
-  <view wx:for="{{profiles}}" wx:key="id" class="card profile-card" data-id="{{item.id}}" bindtap="goDetail">
-    <view style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16rpx;">
-      <view style="padding: 8rpx 20rpx; border-radius: 999rpx; background: #F8FAFB; color: #B8860B; font-size: 22rpx; font-weight: 800;">{{item.relation}}</view>
-      <view style="font-size: 22rpx; color: #C8D6E5;">{{item.timeText}}</view>
+  <view wx:if="{{profiles.length}}" class="profiles-list-head">
+    <text>YOUR RELATIONS</text>
+    <text>{{profiles.length}} 个档案</text>
+  </view>
+
+  <view
+    wx:for="{{profiles}}"
+    wx:key="id"
+    class="profile-sheet"
+    data-id="{{item.id}}"
+    bindtap="goDetail"
+  >
+    <view class="profile-meta">
+      <view class="relation-label">{{item.relation}}</view>
+      <view class="profile-time">{{item.timeText}}</view>
     </view>
-    <view class="serif" style="font-size: 42rpx; font-weight: 900; color: #1A1A2E; line-height: 1.35;">{{item.name}}</view>
-    <view style="font-size: 24rpx; color: #8395A7; margin-top: 8rpx;">疑似类型：{{item.typeLabel || '未知'}}</view>
-    <view wx:if="{{item.note}}" style="margin-top: 20rpx; padding: 24rpx 28rpx; border-radius: 24rpx; background: #F8FAFB; color: rgba(26,26,46,0.75); font-size: 25rpx; line-height: 1.8;">{{item.note}}</view>
+
+    <view class="profile-name">{{item.name}}</view>
+    <view class="profile-type">
+      <text>疑似类型</text>
+      <view>{{item.typeLabel || '未知'}}</view>
+    </view>
+
+    <view wx:if="{{item.note}}" class="profile-note">{{item.note}}</view>
+
     <view wx:if="{{item.latest}}" class="latest-block">
-      <view style="font-size: 22rpx; color: #B8860B; font-weight: 900; margin-bottom: 8rpx;">最近分析 · {{item.latest.kindLabel}} · {{item.latest.timeText}}</view>
-      <view style="font-size: 25rpx; color: rgba(26,26,46,0.76); line-height: 1.7;">{{item.latest.title}}</view>
+      <view class="latest-meta">最近分析 · {{item.latest.kindLabel}} · {{item.latest.timeText}}</view>
+      <view class="latest-title">{{item.latest.title}}</view>
     </view>
-    <view class="detail-link">查看档案详情 ›</view>
 
-    <view class="action-grid">
-      <button catchtap="goDiagnose" data-id="{{item.id}}">分析</button>
-      <button catchtap="goCheck" data-id="{{item.id}}">发不发</button>
-      <button catchtap="goPredict" data-id="{{item.id}}">预测</button>
-      <button catchtap="editProfile" data-id="{{item.id}}">编辑</button>
-      <button class="danger" catchtap="deleteProfile" data-id="{{item.id}}">删除</button>
+    <view class="profile-detail-link">
+      <text>查看完整档案</text>
+      <text>↗</text>
+    </view>
+
+    <view class="profile-tools">
+      <view catchtap="goDiagnose" data-id="{{item.id}}">聊天确诊</view>
+      <view catchtap="goCheck" data-id="{{item.id}}">发不发</view>
+      <view catchtap="goPredict" data-id="{{item.id}}">感情预测</view>
+    </view>
+
+    <view class="profile-manage">
+      <text catchtap="editProfile" data-id="{{item.id}}">编辑档案</text>
+      <text class="danger" catchtap="deleteProfile" data-id="{{item.id}}">删除</text>
     </view>
   </view>
 </view>

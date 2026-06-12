@@ -37,7 +37,32 @@
       <view class="type-selector">
         <view wx:for="{{typeOptions}}" wx:key="key" class="{{pType === item.key ? 'active' : ''}}" bindtap="pickType" data-key="{{item.key}}">{{item.label}}</view>
       </view>
-      <view class="tool-rule"></view>
+    </view>
+
+    <block wx:if="{{!isReplyMode}}">
+      <view class="upload-zone {{imgs.length ? 'has-files' : ''}}" bindtap="chooseImg">
+        <view class="upload-no">{{imgs.length ? imgs.length : '+'}}</view>
+        <view>
+          <view class="upload-title">{{imgs.length ? '聊天截图已就绪' : '选择聊天截图'}}</view>
+          <view class="upload-sub">{{imgs.length ? '继续添加或点击下方预览' : '让判断结合前后文，不只看一句话'}}</view>
+        </view>
+        <view class="upload-arrow">↗</view>
+      </view>
+
+      <view wx:if="{{imgs.length}}" class="shot-panel">
+        <view class="shot-head"><text>SCREENSHOTS / {{imgs.length}}</text><text bindtap="clearImgs">清空</text></view>
+        <view class="shot-grid">
+          <view wx:for="{{imgs}}" wx:key="path" class="shot-tile" data-index="{{index}}" bindtap="previewImg">
+            <image class="shot-img" src="{{item.path}}" mode="aspectFill"></image>
+            <view class="shot-remove" data-index="{{index}}" catchtap="removeImg">×</view>
+            <view class="shot-order">0{{index + 1}}</view>
+          </view>
+        </view>
+      </view>
+      <view class="or-line"><text>或直接粘贴要检查的话</text></view>
+    </block>
+
+    <view class="tool-surface">
       <view class="surface-label">{{isReplyMode ? 'WHAT YOU WANT TO SAY' : 'MESSAGE TO CHECK'}}</view>
       <textarea class="tool-textarea" maxlength="-1" auto-height placeholder="{{isReplyMode ? '你真正想表达什么？' : '把准备发送的话贴在这里…'}}" placeholder-style="color: #B7BBC4" value="{{text}}" bindinput="onInput"></textarea>
     </view>
@@ -72,7 +97,7 @@
     <view class="result-action-grid">
       <button class="result-action" bindtap="resetInput">重新检测</button>
       <button class="result-action" bindtap="copyResult">复制结果</button>
-      <button class="result-action dark" open-type="share">分享</button>
+      <button class="result-action dark" open-type="share">分享给朋友 ↗</button>
     </view>
     <view class="disclaimer">发送建议只基于当前文本和所选类型，不代表对方一定会这样反应。</view>
   </view>
@@ -99,7 +124,7 @@
     <view class="result-action-grid">
       <button class="result-action" bindtap="resetInput">重新生成</button>
       <button class="result-action" bindtap="copyResult">复制回复</button>
-      <button class="result-action dark" open-type="share">分享</button>
+      <button class="result-action dark" open-type="share">分享给朋友 ↗</button>
     </view>
     <view class="disclaimer">回复建议基于你提供的背景生成。别为了显得体面而憋死自己，也别为了爽一下把局面炸了。</view>
   </view>

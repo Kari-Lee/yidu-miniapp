@@ -1,9 +1,9 @@
 var D = require('../../utils/data')
-var API = require('../../utils/api')
 var H = require('../../utils/history')
 var N = require('../../utils/normalize')
 var Share = require('../../utils/share')
 var Format = require('../../utils/format')
+var ChatImages = require('../../utils/chatImages')
 var MSGS = ["扫描关系轨迹", "模拟未来走向"]
 
 function safeDecode(v) {
@@ -15,9 +15,13 @@ function makeContextTip(name, count) {
   return '已带入' + (name || '这段关系') + '的档案' + (n ? '和' + n + '条历史摘要' : '')
 }
 
+function hasInput(text, imgs) {
+  return !!((text || '').trim() || (imgs && imgs.length))
+}
+
 Page({
   data: {
-    statusBarHeight: 0, step: 'input', text: '', ctx: '', err: null,
+    statusBarHeight: 0, step: 'input', text: '', imgs: [], ctx: '', err: null,
     initialCtx: '', profileId: '', profileName: '', profileHistoryCount: 0, contextTip: '',
     ctxEnabled: false, initialCtxEnabled: false, ctxPreviewOpen: false,
     hasInput: false, submitting: false, loadingMsg: '', res: null,
@@ -48,7 +52,48 @@ Page({
     clearInterval(this._timer)
     this._timer = null
   },
-  onInput: function(e) { this.setData({ text: e.detail.value, hasInput: !!e.detail.value.trim() }) },
+  onInput: function(e) {
+    this.setData({ text: e.detail.value, hasInput: hasInput(e.detail.value, this.data.imgs) })
+  },
+  chooseImg: function() {
+    var self = this
+    var remaining = ChatImages.MAX_IMAGES - self.data.imgs.length
+    if (remaining <= 0) {
+      wx.showToast({ title: '这组截图已经够完整了', icon: 'none' })
+      return
+    }
+    wx.chooseImage({
+      count: Math.min(9, remaining),
+      sizeType: ['compressed'],
+      success: function(r) {
+        var paths = self.data.imgs.map(function(item) {
+          return item.originalPath || item.path
+        }).concat(r.tempFilePaths)
+        wx.showLoading({ title: '优化截图中' })
+        ChatImages.optimizeImages(paths).then(function(imgs) {
+          wx.hideLoading()
+          self.setData({ imgs: imgs, hasInput: hasInput(self.data.text, imgs) })
+        }).catch(function() {
+          wx.hideLoading()
+          wx.showToast({ title: '图片处理失败，请重选', icon: 'none' })
+        })
+      }
+    })
+  },
+  previewImg: function(e) {
+    var idx = e.currentTarget.dataset.index
+    var urls = this.data.imgs.map(function(item) { return item.path })
+    wx.previewImage({ current: urls[idx], urls: urls })
+  },
+  removeImg: function(e) {
+    var idx = e.currentTarget.dataset.index
+    var imgs = this.data.imgs.slice()
+    imgs.splice(idx, 1)
+    this.setData({ imgs: imgs, hasInput: hasInput(this.data.text, imgs) })
+  },
+  clearImgs: function() {
+    this.setData({ imgs: [], hasInput: hasInput(this.data.text, []) })
+  },
   onCtxInput: function(e) { this.setData({ ctx: e.detail.value }) },
   toggleCtxEnabled: function(e) { this.setData({ ctxEnabled: e.detail.value }) },
   toggleCtxPreview: function() { this.setData({ ctxPreviewOpen: !this.data.ctxPreviewOpen }) },
@@ -59,6 +104,7 @@ Page({
     this.setData({
       step: 'input',
       text: '',
+      imgs: [],
       ctx: this.data.initialCtx,
       ctxEnabled: this.data.initialCtxEnabled,
       ctxPreviewOpen: false,
@@ -80,10 +126,15 @@ Page({
 
     var ctx = (!self.data.contextTip || self.data.ctxEnabled) ? self.data.ctx : ''
     var um = (ctx ? '关系背景：' + ctx + '\n\n' : '') +
-      (self.data.text.trim() ? '聊天记录：\n' + self.data.text : '')
+      (self.data.text.trim()
+        ? '聊天记录：\n' + self.data.text
+        : '请根据所附聊天截图识别互动内容并预测关系走向。') +
+      (self.data.imgs.length ? '\n\n请同时参考所附聊天截图，并按截图顺序理解上下文。' : '')
 
-    API.callAI(D.P.predict, um, null, null, {
-      onRetry: function() { self.setData({ loadingMsg: '连接波动，正在自动重试' }) }
+    ChatImages.callAI(D.P.predict, um, self.data.imgs, {
+      onRetry: function() { self.setData({ loadingMsg: '连接波动，正在自动重试' }) },
+      onStatus: function(message) { self.setData({ loadingMsg: message }) },
+      onPrepared: function(imgs) { self.setData({ imgs: imgs }) }
     }).then(function(res) {
       self.stopLoading()
       self._submitting = false
@@ -94,6 +145,7 @@ Page({
         title: res.stage || '感情预测',
         summary: res.stage_desc || res.todo || '已生成关系走向预测',
         input: self.data.text.slice(0, 80),
+        imageCount: self.data.imgs.length,
         profileId: self.data.profileId,
         profileName: self.data.profileName,
         result: res

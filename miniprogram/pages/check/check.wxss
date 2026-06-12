@@ -30,14 +30,14 @@
 .verdict-note { margin-top: 24rpx; color: rgba(45,47,51,0.62); font-size: 24rpx; line-height: 1.7; }
 .risk-grid {
   display: grid;
-  grid-template-columns: repeat(2, 1fr);
+  grid-template-columns: minmax(0, 1fr);
   gap: 12rpx;
   margin-top: 12rpx;
 }
 .risk-grid > view { min-height: 150rpx; padding: 26rpx; background: #2D2F33; color: #FFFFFF; box-sizing: border-box; }
 .risk-grid > view:last-child { background: rgba(255,255,255,0.66); color: #2D2F33; }
 .risk-grid text { color: #E17055; font-size: 18rpx; font-weight: 900; }
-.risk-grid view view { margin-top: 12rpx; font-size: 23rpx; font-weight: 800; line-height: 1.6; }
+.risk-grid view view { margin-top: 12rpx; font-size: 23rpx; font-weight: 800; line-height: 1.6; overflow-wrap: anywhere; }
 .alternative-block { margin-top: 12rpx; padding: 34rpx; border-left: 7rpx solid #10A8E8; background: rgba(255,255,255,0.68); }
 .alternative-text { margin-top: 17rpx; color: #2D2F33; font-size: 32rpx; font-weight: 900; line-height: 1.65; }
 .reply-row { padding: 32rpx 0; border-top: 2rpx solid rgba(45,47,51,0.08); }

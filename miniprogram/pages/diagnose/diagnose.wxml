@@ -140,7 +140,7 @@
     <view class="result-action-grid">
       <button class="result-action" bindtap="resetInput">重新分析</button>
       <button class="result-action" bindtap="copyResult">复制结果</button>
-      <button class="result-action dark" open-type="share">分享</button>
+      <button class="result-action dark" open-type="share">分享给朋友 ↗</button>
     </view>
     <view class="disclaimer">分析只适合做自我觉察和沟通参考。别拿它当判决书，更别替代专业心理咨询。</view>
   </view>

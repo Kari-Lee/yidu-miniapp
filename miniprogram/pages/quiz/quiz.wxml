@@ -1,32 +1,35 @@
-<view style="padding: 0 32rpx 120rpx;">
+<view class="tool-page quiz-page">
   <view style="height: {{statusBarHeight}}px"></view>
-
-  <view style="padding: 24rpx 0;">
-    <text bindtap="goBack" style="font-size: 24rpx; color: #B8860B; font-weight: 600;">‹ 返回</text>
+  <view class="tool-topbar">
+    <text class="tool-back" bindtap="goBack">← 返回</text>
+    <text class="tool-brand">YIDU</text>
   </view>
 
-  <view wx:if="{{!result}}">
-    <view style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20rpx;">
-      <view style="display: flex; align-items: center; gap: 24rpx;">
-        <button wx:if="{{qi > 0}}" bindtap="prevQ" style="padding: 12rpx 28rpx; border-radius: 20rpx; background: #F8FAFB; color: #2D3436; font-size: 26rpx; font-weight: 700; border: 2rpx solid rgba(0,0,0,0.04);">‹ 上一题</button>
-        <text class="serif" style="font-size: 28rpx; font-weight: 700; color: #B8860B;">Q{{qi + 1}}</text>
+  <view wx:if="{{!result}}" class="quiz-stage fu">
+    <view class="quiz-head">
+      <view class="quiz-head-no">{{qi + 1}}</view>
+      <view class="quiz-kicker">ATTACHMENT PROFILE / 24Q</view>
+      <view class="quiz-meta">
+        <view class="quiz-count">Q{{qi + 1}} <text>/ {{total}}</text></view>
+        <text wx:if="{{qi > 0}}" class="quiz-prev" bindtap="prevQ">上一题</text>
       </view>
-      <text style="font-size: 24rpx; color: #C8D6E5;">{{qi + 1}}/{{total}}</text>
+      <view class="quiz-progress"><view style="width: {{progress}}%;"></view></view>
     </view>
 
-    <view style="height: 6rpx; background: rgba(0,0,0,0.04); border-radius: 99rpx; overflow: hidden; margin-bottom: 48rpx;">
-      <view style="height: 100%; width: {{progress}}%; background: linear-gradient(90deg, #B8860B, #2D3436); border-radius: 99rpx;"></view>
-    </view>
-
-    <view class="card" style="padding: 48rpx 40rpx;">
-      <view class="serif" style="font-size: 36rpx; font-weight: 700; color: #1A1A2E; margin-bottom: 40rpx; line-height: 1.6;">{{currentQ.q}}</view>
-      <view wx:for="{{currentQ.a}}" wx:key="index" wx:for-index="ai">
-        <view bindtap="answerQ" data-idx="{{ai}}" style="width: 100%; padding: 28rpx 32rpx; margin-bottom: 16rpx; border-radius: 28rpx; border: 4rpx solid {{picked === ai ? '#B8860B' : 'rgba(0,0,0,0.04)'}}; background: {{picked === ai ? 'rgba(184,134,11,0.07)' : '#F4F8FB'}}; color: {{picked === ai ? '#B8860B' : '#1A1A2E'}}; font-size: 28rpx; font-weight: 500; text-align: left; line-height: 1.6; display: flex; align-items: center; box-sizing: border-box;">
-          <view style="width: 44rpx; height: 44rpx; border-radius: 12rpx; background: {{picked === ai ? '#B8860B' : 'rgba(195,214,229,0.25)'}}; color: {{picked === ai ? '#fff' : '#8395A7'}}; display: flex; align-items: center; justify-content: center; font-size: 22rpx; font-weight: 800; flex-shrink: 0; margin-right: 20rpx;">{{letters[ai]}}</view>
-          <text style="flex: 1;">{{item}}</text>
+    <view class="quiz-question">
+      <view class="quiz-question-label">CHOOSE THE REAL REACTION</view>
+      <view class="quiz-question-text">{{currentQ.q}}</view>
+      <view class="quiz-options">
+        <view wx:for="{{currentQ.a}}" wx:key="index" wx:for-index="ai">
+          <view class="quiz-option {{picked === ai ? 'active' : ''}}" bindtap="answerQ" data-idx="{{ai}}">
+            <view class="quiz-option-letter">{{letters[ai]}}</view>
+            <text>{{item}}</text>
+            <view class="quiz-option-arrow">→</view>
+          </view>
         </view>
       </view>
     </view>
+    <view class="quiz-note">没有标准答案。选第一反应，不要选“应该怎样”。</view>
   </view>
 
   <view wx:if="{{result}}" class="fu result-page">

@@ -4,6 +4,7 @@ var H = require('../../utils/history')
 var N = require('../../utils/normalize')
 var Share = require('../../utils/share')
 var Format = require('../../utils/format')
+var ChatImages = require('../../utils/chatImages')
 var MSGS = ["评估杀伤力", "模拟Ta反应"]
 var REPLY_MSGS = ["拆解当前局面", "压低情绪浓度", "生成可发版本"]
 
@@ -16,9 +17,13 @@ function makeContextTip(name, count) {
   return '已带入' + (name || '这段关系') + '的档案' + (n ? '和' + n + '条历史摘要' : '')
 }
 
+function hasInput(text, imgs, isReplyMode, replyTask) {
+  return !!((text || '').trim() || (imgs && imgs.length) || (isReplyMode && replyTask))
+}
+
 Page({
   data: {
-    statusBarHeight: 0, step: 'input', mode: 'check', text: '', pType: '', ctx: '', replyTask: '', err: null,
+    statusBarHeight: 0, step: 'input', mode: 'check', text: '', imgs: [], pType: '', ctx: '', replyTask: '', err: null,
     initialPType: '', profileId: '', profileName: '', profileHistoryCount: 0, contextTip: '',
     ctxEnabled: false, initialCtxEnabled: false, ctxPreviewOpen: false,
     isReplyMode: false,
@@ -68,7 +73,55 @@ Page({
   onInput: function(e) {
     this.setData({
       text: e.detail.value,
-      hasInput: !!e.detail.value.trim() || (this.data.isReplyMode && !!this.data.replyTask)
+      hasInput: hasInput(e.detail.value, this.data.imgs, this.data.isReplyMode, this.data.replyTask)
+    })
+  },
+  chooseImg: function() {
+    var self = this
+    var remaining = ChatImages.MAX_IMAGES - self.data.imgs.length
+    if (remaining <= 0) {
+      wx.showToast({ title: '这组截图已经够完整了', icon: 'none' })
+      return
+    }
+    wx.chooseImage({
+      count: Math.min(9, remaining),
+      sizeType: ['compressed'],
+      success: function(r) {
+        var paths = self.data.imgs.map(function(item) {
+          return item.originalPath || item.path
+        }).concat(r.tempFilePaths)
+        wx.showLoading({ title: '优化截图中' })
+        ChatImages.optimizeImages(paths).then(function(imgs) {
+          wx.hideLoading()
+          self.setData({
+            imgs: imgs,
+            hasInput: hasInput(self.data.text, imgs, self.data.isReplyMode, self.data.replyTask)
+          })
+        }).catch(function() {
+          wx.hideLoading()
+          wx.showToast({ title: '图片处理失败，请重选', icon: 'none' })
+        })
+      }
+    })
+  },
+  previewImg: function(e) {
+    var idx = e.currentTarget.dataset.index
+    var urls = this.data.imgs.map(function(item) { return item.path })
+    wx.previewImage({ current: urls[idx], urls: urls })
+  },
+  removeImg: function(e) {
+    var idx = e.currentTarget.dataset.index
+    var imgs = this.data.imgs.slice()
+    imgs.splice(idx, 1)
+    this.setData({
+      imgs: imgs,
+      hasInput: hasInput(this.data.text, imgs, this.data.isReplyMode, this.data.replyTask)
+    })
+  },
+  clearImgs: function() {
+    this.setData({
+      imgs: [],
+      hasInput: hasInput(this.data.text, [], this.data.isReplyMode, this.data.replyTask)
     })
   },
   pickType: function(e) { this.setData({ pType: e.currentTarget.dataset.key }) },
@@ -79,19 +132,20 @@ Page({
     this.setData({
       step: 'input',
       text: '',
+      imgs: [],
       pType: this.data.initialPType,
       ctxEnabled: this.data.initialCtxEnabled,
       ctxPreviewOpen: false,
       err: null,
       res: null,
       submitting: false,
-      hasInput: this.data.isReplyMode && !!this.data.replyTask
+      hasInput: hasInput('', [], this.data.isReplyMode, this.data.replyTask)
     })
   },
 
   submit: function() {
     if (this._submitting) return
-    if (!this.data.text.trim() && !(this.data.isReplyMode && this.data.replyTask)) return
+    if (!hasInput(this.data.text, this.data.imgs, this.data.isReplyMode, this.data.replyTask)) return
     var self = this
     self._submitting = true
     self.stopLoading()
@@ -111,12 +165,23 @@ Page({
         (self.data.text.trim() ? '用户想表达：' + self.data.text : '用户需求：请根据当前局面，写下一句适合发给Ta的话。')
     } else {
       um = (ctx ? '关系背景：' + ctx + '\n\n' : '') +
-        '对方类型：' + typeLabel + '\n\n我想发：' + self.data.text
+        '对方类型：' + typeLabel + '\n\n' +
+        (self.data.text.trim()
+          ? '我想发：' + self.data.text
+          : '请结合聊天截图中的上下文，判断我接下来准备发送或最新输入的消息是否合适。') +
+        (self.data.imgs.length ? '\n\n请同时参考所附聊天截图。' : '')
     }
 
-    API.callAI(prompt, um, null, null, {
-      onRetry: function() { self.setData({ loadingMsg: '连接波动，正在自动重试' }) }
-    }).then(function(res) {
+    var requestOptions = {
+      onRetry: function() { self.setData({ loadingMsg: '连接波动，正在自动重试' }) },
+      onStatus: function(message) { self.setData({ loadingMsg: message }) },
+      onPrepared: function(imgs) { self.setData({ imgs: imgs }) }
+    }
+    var request = self.data.isReplyMode
+      ? API.callAI(prompt, um, null, null, requestOptions)
+      : ChatImages.callAI(prompt, um, self.data.imgs, requestOptions)
+
+    request.then(function(res) {
       self.stopLoading()
       self._submitting = false
       res = self.data.isReplyMode ? N.normalizeReply(res) : N.normalizeCheck(res)
@@ -126,6 +191,7 @@ Page({
         title: self.data.isReplyMode ? '下一句怎么回' : (res.verdict || '消息检测'),
         summary: self.data.isReplyMode ? (res.strategy || '已生成可发送回复') : (res.reason || res.prediction || '已生成发送建议'),
         input: self.data.text.slice(0, 80) || (self.data.isReplyMode ? '基于分析结果生成回复' : ''),
+        imageCount: self.data.imgs.length,
         profileId: self.data.profileId,
         profileName: self.data.profileName,
         result: res

@@ -1,81 +1,122 @@
-<view class="container" style="padding: 0 32rpx 120rpx;">
+<view class="profile-page">
   <view style="height: {{statusBarHeight}}px"></view>
-  <view style="padding: 24rpx 0; display: flex; align-items: center; justify-content: space-between;">
-    <text bindtap="goBack" style="font-size: 24rpx; color: #B8860B; font-weight: 600;">‹ 返回</text>
-    <text wx:if="{{profile}}" bindtap="goEdit" style="font-size: 24rpx; color: #B8860B; font-weight: 800;">编辑</text>
+
+  <view class="profile-topbar">
+    <text class="profile-back" bindtap="goBack">← 返回</text>
+    <text wx:if="{{profile}}" class="profile-edit" bindtap="goEdit">编辑档案</text>
   </view>
 
-  <view wx:if="{{!profile}}" class="card" style="text-align: center; padding: 80rpx 40rpx;">
-    <view style="font-size: 72rpx; margin-bottom: 20rpx;">🫥</view>
-    <view class="serif" style="font-size: 34rpx; font-weight: 800; color: #1A1A2E;">档案找不到了</view>
-    <view style="font-size: 26rpx; color: #8395A7; margin-top: 12rpx;">可能已经被删除，或者本机缓存被清理</view>
+  <view wx:if="{{!profile}}" class="missing-profile">
+    <view class="missing-no">404</view>
+    <view class="missing-title">档案找不到了</view>
+    <view class="missing-copy">可能已经被删除，或者本机缓存被清理。</view>
   </view>
 
-  <view wx:if="{{profile}}" class="fu">
-    <view class="hero-card">
-      <view style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 24rpx;">
-        <view class="pill">{{profile.relation}}</view>
-        <view style="font-size: 22rpx; color: #C8D6E5;">{{profile.timeText}}</view>
+  <view wx:if="{{profile}}" class="profile-content">
+    <view class="profile-hero">
+      <view class="profile-kicker">RELATION FILE</view>
+      <view class="hero-meta">
+        <text>{{profile.relation}}</text>
+        <text>{{profile.timeText}}</text>
       </view>
-      <view class="serif" style="font-size: 58rpx; font-weight: 900; color: #1A1A2E; line-height: 1.25;">{{profile.name}}</view>
-      <view class="type-line" style="color: {{typeInfo.color}};">
-        <text style="font-size: 36rpx; margin-right: 10rpx;">{{typeInfo.emoji}}</text>
-        <text>{{profile.typeLabel || typeInfo.label}}</text>
-      </view>
-      <view style="font-size: 24rpx; color: #8395A7; margin-top: 8rpx;">{{typeInfo.desc}}</view>
-      <view wx:if="{{profile.note}}" class="note-block">{{profile.note}}</view>
-    </view>
+      <view class="hero-name">{{profile.name}}</view>
 
-    <view class="quick-grid">
-      <button bindtap="goDiagnose">
-        <text>🩺</text>
-        <view>确诊</view>
-      </button>
-      <button bindtap="goCheck">
-        <text>💊</text>
-        <view>发不发</view>
-      </button>
-      <button bindtap="goPredict">
-        <text>🔭</text>
-        <view>预测</view>
-      </button>
-    </view>
-
-    <view wx:if="{{latest}}" class="card latest-card" data-id="{{latest.id}}" bindtap="openHistory">
-      <view class="section-title">最近一次分析</view>
-      <view style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 14rpx;">
-        <view class="pill warm">{{latest.kindLabel}}</view>
-        <view style="font-size: 22rpx; color: #C8D6E5;">{{latest.timeText}}</view>
-      </view>
-      <view class="serif" style="font-size: 34rpx; font-weight: 900; color: #1A1A2E; line-height: 1.4;">{{latest.title}}</view>
-      <view style="font-size: 26rpx; color: rgba(26,26,46,0.72); line-height: 1.8; margin-top: 12rpx;">{{latest.summary}}</view>
-      <view style="margin-top: 18rpx; color: #B8860B; font-size: 24rpx; font-weight: 800;">查看完整结果 ›</view>
-    </view>
-
-    <view class="section-head">
-      <view>
-        <view class="serif" style="font-size: 36rpx; font-weight: 900; color: #1A1A2E;">专属历史</view>
-        <view style="font-size: 23rpx; color: #8395A7; margin-top: 4rpx;">{{records.length}} 条记录，只看这个 Ta</view>
-      </view>
-    </view>
-
-    <view wx:if="{{!records.length}}" class="empty-card">
-      <view style="font-size: 58rpx; margin-bottom: 14rpx;">🗂️</view>
-      <view class="serif" style="font-size: 30rpx; font-weight: 900; color: #1A1A2E;">还没有这个人的分析</view>
-      <view style="font-size: 25rpx; color: #8395A7; margin-top: 8rpx;">先做一次确诊，后面就不用从一堆记录里翻了</view>
-    </view>
-
-    <view wx:for="{{records}}" wx:key="id" class="timeline-card" data-id="{{item.id}}" bindtap="openHistory">
-      <view class="dot"></view>
-      <view style="flex: 1;">
-        <view style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10rpx;">
-          <view class="pill warm">{{item.kindLabel}}</view>
-          <view style="font-size: 22rpx; color: #C8D6E5;">{{item.timeText}}</view>
+      <view class="type-panel">
+        <view>
+          <view class="type-label">疑似依恋类型</view>
+          <view class="type-name" style="color: {{typeInfo.color}};">{{profile.typeLabel || typeInfo.label}}</view>
         </view>
-        <view class="serif" style="font-size: 30rpx; font-weight: 900; color: #1A1A2E; line-height: 1.4;">{{item.title}}</view>
-        <view style="font-size: 25rpx; color: rgba(26,26,46,0.72); line-height: 1.7; margin-top: 10rpx;">{{item.summary}}</view>
-        <view wx:if="{{item.imageCount}}" style="margin-top: 12rpx; color: #00B894; font-size: 23rpx; font-weight: 800;">含 {{item.imageCount}} 张截图</view>
+        <view class="type-desc">{{typeInfo.desc}}</view>
       </view>
+
+      <view wx:if="{{profile.note}}" class="profile-note">
+        <view class="note-label">关系备注</view>
+        <view>{{profile.note}}</view>
+      </view>
+    </view>
+
+    <view class="section-heading">
+      <text>QUICK TOOLS</text>
+      <view>带着这个 Ta 的档案继续分析</view>
+    </view>
+
+    <view class="quick-tools">
+      <view class="tool-entry tool-entry-dark" bindtap="goDiagnose">
+        <view class="tool-no">01</view>
+        <view class="tool-copy">
+          <view class="tool-title">聊天确诊</view>
+          <view class="tool-desc">上传聊天，看双方的依恋模式</view>
+        </view>
+        <view class="tool-arrow">↗</view>
+      </view>
+      <view class="tool-entry" bindtap="goCheck">
+        <view class="tool-no">02</view>
+        <view class="tool-copy">
+          <view class="tool-title">发不发</view>
+          <view class="tool-desc">发送之前，先看会触发什么</view>
+        </view>
+        <view class="tool-arrow">↗</view>
+      </view>
+      <view class="tool-entry" bindtap="goPredict">
+        <view class="tool-no">03</view>
+        <view class="tool-copy">
+          <view class="tool-title">感情预测</view>
+          <view class="tool-desc">根据互动模式推演关系走向</view>
+        </view>
+        <view class="tool-arrow">↗</view>
+      </view>
+    </view>
+
+    <view wx:if="{{latest}}" class="history-section">
+      <view class="section-heading history-heading">
+        <text>LATEST RECORD</text>
+        <view>最近一次分析</view>
+      </view>
+
+      <view class="latest-sheet" data-id="{{latest.id}}" bindtap="openHistory">
+        <view class="latest-meta">
+          <text>{{latest.kindLabel}}</text>
+          <text>{{latest.timeText}}</text>
+        </view>
+        <view class="latest-title">{{latest.title}}</view>
+        <view class="latest-summary">{{latest.summary}}</view>
+        <view class="latest-link">
+          <text>查看完整结果</text>
+          <text>↗</text>
+        </view>
+      </view>
+    </view>
+
+    <view class="section-heading history-heading">
+      <text>PRIVATE HISTORY</text>
+      <view>专属历史 · {{records.length}} 条</view>
+    </view>
+
+    <view wx:if="{{!records.length}}" class="empty-history">
+      <view class="empty-no">00</view>
+      <view class="empty-title">还没有这个人的分析</view>
+      <view class="empty-copy">完成一次聊天确诊后，记录会自动归到这里。</view>
+      <view class="empty-action" bindtap="goDiagnose">开始第一次分析 ↗</view>
+    </view>
+
+    <view
+      wx:for="{{records}}"
+      wx:key="id"
+      class="timeline-row"
+      data-id="{{item.id}}"
+      bindtap="openHistory"
+    >
+      <view class="timeline-index">{{index < 9 ? '0' + (index + 1) : index + 1}}</view>
+      <view class="timeline-content">
+        <view class="timeline-meta">
+          <text>{{item.kindLabel}}</text>
+          <text>{{item.timeText}}</text>
+        </view>
+        <view class="timeline-title">{{item.title}}</view>
+        <view class="timeline-summary">{{item.summary}}</view>
+        <view wx:if="{{item.imageCount}}" class="timeline-images">含 {{item.imageCount}} 张截图</view>
+      </view>
+      <view class="timeline-arrow">↗</view>
     </view>
   </view>
 </view>
