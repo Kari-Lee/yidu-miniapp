@@ -5,6 +5,7 @@
     "pages/diagnose/diagnose",
     "pages/translate/translate",
     "pages/check/check",
+    "pages/misread/misread",
     "pages/predict/predict",
     "pages/history/history",
     "pages/profiles/profiles",

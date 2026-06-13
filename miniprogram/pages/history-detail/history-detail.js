@@ -94,6 +94,15 @@ Page({
         (replyProfile && replyProfile.type ? '&pType=' + replyProfile.type : '') +
         (params ? '&' + params : '')
       wx.navigateTo({ url: '/pages/check/check?' + replyParams })
+    } else if (record.kind === 'misread') {
+      var source = record.result && record.result.source || record.input || ''
+      var mode = record.mode || record.result && record.result.mode || 'person'
+      var misreadParams = [
+        'mode=' + encodeURIComponent(mode),
+        source ? 'text=' + encodeURIComponent(source) : '',
+        params
+      ].filter(Boolean).join('&')
+      wx.navigateTo({ url: '/pages/misread/misread?' + misreadParams })
     } else if (record.kind === 'predict') {
       wx.navigateTo({ url: '/pages/predict/predict' + joiner })
     }

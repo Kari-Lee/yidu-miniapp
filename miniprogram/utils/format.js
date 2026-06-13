@@ -77,6 +77,31 @@ function reply(res) {
   ])
 }
 
+function misread(res) {
+  res = res || {}
+  if (res.safe === false) {
+    return joinLines([
+      '已读 Yidu 已读乱回',
+      res.source ? 'Ta说：' + res.source : '',
+      res.safety_message,
+      res.serious_reply ? '可以先回：' + res.serious_reply : ''
+    ])
+  }
+  var replies = (res.replies || []).map(function(item, idx) {
+    item = item || {}
+    return joinLines([
+      (idx + 1) + '. ' + (item.type || '乱回'),
+      item.text ? '「' + item.text + '」' : '',
+      item.warning
+    ])
+  })
+  return joinLines([
+    '已读 Yidu 已读乱回',
+    res.source ? 'Ta说：' + res.source : '',
+    replies.length ? replies.join('\n') : ''
+  ])
+}
+
 function predict(res) {
   res = res || {}
   var predictions = (res.predictions || []).map(function(item) {
@@ -110,6 +135,7 @@ function record(item) {
   if (item.kind === 'translate') return joinLines([prefix, translate(item.result || {})])
   if (item.kind === 'check') return joinLines([prefix, check(item.result || {})])
   if (item.kind === 'reply') return joinLines([prefix, reply(item.result || {})])
+  if (item.kind === 'misread') return joinLines([prefix, misread(item.result || {})])
   if (item.kind === 'predict') return joinLines([prefix, predict(item.result || {})])
   return joinLines([item.kindLabel, prefix, item.title, item.summary])
 }
@@ -120,6 +146,7 @@ module.exports = {
   translate: translate,
   check: check,
   reply: reply,
+  misread: misread,
   predict: predict,
   record: record
 }

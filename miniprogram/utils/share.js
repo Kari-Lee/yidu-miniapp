@@ -31,6 +31,10 @@ function predict(stage) {
   return page(stage ? '这段关系现在像是：' + stage : '让已读预测一下这段关系走向', '/pages/predict/predict')
 }
 
+function misread(source) {
+  return page(source ? 'Ta说「' + source.slice(0, 18) + '」？我帮你乱回' : '不知道回什么，就回点好笑的', '/pages/misread/misread')
+}
+
 function profiles() {
   return page('给每个Ta建个关系档案，别混着分析', '/pages/profiles/profiles')
 }
@@ -41,6 +45,7 @@ module.exports = {
   diagnose: diagnose,
   translate: translate,
   check: check,
+  misread: misread,
   predict: predict,
   profiles: profiles
 }

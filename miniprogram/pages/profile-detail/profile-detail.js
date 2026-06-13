@@ -64,6 +64,15 @@ Page({
     this.touchAndGo('/pages/diagnose/diagnose?' + ProfileContext.query(profile))
   },
 
+  goMisread: function() {
+    var profile = this.data.profile
+    if (!profile) return
+    var mode = profile.relation === '暧昧对象' || profile.relation === '伴侣' ? 'crush' : 'person'
+    this.touchAndGo('/pages/misread/misread?mode=' + mode +
+      '&profileRelation=' + encodeURIComponent(profile.relation || '') +
+      '&' + ProfileContext.query(profile))
+  },
+
   goCheck: function() {
     var profile = this.data.profile
     if (!profile) return

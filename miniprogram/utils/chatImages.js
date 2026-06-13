@@ -115,6 +115,13 @@ function totalBase64Chars(images) {
   }, 0)
 }
 
+function mergeClientMeta(base, extra) {
+  var result = {}
+  Object.keys(base || {}).forEach(function(key) { result[key] = base[key] })
+  Object.keys(extra || {}).forEach(function(key) { result[key] = extra[key] })
+  return result
+}
+
 function callWithBase64Fallback(prompt, message, items, uploadError, options) {
   if (options.onStatus) options.onStatus('优化备用分析通道')
   var paths = items.map(function(item) { return item.path || item })
@@ -134,11 +141,11 @@ function callWithBase64Fallback(prompt, message, items, uploadError, options) {
     }
     return API.callAI(prompt, message, images, null, {
       onRetry: options.onRetry,
-      clientMeta: {
+      clientMeta: mergeClientMeta(options.clientMeta, {
         imageTransport: 'base64-fallback',
         uploadFallbackCode: uploadError && uploadError.code ? uploadError.code : 'UNKNOWN',
         uploadFallbackDetail: uploadError && uploadError.detail ? uploadError.detail : ''
-      }
+      })
     })
   })
 }
@@ -152,7 +159,10 @@ function callAI(prompt, message, imgs, options) {
   return prepare.then(function(items) {
     if (options.onPrepared) options.onPrepared(items)
     if (!items.length) {
-      return API.callAI(prompt, message, null, null, { onRetry: options.onRetry })
+      return API.callAI(prompt, message, null, null, {
+        onRetry: options.onRetry,
+        clientMeta: options.clientMeta
+      })
     }
     return OSS.uploadImages(items, function(done, total) {
       if (options.onStatus) options.onStatus('上传截图 ' + done + '/' + total)
@@ -160,7 +170,7 @@ function callAI(prompt, message, imgs, options) {
       if (options.onStatus) options.onStatus('识别聊天内容')
       return API.callAI(prompt, message, null, imageKeys, {
         onRetry: options.onRetry,
-        clientMeta: { imageTransport: 'oss' }
+        clientMeta: mergeClientMeta(options.clientMeta, { imageTransport: 'oss' })
       })
     }, function(err) {
       return callWithBase64Fallback(prompt, message, items, err, options)

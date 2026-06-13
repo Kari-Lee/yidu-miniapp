@@ -1,56 +1,88 @@
-<view class="container" style="padding: 0 32rpx 120rpx;">
+<view class="history-page">
   <view style="height: {{statusBarHeight}}px"></view>
-  <view style="padding: 24rpx 0; display: flex; align-items: center; justify-content: space-between;">
-    <text bindtap="goBack" style="font-size: 24rpx; color: #B8860B; font-weight: 600;">‹ 返回</text>
-    <text wx:if="{{records.length}}" bindtap="clearHistory" style="font-size: 24rpx; color: #E17055; font-weight: 600;">清空</text>
+
+  <view class="history-topbar">
+    <text class="history-back" bindtap="goBack">← 返回</text>
+    <text wx:if="{{records.length}}" class="history-clear" bindtap="clearHistory">清空记录</text>
   </view>
 
-  <view style="padding: 24rpx 0 36rpx;">
-    <view class="serif" style="font-size: 56rpx; font-weight: 900; color: #1A1A2E;">最近分析</view>
-    <view style="font-size: 24rpx; color: #8395A7; margin-top: 8rpx;">只保存在本机，最多保留50条</view>
+  <view class="history-head">
+    <view class="history-head-no">05</view>
+    <view class="history-kicker">RECENT RECORDS</view>
+    <view class="history-title">最近分析</view>
+    <view class="history-intro">所有记录只保存在本机，最多保留 50 条。</view>
   </view>
 
-  <view wx:if="{{!records.length}}" class="card" style="text-align: center; padding: 80rpx 40rpx;">
-    <view style="font-size: 72rpx; margin-bottom: 20rpx;">🗂️</view>
-    <view class="serif" style="font-size: 34rpx; font-weight: 800; color: #1A1A2E;">还没有记录</view>
-    <view style="font-size: 26rpx; color: #8395A7; margin-top: 12rpx;">做一次测试或 AI 分析后会出现在这里</view>
+  <view wx:if="{{!records.length}}" class="history-empty">
+    <view class="empty-no">00</view>
+    <view class="empty-kicker">NO RECORDS YET</view>
+    <view class="empty-title">还没有分析记录</view>
+    <view class="empty-copy">完成一次测试、确诊或关系分析后，结果会自动出现在这里。</view>
   </view>
 
-  <view wx:for="{{records}}" wx:key="id" class="card history-card" data-id="{{item.id}}" bindtap="openDetail">
-    <view style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 18rpx;">
-      <view style="padding: 8rpx 20rpx; border-radius: 999rpx; background: #F8FAFB; color: #B8860B; font-size: 22rpx; font-weight: 800;">{{item.kindLabel}}</view>
-      <view style="font-size: 22rpx; color: #C8D6E5;">{{item.timeText}}</view>
+  <view wx:if="{{records.length}}" class="history-count">
+    <text>ANALYSIS ARCHIVE</text>
+    <text>{{records.length}} 条记录</text>
+  </view>
+
+  <view
+    wx:for="{{records}}"
+    wx:key="id"
+    class="history-sheet"
+    data-id="{{item.id}}"
+    bindtap="openDetail"
+  >
+    <view class="sheet-meta">
+      <text>{{item.kindLabel}}</text>
+      <text>{{item.timeText}}</text>
     </view>
 
-    <view class="serif" style="font-size: 34rpx; font-weight: 900; color: #1A1A2E; line-height: 1.4; margin-bottom: 12rpx;">{{item.title}}</view>
-    <view wx:if="{{item.profileName}}" style="font-size: 22rpx; color: #B8860B; font-weight: 800; margin-bottom: 10rpx;">关系档案：{{item.profileName}}</view>
-    <view style="font-size: 26rpx; color: rgba(26,26,46,0.72); line-height: 1.8;">{{item.summary}}</view>
+    <view class="sheet-title">{{item.title}}</view>
+    <view wx:if="{{item.profileName}}" class="sheet-profile">关系档案 / {{item.profileName}}</view>
+    <view class="sheet-summary">{{item.summary}}</view>
 
-    <view wx:if="{{item.input}}" style="margin-top: 20rpx; padding: 22rpx 26rpx; border-radius: 24rpx; background: #F8FAFB; color: #8395A7; font-size: 24rpx; line-height: 1.7;">{{item.input}}</view>
-    <view wx:if="{{item.imageCount}}" style="margin-top: 16rpx; color: #00B894; font-size: 24rpx; font-weight: 700;">含 {{item.imageCount}} 张截图</view>
-
-    <view wx:if="{{item.kind === 'quiz' && item.result.scores}}" class="mini-grid">
-      <text>焦虑 {{item.result.scores.anxious}}</text>
-      <text>回避 {{item.result.scores.avoidant}}</text>
-      <text>安全 {{item.result.scores.secure}}</text>
-      <text>混乱 {{item.result.scores.disorganized}}</text>
+    <view wx:if="{{item.input}}" class="sheet-input">
+      <view>INPUT</view>
+      <text>{{item.input}}</text>
     </view>
 
-    <view wx:if="{{item.kind === 'check' && item.result.alternative}}" class="result-block">
-      <view style="color: #00B894; font-weight: 800; margin-bottom: 8rpx;">替代消息</view>
-      <view>「{{item.result.alternative}}」</view>
+    <view wx:if="{{item.imageCount}}" class="sheet-images">SCREENSHOTS / {{item.imageCount}}</view>
+
+    <view wx:if="{{item.kind === 'quiz' && item.result.scores}}" class="score-preview">
+      <view><text>焦虑</text><text>{{item.result.scores.anxious}}</text></view>
+      <view><text>回避</text><text>{{item.result.scores.avoidant}}</text></view>
+      <view><text>安全</text><text>{{item.result.scores.secure}}</text></view>
+      <view><text>混乱</text><text>{{item.result.scores.disorganized}}</text></view>
     </view>
 
-    <view wx:if="{{item.kind === 'reply' && item.result.drafts && item.result.drafts.length}}" class="result-block">
-      <view style="color: #00B894; font-weight: 800; margin-bottom: 8rpx;">推荐回复</view>
-      <view>「{{item.result.drafts[0].text}}」</view>
+    <view wx:if="{{item.kind === 'check' && item.result.alternative}}" class="sheet-result">
+      <view>替代消息</view>
+      <text>「{{item.result.alternative}}」</text>
     </view>
 
-    <view wx:if="{{item.kind === 'predict' && item.result.todo}}" class="result-block">
-      <view style="color: #B8860B; font-weight: 800; margin-bottom: 8rpx;">现在该做</view>
-      <view>{{item.result.todo}}</view>
+    <view wx:if="{{item.kind === 'reply' && item.result.drafts && item.result.drafts.length}}" class="sheet-result">
+      <view>推荐回复</view>
+      <text>「{{item.result.drafts[0].text}}」</text>
     </view>
 
-    <view style="margin-top: 22rpx; color: #B8860B; font-size: 24rpx; font-weight: 800;">查看详情 ›</view>
+    <view wx:if="{{item.kind === 'misread' && item.result.safe && item.result.replies && item.result.replies.length}}" class="sheet-result">
+      <view>乱回候选</view>
+      <text>「{{item.result.replies[0].text}}」</text>
+    </view>
+
+    <view wx:if="{{item.kind === 'misread' && !item.result.safe}}" class="sheet-result">
+      <view>安全提醒</view>
+      <text>{{item.result.safety_message}}</text>
+    </view>
+
+    <view wx:if="{{item.kind === 'predict' && item.result.todo}}" class="sheet-result">
+      <view>现在该做</view>
+      <text>{{item.result.todo}}</text>
+    </view>
+
+    <view class="sheet-link">
+      <text>查看完整结果</text>
+      <text>↗</text>
+    </view>
   </view>
 </view>

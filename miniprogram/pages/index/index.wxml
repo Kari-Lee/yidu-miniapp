@@ -13,7 +13,7 @@
       <view>测出你的</view>
       <view>依恋人格</view>
     </view>
-    <view class="subline">24 道题，看清你在关系里为什么反复上头。</view>
+    <view class="subline">24 道题，看清你在关系里的真实反应。</view>
 
     <view
       class="hero-action"
@@ -37,36 +37,30 @@
       hover-stay-time="100"
     >已有 Ta？去建关系档案</view>
 
-    <view class="quote-line">
-      <view class="quote-mark">“</view>
-      <view>{{dailyQuote}}</view>
+    <view
+      class="misread-feature"
+      bindtap="goMisread"
+      hover-class="misread-feature-pressed"
+      hover-start-time="20"
+      hover-stay-time="120"
+    >
+      <view class="misread-kicker">MISREAD REPLY · NEW</view>
+      <view class="misread-head">
+        <view>
+          <view class="misread-title">已读，乱回。</view>
+          <view class="misread-desc">不知道怎么回的时候，帮你幽默地回</view>
+        </view>
+        <view class="misread-arrow">↗</view>
+      </view>
+      <view class="misread-demo">
+        <view class="demo-in"><text>{{misreadSample.input}}</text></view>
+        <view class="demo-out"><text>{{misreadSample.output}}</text></view>
+      </view>
     </view>
 
-    <view
-      class="type-poster"
-      bindtap="goQuiz"
-      hover-class="type-poster-pressed"
-      hover-start-time="20"
-      hover-stay-time="130"
-    >
-      <view class="poster-number">04</view>
-      <view class="poster-copy">
-        <view class="preview-kicker">WHICH ONE ARE YOU?</view>
-        <view class="poster-title">
-          <view>你以为你在恋爱，</view>
-          <view>其实是依恋人格在接管。</view>
-        </view>
-      </view>
-      <view class="poster-types">
-        <view><text>01</text>焦虑型</view>
-        <view><text>02</text>回避型</view>
-        <view><text>03</text>安全型</view>
-        <view><text>04</text>混乱型</view>
-      </view>
-      <view class="poster-footer">
-        <text>答案不在直觉里</text>
-        <view>开始识别 ↗</view>
-      </view>
+    <view class="quote-line compact">
+      <view class="quote-mark">“</view>
+      <view>已读不回是冷暴力，已读乱回是行为艺术</view>
     </view>
   </view>
 
@@ -124,10 +118,10 @@
         </view>
         <view class="tool-go">↗</view>
       </view>
-      <view class="tool-row" bindtap="goReply" hover-class="tool-row-pressed" hover-start-time="20" hover-stay-time="100">
+      <view class="tool-row" bindtap="goMisread" hover-class="tool-row-pressed" hover-start-time="20" hover-stay-time="100">
         <view>
-          <view class="tool-title">下一句怎么回</view>
-          <view class="tool-desc">生成能发出去的话</view>
+          <view class="tool-title">已读乱回</view>
+          <view class="tool-desc">挑一句好笑的，直接发</view>
         </view>
         <view class="tool-go">↗</view>
       </view>

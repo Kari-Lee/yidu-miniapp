@@ -1,124 +1,189 @@
-<view class="container" style="padding: 0 32rpx 120rpx;">
+<view class="record-page">
   <view style="height: {{statusBarHeight}}px"></view>
-  <view style="padding: 24rpx 0; display: flex; align-items: center; justify-content: space-between;">
-    <text bindtap="goBack" style="font-size: 24rpx; color: #B8860B; font-weight: 600;">‹ 返回</text>
-    <text wx:if="{{record}}" bindtap="deleteRecord" style="font-size: 24rpx; color: #E17055; font-weight: 700;">删除</text>
+
+  <view class="record-topbar">
+    <text class="record-back" bindtap="goBack">← 返回</text>
+    <text wx:if="{{record}}" class="record-delete" bindtap="deleteRecord">删除记录</text>
   </view>
 
-  <view wx:if="{{!record}}" class="card" style="text-align: center; padding: 80rpx 40rpx;">
-    <view style="font-size: 72rpx; margin-bottom: 20rpx;">🫥</view>
-    <view class="serif" style="font-size: 34rpx; font-weight: 800; color: #1A1A2E;">记录找不到了</view>
-    <view style="font-size: 26rpx; color: #8395A7; margin-top: 12rpx;">可能已经被清空或删除</view>
+  <view wx:if="{{!record}}" class="record-missing">
+    <view class="missing-no">404</view>
+    <view class="missing-kicker">RECORD NOT FOUND</view>
+    <view class="missing-title">记录找不到了</view>
+    <view class="missing-copy">可能已经被清空或删除。</view>
   </view>
 
-  <view wx:if="{{record}}" class="fu">
-    <view class="card" style="padding: 44rpx;">
-      <view style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 18rpx;">
-        <view style="padding: 8rpx 20rpx; border-radius: 999rpx; background: #F8FAFB; color: #B8860B; font-size: 22rpx; font-weight: 800;">{{record.kindLabel}}</view>
-        <view style="font-size: 22rpx; color: #C8D6E5;">{{record.timeText}}</view>
+  <view wx:if="{{record}}" class="record-content">
+    <view class="record-hero">
+      <view class="record-kicker">{{record.kindLabel}}</view>
+      <view class="record-time">{{record.timeText}}</view>
+      <view class="record-title">{{record.title}}</view>
+      <view wx:if="{{record.profileName}}" class="record-profile">RELATION FILE / {{record.profileName}}</view>
+      <view class="record-summary">{{record.summary}}</view>
+
+      <view wx:if="{{record.input}}" class="record-input">
+        <view>ORIGINAL INPUT</view>
+        <text>{{record.input}}</text>
       </view>
-      <view class="serif" style="font-size: 44rpx; font-weight: 900; color: #1A1A2E; line-height: 1.35;">{{record.title}}</view>
-      <view wx:if="{{record.profileName}}" style="font-size: 23rpx; color: #B8860B; font-weight: 900; margin-top: 14rpx;">关系档案：{{record.profileName}}</view>
-      <view style="font-size: 27rpx; color: rgba(26,26,46,0.72); line-height: 1.8; margin-top: 16rpx;">{{record.summary}}</view>
-      <view wx:if="{{record.input}}" class="input-block">{{record.input}}</view>
-      <view wx:if="{{record.imageCount}}" style="margin-top: 16rpx; color: #00B894; font-size: 24rpx; font-weight: 800;">含 {{record.imageCount}} 张截图</view>
+      <view wx:if="{{record.imageCount}}" class="record-images">SCREENSHOTS / {{record.imageCount}}</view>
     </view>
 
-    <view wx:if="{{record.kind === 'quiz' && res.scores}}" class="card" style="padding: 40rpx;">
-      <view class="section-title">各维度得分</view>
+    <view wx:if="{{record.kind === 'quiz' && res.scores}}" class="record-section">
+      <view class="section-head">
+        <text>01 / FOUR-DIMENSION SCORE</text>
+        <view>各维度得分</view>
+      </view>
       <view class="score-grid">
-        <view>焦虑 {{res.scores.anxious}}</view>
-        <view>回避 {{res.scores.avoidant}}</view>
-        <view>安全 {{res.scores.secure}}</view>
-        <view>混乱 {{res.scores.disorganized}}</view>
+        <view><text>焦虑</text><text>{{res.scores.anxious}}</text></view>
+        <view><text>回避</text><text>{{res.scores.avoidant}}</text></view>
+        <view><text>安全</text><text>{{res.scores.secure}}</text></view>
+        <view><text>混乱</text><text>{{res.scores.disorganized}}</text></view>
       </view>
-      <view wx:if="{{res.desc}}" style="font-size: 28rpx; color: rgba(26,26,46,0.8); line-height: 1.9; margin-top: 24rpx;">{{res.desc}}</view>
+      <view wx:if="{{res.desc}}" class="section-copy">{{res.desc}}</view>
     </view>
 
-    <view wx:if="{{record.kind === 'diagnose' && res}}" class="card" style="padding: 40rpx;">
-      <view class="section-title">完整分析</view>
-      <view class="kv">你：{{res.user_label}} / Ta：{{res.partner_label}}</view>
-      <view class="kv">置信度：{{res.confidence}}%</view>
-      <view class="body-text">{{res.match}}</view>
+    <view wx:if="{{record.kind === 'diagnose' && res}}" class="record-section">
+      <view class="section-head">
+        <text>01 / INTERACTION LOOP</text>
+        <view>完整分析</view>
+      </view>
+
+      <view class="duo-summary">
+        <view><text>你</text><view>{{res.user_label}}</view></view>
+        <view class="dark"><text>Ta</text><view>{{res.partner_label}}</view></view>
+      </view>
+
+      <view class="confidence">
+        <view><text>分析置信度</text><text>{{res.confidence}}%</text></view>
+        <view class="confidence-track"><view style="width: {{res.confidence}}%;"></view></view>
+      </view>
+
+      <view class="section-copy">{{res.match}}</view>
+
       <view wx:if="{{record.profileId}}" class="profile-sync">
-        <view style="flex: 1;">
-          <view class="profile-sync-title">写回关系档案</view>
-          <view class="profile-sync-desc">{{record.profileName || '这段关系'}}：Ta 标记为 {{res.partner_label}}</view>
+        <view class="sync-copy">
+          <view>写回关系档案</view>
+          <text>{{record.profileName || '这段关系'}}：Ta 标记为 {{res.partner_label}}</text>
         </view>
         <button class="profile-sync-btn {{profileSynced ? 'done' : ''}}" disabled="{{profileSynced}}" bindtap="syncPartnerType">{{profileSynced ? '已更新' : '写入'}}</button>
       </view>
-      <view class="section-title" style="margin-top: 32rpx;">暴露信号</view>
-      <view wx:for="{{res.signals}}" wx:key="index" class="signal-row">
-        <view style="font-size: 34rpx; width: 48rpx;">{{item.icon}}</view>
-        <view style="flex: 1;">
-          <view style="font-size: 24rpx; color: #8395A7;">{{item.who}}</view>
-          <view class="serif" style="font-size: 28rpx; font-weight: 800;">「{{item.msg}}」</view>
-          <view style="font-size: 25rpx; color: #8395A7;">{{item.meaning}}</view>
+
+      <view class="subsection-label">02 / EXPOSED SIGNALS</view>
+      <view wx:for="{{res.signals}}" wx:key="index" class="numbered-row">
+        <view class="row-no">0{{index + 1}}</view>
+        <view class="row-body">
+          <view class="row-meta">{{item.who}}</view>
+          <view class="row-title">「{{item.msg}}」</view>
+          <view class="row-copy">{{item.meaning}}</view>
         </view>
       </view>
-      <view class="advice-block">给你：{{res.user_advice}}</view>
-      <view class="advice-block">应对Ta：{{res.partner_advice}}</view>
+
+      <view class="advice-grid">
+        <view><text>给你</text><view>{{res.user_advice}}</view></view>
+        <view class="dark"><text>应对 Ta</text><view>{{res.partner_advice}}</view></view>
+      </view>
     </view>
 
-    <view wx:if="{{record.kind === 'translate' && res.translations}}">
-      <view wx:for="{{res.translations}}" wx:key="index" class="card" style="padding: 40rpx;">
-        <view class="section-title">潜台词 {{index + 1}}</view>
-        <view class="quote">「{{item.original}}」</view>
-        <view class="body-text">{{item.verdict}}</view>
-        <view wx:for="{{item.possibilities}}" wx:for-item="p" wx:key="label" class="poss-row">
-          <view style="font-weight: 900; color: #B8860B; width: 54rpx;">{{p.label}}</view>
-          <view style="flex: 1;">
-            <view style="font-size: 26rpx; font-weight: 800;">{{p.meaning}} {{p.percent}}%</view>
-            <view style="font-size: 24rpx; color: #8395A7;">{{p.reason}}</view>
+    <view wx:if="{{record.kind === 'translate' && res.translations}}" class="translations">
+      <view wx:for="{{res.translations}}" wx:key="index" class="record-section translation-section">
+        <view class="section-head">
+          <text>0{{index + 1}} / SUBTEXT</text>
+          <view>潜台词 {{index + 1}}</view>
+        </view>
+        <view class="quote-line">「{{item.original}}」</view>
+        <view class="translation-verdict">{{item.verdict}}</view>
+        <view wx:for="{{item.possibilities}}" wx:for-item="p" wx:key="label" class="numbered-row">
+          <view class="row-no">{{p.label}}</view>
+          <view class="row-body">
+            <view class="poss-head"><text>{{p.meaning}}</text><text>{{p.percent}}%</text></view>
+            <view class="row-copy">{{p.reason}}</view>
           </view>
         </view>
-        <view class="advice-block">最可能：{{item.most_likely}}，{{item.why}}</view>
+        <view class="highlight-block"><text>最可能</text><view>{{item.most_likely}}，{{item.why}}</view></view>
       </view>
     </view>
 
-    <view wx:if="{{record.kind === 'check' && res}}" class="card" style="padding: 40rpx;">
-      <view class="section-title">发送建议</view>
-      <view class="verdict {{res.danger ? 'danger' : 'safe'}}">{{res.verdict}}</view>
-      <view wx:if="{{res.type_note}}" class="body-text">{{res.type_note}}</view>
-      <view class="kv">会触发：{{res.trigger}}</view>
-      <view class="kv">Ta可能会：{{res.prediction}}</view>
-      <view class="advice-block">替代消息：「{{res.alternative}}」</view>
-      <view class="body-text">{{res.reason}}</view>
-    </view>
-
-    <view wx:if="{{record.kind === 'reply' && res}}" class="card" style="padding: 40rpx;">
-      <view class="section-title">下一句怎么回</view>
-      <view class="body-text">{{res.strategy}}</view>
-      <view wx:for="{{res.drafts}}" wx:key="label" class="reply-row">
-        <view style="font-size: 24rpx; color: #00B894; font-weight: 900; margin-bottom: 8rpx;">{{item.label}}</view>
-        <view class="serif" style="font-size: 29rpx; font-weight: 900; color: #1A1A2E; line-height: 1.6;">「{{item.text}}」</view>
-        <view style="font-size: 24rpx; color: #8395A7; line-height: 1.7; margin-top: 8rpx;">{{item.why}}</view>
+    <view wx:if="{{record.kind === 'check' && res}}" class="record-section">
+      <view class="section-head">
+        <text>01 / MESSAGE CHECK</text>
+        <view>发送建议</view>
       </view>
-      <view class="advice-block">别发：{{res.avoid}}</view>
-      <view wx:if="{{res.note}}" class="advice-block">提醒：{{res.note}}</view>
+      <view class="verdict-band {{res.danger ? 'danger' : 'safe'}}">
+        <text>{{res.danger ? 'HIGH RISK' : 'LOW RISK'}}</text>
+        <view>{{res.verdict}}</view>
+      </view>
+      <view wx:if="{{res.type_note}}" class="section-copy">{{res.type_note}}</view>
+      <view class="fact-grid">
+        <view><text>会触发</text><view>{{res.trigger}}</view></view>
+        <view><text>Ta 可能会</text><view>{{res.prediction}}</view></view>
+      </view>
+      <view class="highlight-block"><text>替代消息</text><view>「{{res.alternative}}」</view></view>
+      <view class="section-copy">{{res.reason}}</view>
     </view>
 
-    <view wx:if="{{record.kind === 'predict' && res}}" class="card" style="padding: 40rpx;">
-      <view class="section-title">走向预测</view>
-      <view class="serif" style="font-size: 38rpx; font-weight: 900; color: #1A1A2E;">{{res.stage}}</view>
-      <view class="body-text">{{res.stage_desc}}</view>
-      <view wx:for="{{res.predictions}}" wx:key="index" class="timeline-row">
-        <view style="font-size: 42rpx; width: 58rpx;">{{item.emoji}}</view>
-        <view style="flex: 1;">
-          <view style="display: flex; justify-content: space-between;">
-            <text style="font-size: 27rpx; font-weight: 900;">{{item.time}}</text>
-            <text style="font-size: 24rpx; color: #8395A7;">{{item.prob}}%</text>
-          </view>
-          <view style="font-size: 25rpx; color: rgba(26,26,46,0.72); line-height: 1.7;">{{item.scene}}</view>
+    <view wx:if="{{record.kind === 'reply' && res}}" class="record-section">
+      <view class="section-head">
+        <text>01 / REPLY OPTIONS</text>
+        <view>回复建议</view>
+      </view>
+      <view class="section-copy first-copy">{{res.strategy}}</view>
+      <view wx:for="{{res.drafts}}" wx:key="label" class="reply-option">
+        <view class="reply-meta"><text>{{item.label}}</text><text>可直接发</text></view>
+        <view class="reply-text">「{{item.text}}」</view>
+        <view class="reply-why">{{item.why}}</view>
+      </view>
+      <view class="highlight-block warning"><text>别发</text><view>{{res.avoid}}</view></view>
+      <view wx:if="{{res.note}}" class="highlight-block"><text>类型提醒</text><view>{{res.note}}</view></view>
+    </view>
+
+    <view wx:if="{{record.kind === 'misread' && res && res.safe}}" class="record-section misread-record">
+      <view class="section-head">
+        <text>01 / MISREAD REPLY</text>
+        <view>给「{{res.mode === 'crush' ? 'Crush' : '人'}}」的乱回</view>
+      </view>
+      <view class="misread-source"><text>Ta说</text><view>{{res.source}}</view></view>
+      <view wx:for="{{res.replies}}" wx:key="index" class="misread-option">
+        <view class="misread-option-head"><text>0{{index + 1}}</text><text>{{item.type}}</text></view>
+        <view class="misread-option-text">{{item.text}}</view>
+        <view class="misread-option-warning">{{item.warning}}</view>
+      </view>
+    </view>
+
+    <view wx:if="{{record.kind === 'misread' && res && !res.safe}}" class="record-section misread-record">
+      <view class="section-head">
+        <text>01 / SAFETY CHECK</text>
+        <view>建议认真回复</view>
+      </view>
+      <view class="misread-source"><text>Ta说</text><view>{{res.source}}</view></view>
+      <view class="misread-safety">{{res.safety_message}}</view>
+      <view wx:if="{{res.serious_reply}}" class="highlight-block"><text>可以先回</text><view>「{{res.serious_reply}}」</view></view>
+    </view>
+
+    <view wx:if="{{record.kind === 'predict' && res}}" class="record-section">
+      <view class="section-head">
+        <text>01 / RELATION FORECAST</text>
+        <view>走向预测</view>
+      </view>
+      <view class="stage-title">{{res.stage}}</view>
+      <view class="section-copy">{{res.stage_desc}}</view>
+
+      <view class="subsection-label">02 / TIMELINE</view>
+      <view wx:for="{{res.predictions}}" wx:key="index" class="numbered-row prediction-row">
+        <view class="row-no">0{{index + 1}}</view>
+        <view class="row-body">
+          <view class="poss-head"><text>{{item.time}}</text><text>{{item.prob}}%</text></view>
+          <view class="row-copy">{{item.scene}}</view>
+          <view class="prob-track"><view style="width: {{item.prob}}%;"></view></view>
         </view>
       </view>
-      <view class="advice-block">转折点：{{res.turning}}</view>
-      <view class="advice-block">现在该做：{{res.todo}}</view>
+
+      <view class="highlight-block"><text>转折点</text><view>{{res.turning}}</view></view>
+      <view class="highlight-block dark"><text>现在该做</text><view>{{res.todo}}</view></view>
     </view>
 
-    <view style="display: flex; gap: 20rpx; margin-top: 16rpx;">
-      <button class="btn-reset" style="flex: 1;" bindtap="copyRecord">复制</button>
-      <button class="btn-main" style="flex: 1;" bindtap="reAnalyze">再分析</button>
+    <view class="record-actions">
+      <button bindtap="copyRecord">复制结果</button>
+      <button class="dark" bindtap="reAnalyze">再分析一次 ↗</button>
     </view>
   </view>
 </view>

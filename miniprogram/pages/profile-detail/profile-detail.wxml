@@ -41,8 +41,16 @@
     </view>
 
     <view class="quick-tools">
-      <view class="tool-entry tool-entry-dark" bindtap="goDiagnose">
+      <view class="tool-entry tool-entry-dark" bindtap="goMisread">
         <view class="tool-no">01</view>
+        <view class="tool-copy">
+          <view class="tool-title">已读乱回</view>
+          <view class="tool-desc">带着这个 Ta 的关系背景，生成三条乱回</view>
+        </view>
+        <view class="tool-arrow">↗</view>
+      </view>
+      <view class="tool-entry" bindtap="goDiagnose">
+        <view class="tool-no">02</view>
         <view class="tool-copy">
           <view class="tool-title">聊天确诊</view>
           <view class="tool-desc">上传聊天，看双方的依恋模式</view>
@@ -50,7 +58,7 @@
         <view class="tool-arrow">↗</view>
       </view>
       <view class="tool-entry" bindtap="goCheck">
-        <view class="tool-no">02</view>
+        <view class="tool-no">03</view>
         <view class="tool-copy">
           <view class="tool-title">发不发</view>
           <view class="tool-desc">发送之前，先看会触发什么</view>
@@ -58,7 +66,7 @@
         <view class="tool-arrow">↗</view>
       </view>
       <view class="tool-entry" bindtap="goPredict">
-        <view class="tool-no">03</view>
+        <view class="tool-no">04</view>
         <view class="tool-copy">
           <view class="tool-title">感情预测</view>
           <view class="tool-desc">根据互动模式推演关系走向</view>

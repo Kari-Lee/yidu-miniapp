@@ -1,0 +1,122 @@
+<view class="misread-page {{step === 'loading' ? 'is-loading' : ''}}">
+  <view wx:if="{{step !== 'loading'}}" style="height: {{statusBarHeight}}px"></view>
+
+  <view wx:if="{{step === 'input'}}" class="misread-screen input-screen">
+    <view class="ghost-brand">YIDU</view>
+    <view class="misread-topbar">
+      <text bindtap="goBack">← 返回</text>
+      <text>YIDU</text>
+    </view>
+
+    <view class="misread-kicker">MISREAD REPLY</view>
+    <view class="misread-title">
+      <view>不知道回什么，</view>
+      <view>就回点好笑的。</view>
+    </view>
+    <view class="misread-intro">粘贴 Ta 的话，三秒给你能直接发的回复。</view>
+
+    <view wx:if="{{profileName}}" class="profile-pill">正在回 {{profileName}} · {{profileRelation || '关系档案'}}</view>
+    <view wx:if="{{err}}" class="misread-error">{{err}}</view>
+
+    <view class="input-card">
+      <textarea
+        class="message-input"
+        maxlength="-1"
+        value="{{text}}"
+        placeholder="“{{placeholder}}”"
+        placeholder-style="color:#B6BAC0"
+        bindinput="onInput"
+      ></textarea>
+
+      <view wx:if="{{imgs.length}}" class="image-strip">
+        <view wx:for="{{imgs}}" wx:key="path" class="image-tile" data-index="{{index}}" bindtap="previewImg">
+          <image src="{{item.path}}" mode="aspectFill"></image>
+          <view class="image-remove" data-index="{{index}}" catchtap="removeImg">×</view>
+        </view>
+      </view>
+
+      <view class="input-card-footer">
+        <view class="upload-link" bindtap="chooseImg"><text>▧</text> 甩截图{{imgs.length ? ' · ' + imgs.length : ''}}</view>
+        <view class="try-link" bindtap="tryExample">手上没素材？试一句 <text>→</text></view>
+      </view>
+    </view>
+
+    <view class="mode-switch">
+      <view class="{{mode === 'person' ? 'active' : ''}}" data-mode="person" bindtap="pickMode">人</view>
+      <view class="{{mode === 'crush' ? 'active' : ''}}" data-mode="crush" bindtap="pickMode">Crush</view>
+    </view>
+    <view class="mode-hint">{{modeHint}}</view>
+
+    <button class="start-button" disabled="{{!hasInput || submitting}}" bindtap="submit">
+      <text>开始乱回</text><text>→</text>
+    </button>
+    <view class="safety-note">乱，但有底线。真心求助会被拦下。</view>
+  </view>
+
+  <view wx:if="{{step === 'loading'}}" class="loading-screen">
+    <view style="height: {{statusBarHeight}}px"></view>
+    <view class="loading-brand">YIDU</view>
+    <view class="loading-copy">{{loadingMsg}}</view>
+    <view class="loading-track"><view></view></view>
+  </view>
+
+  <view wx:if="{{step === 'result' && res}}" class="misread-screen result-screen">
+    <view class="misread-topbar">
+      <text bindtap="resetInput">←</text>
+      <text>YIDU</text>
+    </view>
+
+    <view class="source-row">
+      <text>Ta说</text>
+      <view>{{res.source}}</view>
+    </view>
+
+    <view class="result-title">挑一句，直接发。</view>
+    <view class="result-subtitle">给「{{mode === 'crush' ? 'Crush' : '人'}}」的火力 · {{modeHint}}</view>
+
+    <view class="candidate-list">
+      <view wx:for="{{res.replies}}" wx:key="index" class="candidate-card">
+        <view class="candidate-type">{{item.type}}</view>
+        <view class="candidate-text">{{item.text}}</view>
+        <view class="candidate-footer">
+          <text>△ {{item.warning}}</text>
+          <button class="{{copiedIndex === index ? 'copied' : ''}}" data-index="{{index}}" bindtap="copyReply">
+            {{copiedIndex === index ? '✓ 已复制' : '复制'}}
+          </button>
+        </view>
+      </view>
+    </view>
+
+    <view class="result-actions">
+      <button class="refresh-button" bindtap="refresh"><text>↻</text> 换一批</button>
+      <button class="switch-button" bindtap="resetInput">换个对象</button>
+    </view>
+    <view class="submission-note">发出去的截图，欢迎回来投稿</view>
+  </view>
+
+  <view wx:if="{{step === 'safety' && res}}" class="misread-screen safety-screen">
+    <view class="misread-topbar">
+      <text bindtap="resetInput">←</text>
+      <text>YIDU</text>
+    </view>
+    <view class="source-row">
+      <text>Ta说</text>
+      <view>{{res.source}}</view>
+    </view>
+    <view class="safety-kicker">SERIOUS REPLY</view>
+    <view class="safety-title">这条先别乱回。</view>
+    <view class="safety-card">
+      <view>{{res.safety_message}}</view>
+      <text wx:if="{{res.serious_reply}}">建议先回：「{{res.serious_reply}}」</text>
+    </view>
+    <button class="serious-button" bindtap="goSeriousReply">去认真回一句 <text>→</text></button>
+    <button class="safety-reset" bindtap="resetInput">换一条消息</button>
+  </view>
+
+  <view wx:if="{{step !== 'loading'}}" class="misread-tabs">
+    <view data-tab="test" bindtap="goHomeTab">测试</view>
+    <view data-tab="relation" bindtap="goHomeTab">关系</view>
+    <view class="active" data-tab="tools" bindtap="goHomeTab">工具</view>
+    <view data-tab="record" bindtap="goHomeTab">记录</view>
+  </view>
+</view>
