@@ -407,20 +407,30 @@
 .refresh-button,
 .switch-button,
 .safety-reset {
-  min-height: 88rpx;
+  height: 88rpx;
+  padding-top: 0;
+  padding-bottom: 0;
   border: none;
   border-radius: 999rpx;
   font-size: 24rpx;
   font-weight: 900;
+  line-height: 1;
+  box-sizing: border-box;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
 .refresh-button {
   background: #17191C;
   color: #FFFFFF;
+  gap: 10rpx;
 }
 
-.refresh-button text {
+.refresh-button .refresh-icon {
   color: #2D9EE0;
+  font-size: 30rpx;
+  line-height: 1;
 }
 
 .switch-button,

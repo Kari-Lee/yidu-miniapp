@@ -88,8 +88,13 @@
     </view>
 
     <view class="result-actions">
-      <button class="refresh-button" bindtap="refresh"><text>↻</text> 换一批</button>
-      <button class="switch-button" bindtap="resetInput">换个对象</button>
+      <button class="refresh-button" bindtap="refresh">
+        <text class="refresh-icon">↻</text>
+        <text>换一批</text>
+      </button>
+      <button class="switch-button" bindtap="resetInput">
+        <text>换个对象</text>
+      </button>
     </view>
     <view class="submission-note">发出去的截图，欢迎回来投稿</view>
   </view>
