@@ -43,10 +43,13 @@ var COMMON_RULES = [
   '系统体必须全程冷到底，不夹反杀、表情、暧昧或私人评论。',
   '',
   '【鸡汤照搬库】',
-  '使用强行鸡汤时，优先逐字复制以下任一条，禁止把原话关键词改进去：',
+  '强行鸡汤每批最多一条，必须轮换，禁止连续使用同一句，禁止把原话关键词改进去：',
   '“世界上所有的惊喜和好运，都是你累积的温柔和善良，做一个温柔纯良且内心强大的人，温暖自己，也照亮别人。”',
   '“当你学会了装傻，懂得了扮哑。突然间就会发现：心知肚明的事其实不必言说，言不由衷的人也没必要去拆穿。”',
   '“让别人羡慕太容易了，装一下就可以了，但要让自己都羡慕自己，就需要舍去很多东西，拒绝很多东西，懂得很多东西。”',
+  '“生活不会一直为难你，它只是偶尔坐下来，认真研究一下还能从哪个角度为难你。”',
+  '“慢慢来，很多事情不是想明白了才有答案，是答案来了以后，你才发现自己刚才想多了。”',
+  '“人这一生最重要的不是得到什么，而是在失去的时候，尽量记得东西放哪了。”',
   '',
   '【死刑清单】',
   '- 换一条消息也成立的万能模板；真实观察式吐槽；第一联想；过时单句梗。',
@@ -246,9 +249,10 @@ var ROUTE_RULES = {
   ].join('\n'),
   flat: [
     '【本题强制路线：零把手】',
-    '只允许鸡汤库原文和低调凡尔赛长文。不要一字魔改，不要系统概念，不要硬造笑点。',
+    '三条分别使用：一条鸡汤库原文、一条完整无关通知、一条低调凡尔赛长文。禁止三条都是鸡汤。',
+    '不要一字魔改，不要围绕原话搭系统概念，不要硬造笑点。',
     '凡尔赛必须像随口解释自己的日常，细节落在食物、规格、支付方式等外物；禁止迪拜、路易威登、直升机、24K金等暴发户清单。',
-    '宁可三条都是不同鸡汤，也不要输出一个尴尬短句。'
+    '无关通知必须像真实物业、快递或营业时间通知，完整照念，不解释为什么发。'
   ].join('\n'),
   already_joking: [
     '【本题强制路线：对方已经在整活】',
@@ -265,8 +269,48 @@ var ROUTE_RULES = {
 var CHICKEN_REPLIES = [
   '世界上所有的惊喜和好运，都是你累积的温柔和善良，做一个温柔纯良且内心强大的人，温暖自己，也照亮别人。',
   '当你学会了装傻，懂得了扮哑。突然间就会发现：心知肚明的事其实不必言说，言不由衷的人也没必要去拆穿。',
-  '让别人羡慕太容易了，装一下就可以了，但要让自己都羡慕自己，就需要舍去很多东西，拒绝很多东西，懂得很多东西。'
+  '让别人羡慕太容易了，装一下就可以了，但要让自己都羡慕自己，就需要舍去很多东西，拒绝很多东西，懂得很多东西。',
+  '生活不会一直为难你，它只是偶尔坐下来，认真研究一下还能从哪个角度为难你。',
+  '慢慢来，很多事情不是想明白了才有答案，是答案来了以后，你才发现自己刚才想多了。',
+  '人这一生最重要的不是得到什么，而是在失去的时候，尽量记得东西放哪了。',
+  '你现在经历的每一次沉默，都会在未来变成一段你完全想不起来当时为什么沉默的沉默。',
+  '真正的成长不是看透生活，而是看完以后先去吃饭，其他的等血糖稳定了再说。',
+  '有些路看起来很远，走起来也确实很远，所以出门前最好先确认一下是不是走错了。'
 ]
+
+var OFF_TOPIC_NOTICES = [
+  '温馨提示：本周四上午九点至十一点进行二次供水水箱清洗，期间高层住户可能出现水压波动，请提前做好储水准备。',
+  '取件通知：您的包裹已到驿站，请凭取件码于今晚九点前领取。生鲜、冷藏及超长件不提供隔夜保管。',
+  '营业时间调整通知：本周日起闭店时间提前至21:30，最后点单时间为21:00，已充值余额不受影响。',
+  '设备使用说明：首次使用前请撕除底部绝缘片，长按电源键三秒，指示灯常亮后方可正常工作。',
+  '社区通知：明日上午八点进行楼道消杀，请勿在公共区域堆放纸箱、鞋架及可移动杂物。',
+  '乘车提醒：列车开车前五分钟停止检票，请提前确认站台信息，并妥善保管随身物品。'
+]
+
+var LOW_KEY_OFF_TOPIC = [
+  '我刚在便利店结账，店员问小票要不要，我说要。现在小票在我手里，事情暂时发展到这里。',
+  '刚买的鸡蛋是30枚装，送到以后发现有31枚。我已经数了三遍，目前不准备声张。',
+  '我把家里的充电线按长度分了三组，短的放左边，长的放右边，中间那组还在观察。',
+  '今天外卖多送了一双筷子，我没退，先留着，后续如果有进展我再通知你。',
+  '刚才超市收银少扫了一个塑料袋，我主动补了两毛，现在道德余额比较充足。',
+  '我买了两盒抽纸，第二盒便宜三块钱。这件事目前对我的生活影响很大。'
+]
+
+function hashText(value) {
+  value = String(value || '')
+  var hash = 0
+  for (var i = 0; i < value.length; i++) hash = ((hash << 5) - hash + value.charCodeAt(i)) | 0
+  return Math.abs(hash)
+}
+
+function pickRotating(list, source, mode, variant, offset) {
+  var index = hashText(source + ':' + mode) + Number(variant || 0) + Number(offset || 0)
+  return list[index % list.length]
+}
+
+function chickenFor(source, mode, variant, offset) {
+  return pickRotating(CHICKEN_REPLIES, source, mode, variant, offset)
+}
 
 function presetReply(type, text, warning) {
   return {
@@ -285,7 +329,7 @@ function presetResult(mode, source, replies) {
   }
 }
 
-function getPreset(text, mode) {
+function getPreset(text, mode, variant) {
   var source = String(text || '').trim()
   if (!source || source.length > 80) return null
   var route = getRoute(source, mode)
@@ -294,7 +338,7 @@ function getPreset(text, mode) {
     return presetResult(mode, source, [
       presetReply('材料补交通知', '三个工作日内把你的生辰八字、三甲医院传染八项检测报告、肝肾八项报告、无犯罪记录证明、四大银行征信报告、学信网验证报告、社保缴纳证明、直系亲属无犯罪记录证明、未婚单身声明/无婚姻登记记录证明，用PDF格式发给我。'),
       presetReply('初审流程', '材料齐全后进入初审。初审期间不接受口头补充，不接受朋友代为说明，不接受“我真的很喜欢”作为佐证。审核周期五个工作日，结果以短信通知为准，请勿重复提交。', '预警：可能收到一句“你有事吗”'),
-      presetReply('强行鸡汤', CHICKEN_REPLIES[0], '预警：可能收到一个问号')
+      presetReply('强行鸡汤', chickenFor(source, mode, variant, 0), '预警：可能收到一个问号')
     ])
   }
 
@@ -302,7 +346,7 @@ function getPreset(text, mode) {
     return presetResult(mode, source, [
       presetReply('分诊问询', '请具体描述疼痛位置、持续时间和是否放射到左肩，“你”不属于有效部位。'),
       presetReply('挂号通知', '心疼先挂心内科，空腹，早上八点前到，别替我占号。', '预警：可能收到一句“你没救了”'),
-      presetReply('强行鸡汤', CHICKEN_REPLIES[2], '预警：可能收到一个问号')
+      presetReply('强行鸡汤', chickenFor(source, mode, variant, 1), '预警：可能收到一个问号')
     ])
   }
 
@@ -310,7 +354,7 @@ function getPreset(text, mode) {
     return presetResult(mode, source, [
       presetReply('一字魔改', '不要花那么多时间难过，要花更多时间难过。我这边难过完了，现在到你了。'),
       presetReply('继续加码', '不要花那么多时间难过，要花更多时间难过。时间都买了，别浪费。', '预警：可能收到一句“有病吧”'),
-      presetReply('强行鸡汤', CHICKEN_REPLIES[1], '预警：可能收到一个问号')
+      presetReply('强行鸡汤', chickenFor(source, mode, variant, 2), '预警：可能收到一个问号')
     ])
   }
 
@@ -326,7 +370,7 @@ function getPreset(text, mode) {
     return presetResult(mode, source, [
       presetReply('举证通知', '请把“我喜欢你”的证据按时间顺序整理，原图打包发我，聊天记录二次转述不作为有效材料。'),
       presetReply('极简冷接', '请出示原件。', '预警：可能引发继续举证'),
-      presetReply('强行鸡汤', CHICKEN_REPLIES[1], '预警：可能收到一个问号')
+      presetReply('强行鸡汤', chickenFor(source, mode, variant, 3), '预警：可能收到一个问号')
     ])
   }
 
@@ -382,7 +426,7 @@ function getPreset(text, mode) {
     return presetResult(mode, source, [
       presetReply('说明书复读', '炒粉干做法：粉干提前用温水泡软，鸡蛋炒散盛出，锅中放油，下肉丝、香菇、包菜翻炒，加入粉干、生抽和少量盐，大火翻炒至水分收干，最后放回鸡蛋和葱段炒匀出锅。'),
       presetReply('无关细节', '用的是什么牌子的油。', '预警：可能收到一句“这是重点吗”'),
-      presetReply('强行鸡汤', CHICKEN_REPLIES[0], '预警：可能收到一个问号')
+      presetReply('强行鸡汤', chickenFor(source, mode, variant, 4), '预警：可能收到一个问号')
     ])
   }
 
@@ -404,13 +448,42 @@ function getPreset(text, mode) {
 
   if (mode === 'person' && route === 'flat') {
     return presetResult(mode, source, [
-      presetReply('强行鸡汤', CHICKEN_REPLIES[0], '预警：可能收到一个问号'),
-      presetReply('强行鸡汤', CHICKEN_REPLIES[1], '预警：可能让对话安静三秒'),
-      presetReply('强行鸡汤', CHICKEN_REPLIES[2], '预警：可能被问“你在说什么”')
+      presetReply('强行鸡汤', chickenFor(source, mode, variant, 5), '预警：可能收到一个问号'),
+      presetReply('无关通知', pickRotating(OFF_TOPIC_NOTICES, source, mode, variant, 1), '预警：可能被问“你发错人了？”'),
+      presetReply('低调凡尔赛', pickRotating(LOW_KEY_OFF_TOPIC, source, mode, variant, 2), '预警：可能让对话安静三秒')
     ])
   }
 
   return null
+}
+
+function getFallback(text, mode, variant) {
+  var source = String(text || '').trim() || '聊天截图'
+  if (/(不想活|想死|自杀|割腕|活不下去|结束生命|伤害自己|撑不下去)/.test(source)) {
+    return {
+      safe: false,
+      mode: mode,
+      source: source,
+      safety_message: '对方好像不是在发疯，是真的不太好。这条建议认真回。',
+      serious_reply: '我在。你先别一个人扛，告诉我你现在在哪里、身边有没有人，我陪你一起找能马上帮到你的人。'
+    }
+  }
+  var preset = getPreset(source, mode, variant)
+  if (preset) return preset
+
+  var shortSource = source === '聊天截图' ? '这句话' : '“' + source.slice(0, 18) + (source.length > 18 ? '…' : '') + '”'
+  var replies = mode === 'crush'
+    ? [
+        presetReply('暂存处理', shortSource + '我先收下，理解成什么版本我晚点通知你。'),
+        presetReply('极简冷接', '你先别补充，我这边刚把重点理解错。', '预警：可能引发追问'),
+        presetReply('无关通知', pickRotating(OFF_TOPIC_NOTICES, source, mode, variant, 3), '预警：可能收到一个问号')
+      ]
+    : [
+        presetReply('说明书索取', shortSource + '的原装说明书发我一下，第三方翻译的不算。'),
+        presetReply('无关细节', '这句话有生产日期吗？', '预警：可能收到一句“你有事吗”'),
+        presetReply('无关通知', pickRotating(OFF_TOPIC_NOTICES, source, mode, variant, 4), '预警：可能收到一个问号')
+      ]
+  return presetResult(mode, source, replies)
 }
 
 function getRoute(text, mode) {
@@ -458,5 +531,6 @@ module.exports = {
   },
   getRouteHint: getRouteHint,
   getRoute: getRoute,
-  getPreset: getPreset
+  getPreset: getPreset,
+  getFallback: getFallback
 }

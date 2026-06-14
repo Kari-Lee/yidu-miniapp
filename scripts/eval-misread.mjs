@@ -65,38 +65,15 @@ async function callAI(testCase) {
   return parseResponse(text);
 }
 
-async function callReview(testCase, result, issues) {
-  const message = [
-    modeLock(testCase.mode),
-    `对方消息原文：\n${result.source}`,
-    `本地质检判废原因：\n- ${issues.join("\n- ")}`,
-    "首轮草稿如下。没有命中问题的好句必须原样保留；只重写不合格项：",
-    result.replies.map((item) => `[${item.type}] ${item.text}`).join("\n"),
-    "最终仍输出三条。禁止改坏已经合格的句子。",
-  ].join("\n\n");
-  const response = await fetch(API_URL, {
-    method: "POST",
-    headers: { "content-type": "application/json" },
-    body: JSON.stringify({
-      system: Prompt.getReviewPrompt(testCase.mode, result.source),
-      message,
-      clientMeta: { task: "misread" },
-    }),
-    signal: AbortSignal.timeout(115000),
-  });
-  const text = await response.text();
-  if (!response.ok) throw new Error(`${response.status}: ${text}`);
-  return parseResponse(text);
-}
-
 const selected = requested.size ? cases.filter((item) => requested.has(item.id)) : cases;
-for (const testCase of selected) {
+for (const [index, testCase] of selected.entries()) {
   try {
-    const preset = Prompt.getPreset(testCase.source, testCase.mode);
+    const variant = index + 1;
+    const preset = Prompt.getPreset(testCase.source, testCase.mode, variant);
     const initial = preset || await callAI(testCase);
     const initialIssues = Quality.inspect(initial, testCase.mode, []);
     const result = initialIssues.length
-      ? await callReview(testCase, initial, initialIssues)
+      ? Prompt.getFallback(initial.source, testCase.mode, variant)
       : initial;
     const issues = Quality.inspect(result, testCase.mode, []);
     process.stdout.write(`${JSON.stringify({

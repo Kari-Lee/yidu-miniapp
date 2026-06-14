@@ -49,6 +49,16 @@ function addIssue(issues, issue) {
   if (issues.indexOf(issue) === -1) issues.push(issue)
 }
 
+function hasReplyType(replies, pattern) {
+  return replies.some(function(item) {
+    return pattern.test(String(item && item.type || ''))
+  })
+}
+
+function isChickenText(text) {
+  return /(世界上所有的惊喜和好运|当你学会了装傻|让别人羡慕太容易了|生活不会一直为难你|慢慢来，很多事情|人这一生最重要的|每一次沉默|真正的成长不是|有些路看起来很远)/.test(String(text || ''))
+}
+
 function inspect(result, mode, oppositeReplies) {
   if (!result || result.safe === false) return []
   var replies = result.replies || []
@@ -147,6 +157,7 @@ function inspect(result, mode, oppositeReplies) {
       }
     }
   }
+  if (texts.filter(isChickenText).length > 1) addIssue(issues, '同一批出现了多条同质鸡汤')
 
   if (mode === 'crush') {
     var crushBanned = [
@@ -243,6 +254,9 @@ function inspect(result, mode, oppositeReplies) {
     })
   }
   if (route === 'crush_insecurity') {
+    if (hasReplyType(replies, /鸡汤/) || texts.some(isChickenText)) {
+      addIssue(issues, 'Crush 不安题不应使用无关鸡汤')
+    }
     texts.forEach(function(text) {
       if (/[？?]/.test(text)) addIssue(issues, 'Crush 不安题不应反问')
     })
@@ -292,19 +306,18 @@ function inspect(result, mode, oppositeReplies) {
     var hasManual = texts.some(function(text) {
       return /(做法|步骤|锅中|倒入|加入|翻炒|使用方法|注意事项)/.test(text) && text.length >= 45
     })
-    var hasChicken = texts.some(function(text) {
-      return /(世界上所有的惊喜和好运|当你学会了装傻|让别人羡慕太容易了)/.test(text)
-    })
+    var hasChicken = hasReplyType(replies, /鸡汤/)
     if (!hasManual || !hasChicken) addIssue(issues, '日常小事没有完整说明书和原版鸡汤')
   }
   if (route === 'flat') {
     texts.forEach(function(text) {
       if (containsAny(text, luxuryMarkers)) addIssue(issues, '零把手题硬塞了暴发户式奢侈品')
     })
-    if (!texts.some(function(text) {
-      return /(世界上所有的惊喜和好运|当你学会了装傻|让别人羡慕太容易了)/.test(text)
-    })) {
+    if (!hasReplyType(replies, /鸡汤/)) {
       addIssue(issues, '零把手题缺少完整无关鸡汤')
+    }
+    if (!hasReplyType(replies, /通知/) || !hasReplyType(replies, /凡尔赛/)) {
+      addIssue(issues, '零把手题的三条回答仍然同质化')
     }
   }
 

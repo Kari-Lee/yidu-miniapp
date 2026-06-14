@@ -14,6 +14,7 @@ var PLACEHOLDERS = [
   '炒粉干被油溅到了'
 ]
 var LOADING_MESSAGES = ['正在认真地读歪……', '正在假装没看懂……']
+var VARIANT_KEY = 'yidu_misread_reply_variant_v1'
 
 function safeDecode(value) {
   try { return decodeURIComponent(value || '') } catch (e) { return value || '' }
@@ -21,6 +22,14 @@ function safeDecode(value) {
 
 function hasInput(text, imgs) {
   return !!((text || '').trim() || (imgs && imgs.length))
+}
+
+function nextReplyVariant() {
+  var value = 0
+  try { value = Number(wx.getStorageSync(VARIANT_KEY) || 0) } catch (e) {}
+  value = (value + 1) % 10000
+  try { wx.setStorageSync(VARIANT_KEY, value) } catch (e) {}
+  return value
 }
 
 function normalizeWarning(value) {
@@ -101,6 +110,7 @@ Page({
   _loadingTimer: null,
   _copyTimer: null,
   _submitting: false,
+  _replyVariant: 0,
 
   onLoad: function(options) {
     options = options || {}
@@ -232,6 +242,9 @@ Page({
       ? '唯一模式：Crush。必须幽默打底、微量甜，禁止套用“人”模式的攻击和隔离逻辑。'
       : '唯一模式：人。必须火力全开地阅读失败，禁止暧昧、表白和推进关系。'
     var oppositeReplies = Quality.getOppositeReplies(this.data.text, this.data.mode)
+    var previousReplies = this.data.res && this.data.res.replies
+      ? this.data.res.replies.map(function(item) { return item.text }).filter(Boolean)
+      : []
     var lines = [
       modeLock,
       this.data.profileName ? '关系档案：' + this.data.profileName + '（' + (this.data.profileRelation || '未知关系') + '）' : '',
@@ -240,30 +253,15 @@ Page({
       '本地路由提示：\n' + Prompt.getRouteHint(this.data.text, this.data.mode),
       this.data.imgs.length ? '请结合所附聊天截图，只生成针对最新消息的回复。' : '',
       this.data.previousWeapons.length ? '上一批已使用武器：' + this.data.previousWeapons.join('、') + '。本批必须换武器。' : '',
+      previousReplies.length ? '上一批回复如下，本批禁止复用相同句子、鸡汤、通知和核心包袱：\n' + previousReplies.join('\n') : '',
       oppositeReplies.length ? '同一句话在另一模式出现过以下回复，本模式禁止复用其句式、包袱和结尾：\n' + oppositeReplies.join('\n') : ''
     ]
     return lines.filter(Boolean).join('\n\n')
   },
 
-  buildRepairMessage: function(result, issues, oppositeReplies) {
-    return [
-      this.data.mode === 'crush'
-        ? '唯一模式：Crush。重新生成时必须体现幽默打底、微量甜，并与 person 模式彻底不同。'
-        : '唯一模式：人。重新生成时必须是阅读失败，不能出现任何暧昧或关系推进。',
-      '对方消息原文：\n' + result.source,
-      this.data.ctx ? '关系背景：\n' + this.data.ctx : '',
-      '本地质检判废原因：\n- ' + issues.join('\n- '),
-      '首轮草稿如下。没有命中问题的好句必须原样保留；只重写不合格项：\n' + result.replies.map(function(item) {
-        return '[' + item.type + '] ' + item.text
-      }).join('\n'),
-      oppositeReplies.length ? '另一模式已有回复，禁止与它们相似：\n' + oppositeReplies.join('\n') : '',
-      '最终仍输出三条。禁止改坏已经合格的句子。'
-    ].filter(Boolean).join('\n\n')
-  },
-
   requestResult: function(message, options) {
     var preset = !this.data.imgs.length && !this.data.previousWeapons.length
-      ? Prompt.getPreset(this.data.text, this.data.mode)
+      ? Prompt.getPreset(this.data.text, this.data.mode, this._replyVariant)
       : null
     if (preset) return Promise.resolve(preset)
     var prompt = Prompt.getPrompt(this.data.mode, false, this.data.text)
@@ -273,27 +271,29 @@ Page({
       : API.callAI(prompt, message, null, null, options)
   },
 
-  reviewResult: function(result, issues) {
+  finishResult: function(result) {
     var self = this
-    var oppositeReplies = Quality.getOppositeReplies(result.source, self.data.mode)
-    self.setData({ loadingMsg: '正在把尬的那句删掉……' })
-    return API.callAI(
-      Prompt.getReviewPrompt(self.data.mode, result.source),
-      self.buildRepairMessage(result, issues, oppositeReplies),
-      null,
-      null,
-      {
-        onRetry: function() { self.setData({ loadingMsg: '终审路上拐了个弯……' }) },
-        clientMeta: { task: 'misread' }
-      }
-    ).then(function(raw) {
-      var repaired = normalizeResult(raw, result.source, self.data.mode)
-      var repairedIssues = Quality.inspect(repaired, self.data.mode, oppositeReplies)
-      if (raw && raw.mode && raw.mode !== self.data.mode) repairedIssues.unshift('模型返回了错误模式')
-      if (repairedIssues.length) {
-        throw new Error('这批回复还是太像普通聊天，已替你拦住，请再试一次')
-      }
-      return repaired
+    var weapons = result.safe ? result.replies.map(function(item) { return item.type }) : []
+    if (result.safe) Quality.remember(result.source, self.data.mode, result.replies)
+    H.addRecord({
+      kind: 'misread',
+      kindLabel: '已读乱回',
+      title: result.safe ? '给「' + (self.data.mode === 'crush' ? 'Crush' : '人') + '」的乱回' : '建议认真回复',
+      summary: result.safe ? result.replies[0].text : result.safety_message,
+      input: result.source.slice(0, 120),
+      imageCount: self.data.imgs.length,
+      mode: self.data.mode,
+      profileId: self.data.profileId,
+      profileName: self.data.profileName,
+      result: result
+    })
+    self.stopLoading()
+    self._submitting = false
+    self.setData({
+      step: result.safe ? 'result' : 'safety',
+      res: result,
+      submitting: false,
+      previousWeapons: weapons
     })
   },
 
@@ -301,6 +301,7 @@ Page({
     if (this._submitting || !this.data.hasInput) return
     var self = this
     self._submitting = true
+    self._replyVariant = nextReplyVariant()
     self.stopPlaceholder()
     self.stopLoading()
     self.setData({
@@ -327,46 +328,21 @@ Page({
     request.then(function(raw) {
       var result = normalizeResult(raw, self.data.text, self.data.mode)
       var recognizedPreset = self.data.imgs.length && !self.data.previousWeapons.length
-        ? Prompt.getPreset(result.source, self.data.mode)
+        ? Prompt.getPreset(result.source, self.data.mode, self._replyVariant)
         : null
       if (recognizedPreset) result = recognizedPreset
       var oppositeReplies = Quality.getOppositeReplies(result.source, self.data.mode)
       var issues = Quality.inspect(result, self.data.mode, oppositeReplies)
       if (raw && raw.mode && raw.mode !== self.data.mode) issues.unshift('模型返回了错误模式')
       if (!result.safe) return result
-      return issues.length ? self.reviewResult(result, issues) : result
+      return issues.length
+        ? Prompt.getFallback(result.source, self.data.mode, self._replyVariant)
+        : result
     }).then(function(result) {
-      var weapons = result.safe ? result.replies.map(function(item) { return item.type }) : []
-      if (result.safe) Quality.remember(result.source, self.data.mode, result.replies)
-      H.addRecord({
-        kind: 'misread',
-        kindLabel: '已读乱回',
-        title: result.safe ? '给「' + (self.data.mode === 'crush' ? 'Crush' : '人') + '」的乱回' : '建议认真回复',
-        summary: result.safe ? result.replies[0].text : result.safety_message,
-        input: result.source.slice(0, 120),
-        imageCount: self.data.imgs.length,
-        mode: self.data.mode,
-        profileId: self.data.profileId,
-        profileName: self.data.profileName,
-        result: result
-      })
-      self.stopLoading()
-      self._submitting = false
-      self.setData({
-        step: result.safe ? 'result' : 'safety',
-        res: result,
-        submitting: false,
-        previousWeapons: weapons
-      })
-    }).catch(function(error) {
-      self.stopLoading()
-      self._submitting = false
-      self.setData({
-        step: 'input',
-        submitting: false,
-        err: error.message || '这次没读歪成功，请再试一次'
-      })
-      self.startPlaceholder()
+      self.finishResult(result)
+    }).catch(function() {
+      var fallback = Prompt.getFallback(self.data.text, self.data.mode, self._replyVariant)
+      self.finishResult(fallback)
     })
   },
 
