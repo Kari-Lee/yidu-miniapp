@@ -56,7 +56,7 @@ function hasReplyType(replies, pattern) {
 }
 
 function isChickenText(text) {
-  return /(世界上所有的惊喜和好运|当你学会了装傻|让别人羡慕太容易了|生活不会一直为难你|慢慢来，很多事情|人这一生最重要的|每一次沉默|真正的成长不是|有些路看起来很远)/.test(String(text || ''))
+  return /(世界上所有的惊喜和好运|当你学会了装傻|让别人羡慕太容易了|生活不会一直为难你|慢慢来，很多事情|人这一生最重要的|每一次沉默|真正的成长不是|有些路看起来很远|愿你成为自己的太阳|人生没有白走的路|别跟往事过不去|成年人的崩溃|你要悄悄拔尖|所有的相遇都是久别重逢)/.test(String(text || ''))
 }
 
 function inspect(result, mode, oppositeReplies) {
@@ -164,10 +164,18 @@ function inspect(result, mode, oppositeReplies) {
       '过敏原', '季节性过敏', '去医院看了', '医生说', '你别来找我',
       '离我远点', '排行榜', '排名更新', '预约名额', '可用时段'
     ]
+    var oilyMarkers = [
+      '归我管', '你是我的', '我的人', '名单我审核',
+      '锁骨', '盖在你', '撩你', '我挑的是你',
+      '甜度超标', '心动报警'
+    ]
     texts.forEach(function(text) {
       if (containsAny(text, crushBanned)) addIssue(issues, 'Crush 回答串入了 person 模式')
       if (/(一辈子|愿意被你|永远喜欢|永远爱|但我愿意)/.test(text)) {
         addIssue(issues, 'Crush 回答出现空头情话')
+      }
+      if (containsAny(text, oilyMarkers)) {
+        addIssue(issues, 'Crush 回答太油（占有腔/身体暗示/油梗）')
       }
     })
     if (/(哪个女|哪个男|跟谁|约会去了|为什么不理|怎么不回|不回我|是不是不想理|去哪了)/.test(source)) {
@@ -369,9 +377,43 @@ function remember(source, mode, replies) {
   try { wx.setStorageSync(CACHE_KEY, cache.slice(0, 16)) } catch (e) {}
 }
 
+var RECENT_KEY = 'yidu_misread_recent_v1'
+var RECENT_MAX = 30
+
+function readRecent() {
+  try {
+    var list = wx.getStorageSync(RECENT_KEY)
+    return Array.isArray(list) ? list : []
+  } catch (e) {
+    return []
+  }
+}
+
+// 跨输入（不同消息之间）记住最近用过的武器和包袱，用于对抗「换条消息也重样」
+function rememberRecent(mode, replies) {
+  if (!replies || !replies.length) return
+  var fresh = replies.map(function(item) {
+    return {
+      mode: mode,
+      weapon: String((item && (item.type || item.weapon)) || '').trim(),
+      text: String((item && item.text) || '').trim()
+    }
+  }).filter(function(item) { return item.text })
+  if (!fresh.length) return
+  var list = fresh.concat(readRecent()).slice(0, RECENT_MAX)
+  try { wx.setStorageSync(RECENT_KEY, list) } catch (e) {}
+}
+
+function getRecent(mode, limit) {
+  var list = readRecent().filter(function(item) { return item && item.mode === mode })
+  return limit ? list.slice(0, limit) : list
+}
+
 module.exports = {
   inspect: inspect,
   similarity: similarity,
   getOppositeReplies: getOppositeReplies,
-  remember: remember
+  remember: remember,
+  rememberRecent: rememberRecent,
+  getRecent: getRecent
 }

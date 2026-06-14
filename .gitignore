@@ -14,6 +14,9 @@ yarn-debug.log*
 yarn-error.log*
 .DS_Store
 
+# Misread corpus builder: discarded-draft log (transient debug output)
+corpus/misread-rejects.jsonl
+
 # Obsolete local template kept out of source control
 miniprogram-backup/
 

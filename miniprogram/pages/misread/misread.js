@@ -5,6 +5,7 @@ var Share = require('../../utils/share')
 var ProfileContext = require('../../utils/profileContext')
 var Prompt = require('../../utils/misreadPrompt')
 var Quality = require('../../utils/misreadQuality')
+var Report = require('../../utils/report')
 
 var PLACEHOLDERS = [
   '我是世界上最厉害的人',
@@ -82,6 +83,21 @@ function normalizeResult(raw, fallbackSource, mode) {
 
 function modeFromRelation(relation) {
   return relation === '暧昧对象' || relation === '伴侣' ? 'crush' : 'person'
+}
+
+function buildReviewMessage(source, replies, issues) {
+  var drafts = (replies || []).map(function(item, index) {
+    return (index + 1) + '. [' + (item.type || '') + '] ' + (item.text || '')
+  }).join('\n')
+  var problems = (issues || []).length
+    ? '本地质检命中的问题：\n- ' + issues.join('\n- ')
+    : '本地质检没报具体问题，但整体不够好笑，请整体抬高质量。'
+  return [
+    source ? '对方原话：\n' + source : '',
+    '首轮草稿（逐条）：\n' + drafts,
+    problems,
+    '请按终审编辑模式处理：完全合格的原样保留，命中问题的从零重写，最终仍输出严格 JSON 的三条回复。'
+  ].filter(Boolean).join('\n\n')
 }
 
 Page({
@@ -245,6 +261,17 @@ Page({
     var previousReplies = this.data.res && this.data.res.replies
       ? this.data.res.replies.map(function(item) { return item.text }).filter(Boolean)
       : []
+    var recent = Quality.getRecent(this.data.mode, 12)
+    var recentWeapons = []
+    var recentSnippets = []
+    recent.forEach(function(item) {
+      if (item.weapon && recentWeapons.indexOf(item.weapon) === -1) recentWeapons.push(item.weapon)
+      var snippet = (item.text || '').slice(0, 24)
+      if (snippet) recentSnippets.push(snippet)
+    })
+    var recentNovelty = recent.length
+      ? '跨对话新奇约束：最近在别的对话里已经用过这些武器【' + recentWeapons.join('、') + '】和这些包袱：\n' + recentSnippets.join('\n') + '\n本批必须换武器、换包袱、换职业/意象/结尾，禁止复用以上任何套路。'
+      : ''
     var lines = [
       modeLock,
       this.data.profileName ? '关系档案：' + this.data.profileName + '（' + (this.data.profileRelation || '未知关系') + '）' : '',
@@ -254,6 +281,7 @@ Page({
       this.data.imgs.length ? '请结合所附聊天截图，只生成针对最新消息的回复。' : '',
       this.data.previousWeapons.length ? '上一批已使用武器：' + this.data.previousWeapons.join('、') + '。本批必须换武器。' : '',
       previousReplies.length ? '上一批回复如下，本批禁止复用相同句子、鸡汤、通知和核心包袱：\n' + previousReplies.join('\n') : '',
+      recentNovelty,
       oppositeReplies.length ? '同一句话在另一模式出现过以下回复，本模式禁止复用其句式、包袱和结尾：\n' + oppositeReplies.join('\n') : ''
     ]
     return lines.filter(Boolean).join('\n\n')
@@ -271,10 +299,31 @@ Page({
       : API.callAI(prompt, message, null, null, options)
   },
 
+  reviewResult: function(result, issues, options) {
+    var self = this
+    var source = result.source || self.data.text
+    var system = Prompt.getReviewPrompt(self.data.mode, source)
+    var message = buildReviewMessage(source, result.replies, issues)
+    return API.callAI(system, message, null, null, {
+      onRetry: options.onRetry,
+      clientMeta: { task: 'misread-review' }
+    }).then(function(raw) {
+      return normalizeResult(raw, source, self.data.mode)
+    })
+  },
+
   finishResult: function(result) {
     var self = this
+    if (result && Array.isArray(result.replies)) {
+      result.replies.forEach(function(item) {
+        if (item && item.text) item.text = Prompt.stripDash(item.text)
+      })
+    }
+    if (result && result.safety_message) result.safety_message = Prompt.stripDash(result.safety_message)
+    if (result && result.serious_reply) result.serious_reply = Prompt.stripDash(result.serious_reply)
     var weapons = result.safe ? result.replies.map(function(item) { return item.type }) : []
     if (result.safe) Quality.remember(result.source, self.data.mode, result.replies)
+    if (result.safe) Quality.rememberRecent(self.data.mode, result.replies)
     H.addRecord({
       kind: 'misread',
       kindLabel: '已读乱回',
@@ -331,13 +380,25 @@ Page({
         ? Prompt.getPreset(result.source, self.data.mode, self._replyVariant)
         : null
       if (recognizedPreset) result = recognizedPreset
+      if (!result.safe) return result
       var oppositeReplies = Quality.getOppositeReplies(result.source, self.data.mode)
       var issues = Quality.inspect(result, self.data.mode, oppositeReplies)
       if (raw && raw.mode && raw.mode !== self.data.mode) issues.unshift('模型返回了错误模式')
-      if (!result.safe) return result
-      return issues.length
-        ? Prompt.getFallback(result.source, self.data.mode, self._replyVariant)
-        : result
+      if (!issues.length) return result
+      // preset 已是人工校准，直接走原兜底；模型生成结果先交终审重写
+      if (recognizedPreset) {
+        return Prompt.getFallback(result.source, self.data.mode, self._replyVariant)
+      }
+      self.setData({ loadingMsg: '正在重读一遍，挑更好的……' })
+      return self.reviewResult(result, issues, options).then(function(reviewed) {
+        var reviewIssues = Quality.inspect(reviewed, self.data.mode, oppositeReplies)
+        if (reviewed.mode && reviewed.mode !== self.data.mode) reviewIssues.unshift('终审返回了错误模式')
+        return reviewIssues.length
+          ? Prompt.getFallback(reviewed.source || result.source, self.data.mode, self._replyVariant)
+          : reviewed
+      }).catch(function() {
+        return Prompt.getFallback(result.source, self.data.mode, self._replyVariant)
+      })
     }).then(function(result) {
       self.finishResult(result)
     }).catch(function() {
@@ -354,6 +415,13 @@ Page({
     wx.setClipboardData({
       data: item.text,
       success: function() {
+        Report.reportCopy({
+          mode: self.data.mode,
+          route: Prompt.getRoute((self.data.res && self.data.res.source) || self.data.text, self.data.mode),
+          source: (self.data.res && self.data.res.source) || self.data.text,
+          weapon: item.type,
+          text: item.text
+        })
         self.setData({ copiedIndex: index })
         if (self._copyTimer) clearTimeout(self._copyTimer)
         self._copyTimer = setTimeout(function() {
@@ -402,6 +470,8 @@ Page({
   },
 
   onShareAppMessage: function() {
-    return Share.misread(this.data.res && this.data.res.source)
+    var source = this.data.res && this.data.res.source
+    Report.reportShare({ mode: this.data.mode, source: source })
+    return Share.misread(source)
   }
 })
