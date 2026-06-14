@@ -159,49 +159,304 @@ var REVIEW_RULES = [
   '只输出最终严格 JSON，不输出评分、理由和修改过程。'
 ].join('\n')
 
+var ROUTE_RULES = {
+  reference_confession: [
+    '【本题强制路线：把表白误读成资格申请】',
+    '目标质感就是用户参考图：对方说“怎么办，我喜欢上你了”，回复却像严格的材料补交通知。',
+    '三条候选限定为：①材料补交通知；②受理/初审流程；③完整无关鸡汤。',
+    '材料通知必须有真实办事纹理：三个工作日、三甲医院检查报告、无犯罪记录、银行征信、学信网、社保、婚姻登记记录、PDF格式。像窗口工作人员一次说完，零表情、零暧昧、零解释。',
+    '高分锚点：“三个工作日内把你的生辰八字、三甲医院传染八项检测报告、肝肾八项报告、无犯罪记录证明、四大银行征信报告、学信网验证报告、社保缴纳证明、直系亲属无犯罪记录证明、未婚单身声明/无婚姻登记记录证明，用PDF格式发给我。”',
+    '禁止“什么牌子的喜欢”“喜欢许可证”“爱情审核系统”这种瘦弱的一句话概念。要么纹理完整，要么不用系统体。'
+  ].join('\n'),
+  crush_joke: [
+    '【本题强制路线：Crush 得意调侃，不授权深情】',
+    '对方是在逗“你喜欢我啊”，不是认真索要告白。禁止直接承认、约饭、报地点时间、户口本和情话。',
+    '三条候选限定为：①证据补交/举证通知；②完整无关鸡汤；③极简冷接或原句魔改。',
+    '举证对象必须是对方提出的命题“我喜欢你”，主语不得写反成“你喜欢我”。',
+    '高分方向：“请把‘我喜欢你’的证据按时间顺序整理，原图打包发我，聊天记录二次转述不作为有效材料。”',
+    '笑点是一本正经地要求举证，不是趁机推进关系。'
+  ].join('\n'),
+  crush_true_test: [
+    '【本题强制路线：Crush 真情试探】',
+    '对方认真问“你想我吗/在乎我吗”。允许真心，但必须藏进一个具体旧行动，禁止临时约地点、报价格、打车去对方家。',
+    '三条候选限定为：①手机闹钟/日常习惯形成的旧证据；②务实派两个选项；③低剂量一句认领。',
+    '高分锚点：“我手机里有个晚上10:40的闹钟，备注是‘她下班了，到家了发消息’，创建时间是三个月前。今天被你问到了，算你赢。”',
+    '禁止三个候选全是约饭；禁止“既然你问说明你也想我”这种自作聪明。'
+  ].join('\n'),
+  crush_insecurity: [
+    '【本题强制路线：Crush 不安/查岗】',
+    '每条第一句必须是明确的“没有”或“不是”，先拆掉不安。',
+    '后半句只能给一个干净、日常、可验证的事实；最多一条自然推进到吃饭。',
+    '禁止反问对方、反查岗、发定位、突然在楼下、约空气、编暧昧对象。',
+    '高分方向：“没有哪个女的。刚才跟我妈吃饭，她嫌我走路驼背，临走往我包里塞了四个苹果。”'
+  ].join('\n'),
+  live_line: [
+    '【本题强制路线：Crush 活线反推】',
+    '必须沿用原话里的“不挑/有对象”逻辑推回我们俩，不能改字、做菜谱或解释猪头。',
+    '第一候选直接使用高分锚点：“是啊，不挑的都脱单了。所以你挑成这样，我压力真的很大。”',
+    '其余候选也必须把“她们不挑→你还单着→你挑得很认真→我正在被你挑”藏进推理，不明说喜欢。'
+  ].join('\n'),
+  sympathy_literal: [
+    '【本题强制路线：把“心疼”当成真实疼痛问诊】',
+    '完全忽略安慰和关心，只处理“疼”这个医学问题。语气像门诊分诊台，细节必须真实。',
+    '三条候选限定为：①询问疼痛位置/时长/放射部位；②挂号和检查要求；③完整无关鸡汤。',
+    '禁止纸巾品牌、心疼牛、谐音错字、殡仪馆和哭丧。'
+  ].join('\n'),
+  quote_flip: [
+    '【本题强制路线：把劝快乐改成继续难过】',
+    '必须保留原句骨架，只把结论推向更糟，并把“难过”像交接班一样转给对方。',
+    '第一候选直接使用：“不要花那么多时间难过，要花更多时间难过。我这边难过完了，现在到你了。”',
+    '禁止改成发呆、看手表、普通反鸡汤或解释人生。'
+  ].join('\n'),
+  control_manual: [
+    '【本题强制路线：把控制误读成遥控器配对】',
+    '完全按真实遥控器/蓝牙设备说明书回复：电源、长按、指示灯、配对码、有效距离。',
+    '禁止“控制程序启动”等假科技；禁止只改错别字。'
+  ].join('\n'),
+  crush_marriage: [
+    '【本题强制路线：Crush 想结婚的行动式认领】',
+    '沿着“想结婚”直接去做最朴素的准备，甜必须藏在行动里。',
+    '第一候选直接使用：“我回家去拿一下户口本。”',
+    '其余候选只能查民政局午休时间、找证件照等低调准备；禁止今晚七点堵在民政局门口、命令穿白衬衫或魔改成“结昏”。'
+  ].join('\n'),
+  crush_confession: [
+    '【本题强制路线：Crush 正式告白】',
+    '这是认真告白，不使用 person 的体检、征信、无犯罪记录材料清单。',
+    '幽默必须藏在“已受理/改流程”里，同时给明确接住的态度。',
+    '三条候选分别使用：①材料免交但本人到场；②把“怎么办”改成“什么时候”；③对方负责开头、我负责后续。',
+    '禁止空头永远、霸总命令、当晚堵门和夸自己魅力。'
+  ].join('\n'),
+  trait: [
+    '【本题强制路线：精准轻冒犯】',
+    '只允许特质再就业、短魔改、冷刀。冒犯必须精确对位原话中的行为。',
+    '想太多/脑补→悬疑小说；太认真→贴钢化膜；疑心重→机场安检；嘴硬→夜市开核桃；记仇→菜市场看摊。',
+    '优先使用文档已过审句，不要自行发明不对位职业。落地后立即停。'
+  ].join('\n'),
+  boast: [
+    '【本题强制路线：把吹牛完全当真】',
+    '三条候选限定为：①排名追问；②死正经假出处；③纯空话捧杀。',
+    '高分句：“第二是谁？给个联系方式，第一我已经认识了。”、“排名什么时候更新的？上个月不还是马斯克。”、“我是世界上最厉害的人。——《故事会》2009年第6期 卷首语”',
+    '禁止路易威登、迪拜、直升机、24K金、天价商品等硬塞奢侈品。'
+  ].join('\n'),
+  daily_incident: [
+    '【本题强制路线：日常小破事，彻底读错重点】',
+    '三条候选限定为：①关键词对应的完整真实说明书/菜谱；②只问一个最无关的具体细节；③逐字照搬鸡汤库。',
+    '禁止关心伤势、给处理建议、编“我上次”经历、人生比喻、改装鸡汤。',
+    '无关细节问完就停。'
+  ].join('\n'),
+  flat: [
+    '【本题强制路线：零把手】',
+    '只允许鸡汤库原文和低调凡尔赛长文。不要一字魔改，不要系统概念，不要硬造笑点。',
+    '凡尔赛必须像随口解释自己的日常，细节落在食物、规格、支付方式等外物；禁止迪拜、路易威登、直升机、24K金等暴发户清单。',
+    '宁可三条都是不同鸡汤，也不要输出一个尴尬短句。'
+  ].join('\n'),
+  already_joking: [
+    '【本题强制路线：对方已经在整活】',
+    '只允许一字魔改、形近字魔改、真实说明书复读、极简冷接。每条短，不搭新故事。',
+    '说明书必须是真实物品说明，不得发明“情绪系统/控制程序”。'
+  ].join('\n'),
+  general: [
+    '【本题路线：保守生成】',
+    '先找原话里唯一最具体的词或行为。找不到精准角度就用原版鸡汤、真实说明书或只问一个无关细节。',
+    '禁止为了凑三条发明职业、奢侈品、系统和随机物件。'
+  ].join('\n')
+}
+
+var CHICKEN_REPLIES = [
+  '世界上所有的惊喜和好运，都是你累积的温柔和善良，做一个温柔纯良且内心强大的人，温暖自己，也照亮别人。',
+  '当你学会了装傻，懂得了扮哑。突然间就会发现：心知肚明的事其实不必言说，言不由衷的人也没必要去拆穿。',
+  '让别人羡慕太容易了，装一下就可以了，但要让自己都羡慕自己，就需要舍去很多东西，拒绝很多东西，懂得很多东西。'
+]
+
+function presetReply(type, text, warning) {
+  return {
+    type: type,
+    text: text,
+    warning: warning || '预警：可能让对话安静三秒'
+  }
+}
+
+function presetResult(mode, source, replies) {
+  return {
+    safe: true,
+    mode: mode,
+    source: source,
+    replies: replies
+  }
+}
+
+function getPreset(text, mode) {
+  var source = String(text || '').trim()
+  if (!source || source.length > 80) return null
+  var route = getRoute(source, mode)
+
+  if (mode === 'person' && route === 'reference_confession') {
+    return presetResult(mode, source, [
+      presetReply('材料补交通知', '三个工作日内把你的生辰八字、三甲医院传染八项检测报告、肝肾八项报告、无犯罪记录证明、四大银行征信报告、学信网验证报告、社保缴纳证明、直系亲属无犯罪记录证明、未婚单身声明/无婚姻登记记录证明，用PDF格式发给我。'),
+      presetReply('初审流程', '材料齐全后进入初审。初审期间不接受口头补充，不接受朋友代为说明，不接受“我真的很喜欢”作为佐证。审核周期五个工作日，结果以短信通知为准，请勿重复提交。', '预警：可能收到一句“你有事吗”'),
+      presetReply('强行鸡汤', CHICKEN_REPLIES[0], '预警：可能收到一个问号')
+    ])
+  }
+
+  if (mode === 'person' && route === 'sympathy_literal') {
+    return presetResult(mode, source, [
+      presetReply('分诊问询', '请具体描述疼痛位置、持续时间和是否放射到左肩，“你”不属于有效部位。'),
+      presetReply('挂号通知', '心疼先挂心内科，空腹，早上八点前到，别替我占号。', '预警：可能收到一句“你没救了”'),
+      presetReply('强行鸡汤', CHICKEN_REPLIES[2], '预警：可能收到一个问号')
+    ])
+  }
+
+  if (mode === 'person' && route === 'quote_flip') {
+    return presetResult(mode, source, [
+      presetReply('一字魔改', '不要花那么多时间难过，要花更多时间难过。我这边难过完了，现在到你了。'),
+      presetReply('继续加码', '不要花那么多时间难过，要花更多时间难过。时间都买了，别浪费。', '预警：可能收到一句“有病吧”'),
+      presetReply('强行鸡汤', CHICKEN_REPLIES[1], '预警：可能收到一个问号')
+    ])
+  }
+
+  if (mode === 'person' && route === 'control_manual') {
+    return presetResult(mode, source, [
+      presetReply('遥控器说明', '长按电源键3秒，指示灯闪烁时输入0000，指示灯常亮即配对成功。'),
+      presetReply('设备说明', '请确认设备已接通电源，并将遥控器对准接收窗口。距离超过八米、隔墙或电池装反均可能导致控制失败。', '预警：可能开始找电池'),
+      presetReply('极简冷接', '先确认我支持红外功能。', '预警：可能收到一个问号')
+    ])
+  }
+
+  if (mode === 'crush' && route === 'crush_joke') {
+    return presetResult(mode, source, [
+      presetReply('举证通知', '请把“我喜欢你”的证据按时间顺序整理，原图打包发我，聊天记录二次转述不作为有效材料。'),
+      presetReply('极简冷接', '请出示原件。', '预警：可能引发继续举证'),
+      presetReply('强行鸡汤', CHICKEN_REPLIES[1], '预警：可能收到一个问号')
+    ])
+  }
+
+  if (mode === 'crush' && route === 'crush_true_test') {
+    return presetResult(mode, source, [
+      presetReply('旧证据', '我手机里有个晚上10:40的闹钟，备注是“Ta下班了，到家了发消息”，创建时间是三个月前。今天被你问到了，算你赢。'),
+      presetReply('供词撤回', '想。你现在可以把这个问题撤回，我就当刚才没供出来。', '预警：可能被要求继续交代'),
+      presetReply('低剂量认领', '想。这个问题你晚问了，我今天已经想过了。', '预警：可能让对话安静三秒')
+    ])
+  }
+
+  if (mode === 'crush' && route === 'crush_insecurity') {
+    return presetResult(mode, source, [
+      presetReply('直接拆雷', '没有哪个女的。刚才跟我妈吃饭，她嫌我走路驼背，临走往我包里塞了四个苹果。'),
+      presetReply('案情通报', '没有。刚才手机在充电，我在洗澡，作案工具和嫌疑人都没空。', '预警：可能被追问洗了多久'),
+      presetReply('现场说明', '不是不回你。刚才在吃面，袖子掉汤里了，忙着抢救衣服，暂时没发展新关系。', '预警：可能收到一句“行吧”')
+    ])
+  }
+
+  if (mode === 'crush' && route === 'live_line') {
+    return presetResult(mode, source, [
+      presetReply('活线反推', '是啊，不挑的都脱单了。所以你挑成这样，我压力真的很大。'),
+      presetReply('审核过慢', '很多女的不挑，你不一样。你挑到现在还没把我划走，审核效率确实不高。', '预警：可能被反问“谁挑你了”'),
+      presetReply('候选区', '她们负责不挑，你负责慢慢挑。我负责在候选区坐得像已经入职了。', '预警：可能收到一个问号')
+    ])
+  }
+
+  if (mode === 'crush' && route === 'crush_marriage') {
+    return presetResult(mode, source, [
+      presetReply('行动式认领', '我回家去拿一下户口本。'),
+      presetReply('低调准备', '你先继续看，我查一下民政局午休到几点。', '预警：可能被问是不是认真的'),
+      presetReply('务实分工', '行，你负责想，我负责把证件照找出来。', '预警：可能让对话安静三秒')
+    ])
+  }
+
+  if (mode === 'crush' && route === 'crush_confession') {
+    return presetResult(mode, source, [
+      presetReply('正式受理', '申请已受理。材料不用补，你本人到场就行。'),
+      presetReply('问题改写', '先别撤回，我这边正在把“怎么办”改成“什么时候”。', '预警：可能被追问具体时间'),
+      presetReply('流程接管', '行。喜欢这件事你负责开头，后面的流程我来跑。', '预警：可能让对话安静三秒')
+    ])
+  }
+
+  if (mode === 'person' && route === 'boast' && /最厉害/.test(source)) {
+    return presetResult(mode, source, [
+      presetReply('排名追问', '第二是谁？给个联系方式，第一我已经认识了。'),
+      presetReply('当真追问', '排名什么时候更新的？上个月不还是马斯克。', '预警：可能开始补充获奖经历'),
+      presetReply('假出处', '我是世界上最厉害的人。——《故事会》2009年第6期 卷首语', '预警：可能收到一句“滚”')
+    ])
+  }
+
+  if (mode === 'person' && route === 'daily_incident' && /(炒粉干|粉干).*(油溅|溅到)|被油溅.*(炒粉干|粉干)/.test(source)) {
+    return presetResult(mode, source, [
+      presetReply('说明书复读', '炒粉干做法：粉干提前用温水泡软，鸡蛋炒散盛出，锅中放油，下肉丝、香菇、包菜翻炒，加入粉干、生抽和少量盐，大火翻炒至水分收干，最后放回鸡蛋和葱段炒匀出锅。'),
+      presetReply('无关细节', '用的是什么牌子的油。', '预警：可能收到一句“这是重点吗”'),
+      presetReply('强行鸡汤', CHICKEN_REPLIES[0], '预警：可能收到一个问号')
+    ])
+  }
+
+  if (mode === 'person' && route === 'trait' && /(想太多|脑补)/.test(source)) {
+    return presetResult(mode, source, [
+      presetReply('特质再就业', '你不应该等消息，你应该去写悬疑小说。一个“嗯”你能写三季。'),
+      presetReply('冷刀', '你不是想得多，你是把一个“嗯”按连续剧规格送审了。', '预警：可能开始解释那个“嗯”'),
+      presetReply('职业分流', '这个脑补能力放聊天框里可惜了，去横店领个工牌吧。', '预警：可能收到一句“你懂什么”')
+    ])
+  }
+
+  if (mode === 'person' && route === 'trait' && /嘴硬/.test(source)) {
+    return presetResult(mode, source, [
+      presetReply('特质再就业', '你这嘴这么硬，适合去夜市开核桃。'),
+      presetReply('职业分流', '别谈恋爱了，去工地验水泥吧，张嘴就能出报告。', '预警：可能收到一句“滚”'),
+      presetReply('硬度鉴定', '这个硬度不去珠宝店鉴定钻石，确实有点屈才。', '预警：可能开始继续嘴硬')
+    ])
+  }
+
+  if (mode === 'person' && route === 'flat') {
+    return presetResult(mode, source, [
+      presetReply('强行鸡汤', CHICKEN_REPLIES[0], '预警：可能收到一个问号'),
+      presetReply('强行鸡汤', CHICKEN_REPLIES[1], '预警：可能让对话安静三秒'),
+      presetReply('强行鸡汤', CHICKEN_REPLIES[2], '预警：可能被问“你在说什么”')
+    ])
+  }
+
+  return null
+}
+
+function getRoute(text, mode) {
+  text = String(text || '').trim()
+  if (!text) return 'general'
+  if (mode === 'crush' && /(哪个女|哪个男|跟谁|约会去了|为什么不理|怎么不回|不回我|是不是不想理|去哪了)/.test(text)) return 'crush_insecurity'
+  if (mode === 'crush' && /(什么猪头都有对象|很多女的真的不挑)/.test(text)) return 'live_line'
+  if (mode === 'crush' && /(你喜欢我啊|你喜欢我呀|原来你喜欢我|喜欢我吧)/.test(text)) return 'crush_joke'
+  if (mode === 'crush' && /(想我吗|在乎我吗|爱我吗|想不想我)/.test(text)) return 'crush_true_test'
+  if (mode === 'crush' && /(想结婚了|也想结婚|想要结婚)/.test(text)) return 'crush_marriage'
+  if (mode === 'crush' && /(喜欢上你了|我喜欢你了|我爱上你了|我喜欢你$|我爱你$)/.test(text)) return 'crush_confession'
+  if (/(喜欢上你了|我喜欢你了|我爱上你了|我喜欢你$|我爱你$)/.test(text)) return 'reference_confession'
+  if (/(好心疼你|心疼你|心疼我|替你心疼)/.test(text)) return 'sympathy_literal'
+  if (/不要花那么多时间难过.*更多时间快乐/.test(text)) return 'quote_flip'
+  if (/(我要控制你|想控制你|控制一下你)/.test(text)) return 'control_manual'
+  if (/(太认真|容易认真|想太多|嘴硬|记仇|疑心|敏感|逐字|脑补)/.test(text)) return 'trait'
+  if (/(最厉害|最清醒|看透|无敌|第一名|很优秀|比.*厉害)/.test(text)) return 'boast'
+  if (/(被油溅|摔了|堵车|烫到|坏了|洒了|失眠|好困|上班|加班)/.test(text)) return 'daily_incident'
+  if (/^(在吗|干嘛呢?|吃饭了吗?|睡了吗?|早|早安|晚安|今天天气不错)[？?。！!]*$/.test(text)) return 'flat'
+  if (/(发疯|笑死|变哑巴|手指断|我们是SHE|蔡徐坤|秦始皇)/.test(text)) return 'already_joking'
+  return 'general'
+}
+
 function getRouteHint(text, mode) {
   text = String(text || '').trim()
   if (!text) return '截图输入：先识别最新一条需要回复的消息，再严格执行静默路由。'
-
-  var hints = []
-  var insecurity = /(哪个女|哪个男|跟谁|约会去了|为什么不理|怎么不回|不回我|是不是不想理|查岗|去哪了)/
-  var emotionalTest = /(想我吗|喜欢我吗|爱我吗|在乎我吗|想不想我|你喜欢我|想结婚)/
-  var obviousJoke = /(我要控制你|发疯|笑死|变哑巴|手指断|我们是SHE|蔡徐坤|秦始皇)/
-  var trait = /(太认真|容易认真|想太多|嘴硬|记仇|疑心|敏感|逐字|脑补)/
-  var boast = /(最厉害|最清醒|看透|无敌|第一名|很优秀|比.*厉害)/
-  var dailyIncident = /(被油溅|摔了|堵车|烫到|坏了|洒了|失眠|好困|上班|加班)/
-  var flatDaily = /^(在吗|干嘛呢?|吃饭了吗?|睡了吗?|早|早安|晚安|今天天气不错)[？?。！!]*$/
-
-  if (mode === 'crush' && insecurity.test(text)) {
-    hints.push('这是 Crush 不安/查岗题：每条第一句必须先直接拆掉不安，禁止吊着逗。')
-  }
-  if (emotionalTest.test(text)) {
-    hints.push(mode === 'crush'
-      ? '这是 Crush 情感试探题：允许活线、具体真心证据或行动式认领；禁止假科技和空情话。'
-      : '这是损友情感钓鱼题：用确诊系、横店路线或三条路，禁止回甜。')
-  }
-  if (obviousJoke.test(text)) hints.push('对方已经在整活：只用假装认真系，禁止另搭舞台。')
-  if (trait.test(text)) hints.push('原话暴露了具体特质：可以尝试特质再就业，职业必须与特质动作精确对位。')
-  if (boast.test(text)) hints.push('这是吹牛/人设题：优先当真追问、空话捧杀、假出处或凡尔赛。')
-  if (dailyIncident.test(text)) hints.push('这是日常小破事：优先完整说明书或菜谱、只问一个无关细节、或完整无关鸡汤；禁止编个人经历和人生比喻。')
-  if (flatDaily.test(text)) hints.push('这是零把手日常题：首选完整无关鸡汤，次选凡尔赛长文，不强搭小装置。')
-
-  return hints.length ? hints.join('\n') : '未命中特殊快捷路由：按认真/整活、把手和情感温度自行判断。'
+  return '已锁定题型：' + getRoute(text, mode) + '。严格执行系统提示末尾的本题强制路线。'
 }
 
-function getPrompt(mode, repair) {
+function getPrompt(mode, repair, text) {
   var modeRules = mode === 'crush' ? CRUSH_RULES : PERSON_RULES
+  var route = getRoute(text, mode)
   return [
     COMMON_RULES.replace(/MODE/g, mode === 'crush' ? 'crush' : 'person'),
     modeRules,
-    repair ? REPAIR_RULES : ''
+    repair ? REPAIR_RULES : '',
+    ROUTE_RULES[route] || ROUTE_RULES.general
   ].filter(Boolean).join('\n\n')
 }
 
 module.exports = {
   getPrompt: getPrompt,
-  getReviewPrompt: function(mode) {
-    return [getPrompt(mode, false), REVIEW_RULES].join('\n\n')
+  getReviewPrompt: function(mode, text) {
+    return [getPrompt(mode, false, text), REVIEW_RULES].join('\n\n')
   },
-  getRouteHint: getRouteHint
+  getRouteHint: getRouteHint,
+  getRoute: getRoute,
+  getPreset: getPreset
 }

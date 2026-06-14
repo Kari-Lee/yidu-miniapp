@@ -1,3 +1,5 @@
+var Prompt = require('./misreadPrompt')
+
 var CACHE_KEY = 'yidu_misread_mode_cache_v1'
 
 function compact(value) {
@@ -50,18 +52,21 @@ function addIssue(issues, issue) {
 function inspect(result, mode, oppositeReplies) {
   if (!result || result.safe === false) return []
   var replies = result.replies || []
+  var source = String(result.source || '')
+  var route = Prompt.getRoute(source, mode)
   var issues = []
   var types = {}
   var texts = []
   var genericMarkers = [
     '哈哈', '开玩笑', '狗头', 'yyds', '听君一席话',
-    '首先', '其次', '最后', '综上', '这说明', '建议你',
+    '综上', '这说明', '建议你',
     '作为一个', '根据你的描述', '从这个角度', '换句话说',
     '脑电波', '思念指数', '情感指数', '免疫屏障', '辐射服',
     '强度指数', '想你程序', '诊断手册', '情感手册',
     '启动程序', '程序启动', '物理意义', '心理学术语',
     '已读乱回版', '人生里了', '把命也重开', '建议重开',
-    '约空气', '过期辣酱', '辣酱的审核'
+    '约空气', '过期辣酱', '辣酱的审核',
+    '殡仪馆', '哭丧', '哭灵', '棺材'
   ]
   var familyAndRiskMarkers = [
     '想你妈', '你妈', '你爸', '你爹', '你娘',
@@ -82,11 +87,15 @@ function inspect(result, mode, oppositeReplies) {
     var type = compact(item.type)
     var text = String(item.text || '').trim()
     if (!text) addIssue(issues, '第' + (index + 1) + '条为空')
-    if (type && types[type]) addIssue(issues, '三条使用了重复武器')
+    if (type && types[type] && route !== 'flat') addIssue(issues, '三条使用了重复武器')
     types[type] = true
     if (containsAny(text.toLowerCase(), genericMarkers)) {
       addIssue(issues, '出现 AI 腔、陈旧梗或破功标记')
     }
+    var aiStructureHits = ['首先', '其次', '最后'].filter(function(marker) {
+      return text.indexOf(marker) !== -1
+    }).length
+    if (aiStructureHits >= 2) addIssue(issues, '出现定义式 AI 三段结构')
     if (containsAny(text, familyAndRiskMarkers)) {
       addIssue(issues, '攻击家人或使用越界行动')
     }
@@ -120,10 +129,10 @@ function inspect(result, mode, oppositeReplies) {
       addIssue(issues, '特质再就业后补了空头情话')
     }
     if (/特质再就业/.test(typeName) &&
-        !/(太认真|容易认真|想太多|嘴硬|记仇|疑心|敏感|逐字|脑补|健忘|记性)/.test(String(result.source || ''))) {
+        !/(太认真|容易认真|想太多|嘴硬|记仇|疑心|敏感|逐字|脑补|健忘|记性)/.test(source)) {
       addIssue(issues, '原话没有具体特质，却强套特质再就业')
     }
-    if (/鸡汤/.test(typeName) && sharedBigrams(text, String(result.source || '')) > 0) {
+    if (/鸡汤/.test(typeName) && sharedBigrams(text, source) > 0) {
       addIssue(issues, '鸡汤根据原话进行了改装')
     }
     if (/户口本/.test(text) && /户口本[。！？!?]?\s*[^。！？!?]/.test(text)) {
@@ -150,7 +159,6 @@ function inspect(result, mode, oppositeReplies) {
         addIssue(issues, 'Crush 回答出现空头情话')
       }
     })
-    var source = String(result.source || '')
     if (/(哪个女|哪个男|跟谁|约会去了|为什么不理|怎么不回|不回我|是不是不想理|去哪了)/.test(source)) {
       texts.forEach(function(text) {
         if (!/^(没有|没|不是|不在|没跟|没有跟|刚才没有)/.test(text.trim())) {
@@ -169,6 +177,135 @@ function inspect(result, mode, oppositeReplies) {
     texts.forEach(function(text) {
       if (containsAny(text, personBanned)) addIssue(issues, 'person 回答串入了 Crush 模式')
     })
+  }
+
+  var luxuryMarkers = [
+    '迪拜', '路易威登', 'LV', '直升机', '24K', '劳斯莱斯',
+    '私人飞机', '游艇', '爱马仕', '百达翡丽'
+  ]
+  if (route === 'reference_confession') {
+    var materialReply = texts.some(function(text) {
+      var materialHits = [
+        '工作日', '三甲医院', '无犯罪记录', '征信',
+        '学信网', '社保', '婚姻登记', 'PDF'
+      ].filter(function(marker) { return text.indexOf(marker) !== -1 }).length
+      return text.length >= 90 && materialHits >= 5
+    })
+    if (!materialReply) addIssue(issues, '表白题没有生成完整的材料补交通知')
+  }
+  if (route === 'sympathy_literal') {
+    if (!texts.some(function(text) {
+      return /(疼痛位置|持续时间|放射到|心内科|心电图)/.test(text)
+    })) {
+      addIssue(issues, '心疼题没有误读成真实问诊')
+    }
+    texts.forEach(function(text) {
+      if (/(纸巾|心疼牛|殡仪馆|哭丧)/.test(text)) addIssue(issues, '心疼题使用了低级谐音或越界意象')
+    })
+  }
+  if (route === 'quote_flip') {
+    if (!texts.some(function(text) {
+      return /更多时间难过/.test(text) && /我这边难过完了/.test(text)
+    })) {
+      addIssue(issues, '劝快乐题没有完成“继续难过”的交接反转')
+    }
+  }
+  if (route === 'control_manual') {
+    if (!texts.some(function(text) {
+      return /(长按|按住)/.test(text) && /(指示灯|配对|电源键)/.test(text)
+    })) {
+      addIssue(issues, '控制题没有误读成真实设备说明书')
+    }
+  }
+  if (route === 'crush_joke') {
+    if (!texts.some(function(text) {
+      return /(证据|举证|原图|聊天记录|材料)/.test(text) &&
+        /(我喜欢你|本人喜欢你|我对你)/.test(text)
+    })) {
+      addIssue(issues, 'Crush 调侃题没有正确举证“我喜欢你”')
+    }
+    texts.forEach(function(text) {
+      if (/(我也喜欢|^(对|是|嗯|没错)[，。！! ]*(我也)?喜欢|周[六日]|几点见|地铁站|火锅|餐厅|见面|请客|出来吃|户口本)/.test(text)) {
+        addIssue(issues, 'Crush 调侃题擅自进入告白或约会')
+      }
+    })
+  }
+  if (route === 'crush_true_test') {
+    if (!texts.some(function(text) {
+      return /(闹钟|备注|创建时间|三个月前|日历|备忘录)/.test(text)
+    })) {
+      addIssue(issues, 'Crush 真情试探缺少已有行动证据')
+    }
+    texts.forEach(function(text) {
+      if (/(你家|打车|7-11|便利店|现在去|马上到|发定位|几点见)/.test(text)) {
+        addIssue(issues, 'Crush 真情试探临时编了地点或行程')
+      }
+    })
+  }
+  if (route === 'crush_insecurity') {
+    texts.forEach(function(text) {
+      if (/[？?]/.test(text)) addIssue(issues, 'Crush 不安题不应反问')
+    })
+  }
+  if (route === 'live_line') {
+    if (!texts.some(function(text) {
+      return /不挑的都脱单/.test(text) && /你挑成这样|你这么挑|挑得/.test(text)
+    })) {
+      addIssue(issues, '活线题没有沿着“不挑”逻辑推回两人')
+    }
+  }
+  if (route === 'crush_marriage') {
+    if (!texts.some(function(text) {
+      return /回家.*户口本/.test(text)
+    })) {
+      addIssue(issues, 'Crush 结婚题没有命中低调行动式认领')
+    }
+    texts.forEach(function(text) {
+      if (/(今晚\s*7点|今晚七点|穿白衬衫|结昏)/.test(text)) {
+        addIssue(issues, 'Crush 结婚题过度表演或使用低级魔改')
+      }
+    })
+  }
+  if (route === 'crush_confession') {
+    if (!texts.some(function(text) {
+      return /申请已受理/.test(text) && /本人到场/.test(text)
+    })) {
+      addIssue(issues, 'Crush 告白题没有明确接住并保持阅读失败')
+    }
+    texts.forEach(function(text) {
+      if (/(三甲医院|无犯罪记录|银行征信|学信网|传染八项)/.test(text)) {
+        addIssue(issues, 'Crush 告白题串入了 person 材料审查')
+      }
+    })
+  }
+  if (route === 'boast') {
+    texts.forEach(function(text) {
+      if (containsAny(text, luxuryMarkers)) addIssue(issues, '吹牛题硬塞了奢侈品')
+    })
+    if (!texts.some(function(text) {
+      return /(第二是谁|排名|第[一二三]|《.+》|故事会|第\d+期)/.test(text)
+    })) {
+      addIssue(issues, '吹牛题没有命中排名或假出处')
+    }
+  }
+  if (route === 'daily_incident') {
+    var hasManual = texts.some(function(text) {
+      return /(做法|步骤|锅中|倒入|加入|翻炒|使用方法|注意事项)/.test(text) && text.length >= 45
+    })
+    var hasChicken = texts.some(function(text) {
+      return /(世界上所有的惊喜和好运|当你学会了装傻|让别人羡慕太容易了)/.test(text)
+    })
+    if (!hasManual || !hasChicken) addIssue(issues, '日常小事没有完整说明书和原版鸡汤')
+  }
+  if (route === 'flat') {
+    texts.forEach(function(text) {
+      if (containsAny(text, luxuryMarkers)) addIssue(issues, '零把手题硬塞了暴发户式奢侈品')
+    })
+    if (!texts.some(function(text) {
+      return /(世界上所有的惊喜和好运|当你学会了装傻|让别人羡慕太容易了)/.test(text)
+    })) {
+      addIssue(issues, '零把手题缺少完整无关鸡汤')
+    }
   }
 
   ;(oppositeReplies || []).forEach(function(oldText) {

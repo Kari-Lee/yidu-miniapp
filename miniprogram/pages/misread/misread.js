@@ -262,7 +262,11 @@ Page({
   },
 
   requestResult: function(message, options) {
-    var prompt = Prompt.getPrompt(this.data.mode, false)
+    var preset = !this.data.imgs.length && !this.data.previousWeapons.length
+      ? Prompt.getPreset(this.data.text, this.data.mode)
+      : null
+    if (preset) return Promise.resolve(preset)
+    var prompt = Prompt.getPrompt(this.data.mode, false, this.data.text)
     options.clientMeta = { task: 'misread' }
     return this.data.imgs.length
       ? ChatImages.callAI(prompt, message, this.data.imgs, options)
@@ -274,7 +278,7 @@ Page({
     var oppositeReplies = Quality.getOppositeReplies(result.source, self.data.mode)
     self.setData({ loadingMsg: '正在把尬的那句删掉……' })
     return API.callAI(
-      Prompt.getReviewPrompt(self.data.mode),
+      Prompt.getReviewPrompt(self.data.mode, result.source),
       self.buildRepairMessage(result, issues, oppositeReplies),
       null,
       null,
@@ -322,6 +326,10 @@ Page({
 
     request.then(function(raw) {
       var result = normalizeResult(raw, self.data.text, self.data.mode)
+      var recognizedPreset = self.data.imgs.length && !self.data.previousWeapons.length
+        ? Prompt.getPreset(result.source, self.data.mode)
+        : null
+      if (recognizedPreset) result = recognizedPreset
       var oppositeReplies = Quality.getOppositeReplies(result.source, self.data.mode)
       var issues = Quality.inspect(result, self.data.mode, oppositeReplies)
       if (raw && raw.mode && raw.mode !== self.data.mode) issues.unshift('模型返回了错误模式')
