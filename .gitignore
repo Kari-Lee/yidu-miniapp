@@ -22,3 +22,7 @@ miniprogram-backup/
 
 # Accidental shell-brace directories
 miniprogram/[{]pages*/
+
+# Local scratch / handoff notes, not part of the app
+outputs/
+MISREAD-CHANGES-HANDOFF.md
