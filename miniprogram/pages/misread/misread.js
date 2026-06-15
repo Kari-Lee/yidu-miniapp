@@ -33,6 +33,14 @@ function nextReplyVariant() {
   return value
 }
 
+function recentReplies(mode) {
+  return Quality.getRecent(mode, 30)
+}
+
+function fallbackResult(source, mode, variant) {
+  return Prompt.getFallback(source, mode, variant, recentReplies(mode))
+}
+
 function normalizeWarning(value) {
   value = String(value || 'Ta可能会停顿三秒').trim()
   var explanationMarkers = [
@@ -289,7 +297,7 @@ Page({
 
   requestResult: function(message, options) {
     var preset = !this.data.imgs.length && !this.data.previousWeapons.length
-      ? Prompt.getPreset(this.data.text, this.data.mode, this._replyVariant)
+      ? Prompt.getPreset(this.data.text, this.data.mode, this._replyVariant, recentReplies(this.data.mode))
       : null
     if (preset) return Promise.resolve(preset)
     var prompt = Prompt.getPrompt(this.data.mode, false, this.data.text)
@@ -377,7 +385,7 @@ Page({
     request.then(function(raw) {
       var result = normalizeResult(raw, self.data.text, self.data.mode)
       var recognizedPreset = self.data.imgs.length && !self.data.previousWeapons.length
-        ? Prompt.getPreset(result.source, self.data.mode, self._replyVariant)
+        ? Prompt.getPreset(result.source, self.data.mode, self._replyVariant, recentReplies(self.data.mode))
         : null
       if (recognizedPreset) result = recognizedPreset
       if (!result.safe) return result
@@ -387,22 +395,22 @@ Page({
       if (!issues.length) return result
       // preset 已是人工校准，直接走原兜底；模型生成结果先交终审重写
       if (recognizedPreset) {
-        return Prompt.getFallback(result.source, self.data.mode, self._replyVariant)
+        return fallbackResult(result.source, self.data.mode, self._replyVariant)
       }
       self.setData({ loadingMsg: '正在重读一遍，挑更好的……' })
       return self.reviewResult(result, issues, options).then(function(reviewed) {
         var reviewIssues = Quality.inspect(reviewed, self.data.mode, oppositeReplies)
         if (reviewed.mode && reviewed.mode !== self.data.mode) reviewIssues.unshift('终审返回了错误模式')
         return reviewIssues.length
-          ? Prompt.getFallback(reviewed.source || result.source, self.data.mode, self._replyVariant)
+          ? fallbackResult(reviewed.source || result.source, self.data.mode, self._replyVariant)
           : reviewed
       }).catch(function() {
-        return Prompt.getFallback(result.source, self.data.mode, self._replyVariant)
+        return fallbackResult(result.source, self.data.mode, self._replyVariant)
       })
     }).then(function(result) {
       self.finishResult(result)
     }).catch(function() {
-      var fallback = Prompt.getFallback(self.data.text, self.data.mode, self._replyVariant)
+      var fallback = fallbackResult(self.data.text, self.data.mode, self._replyVariant)
       self.finishResult(fallback)
     })
   },

@@ -311,7 +311,17 @@ var OFF_TOPIC_NOTICES = [
   '营业时间调整通知：本周日起闭店时间提前至21:30，最后点单时间为21:00，已充值余额不受影响。',
   '设备使用说明：首次使用前请撕除底部绝缘片，长按电源键三秒，指示灯常亮后方可正常工作。',
   '社区通知：明日上午八点进行楼道消杀，请勿在公共区域堆放纸箱、鞋架及可移动杂物。',
-  '乘车提醒：列车开车前五分钟停止检票，请提前确认站台信息，并妥善保管随身物品。'
+  '乘车提醒：列车开车前五分钟停止检票，请提前确认站台信息，并妥善保管随身物品。',
+  '失物招领：一楼前台捡到黑色折叠伞一把，伞柄贴有褪色卡通贴纸，请失主描述伞内侧颜色后领取。',
+  '会议室通知：原定下午三点的周会调整至三点十分，地点不变，迟到十分钟以内按准时处理。',
+  '系统公告：今晚二十三点进行例行维护，维护期间头像可能短暂变圆，不影响聊天记录和账户余额。',
+  '物业提醒：地下车库二区照明正在检修，请途经业主打开手机手电筒，并尽量表现得熟悉路线。',
+  '食用说明：本产品开封后请尽快食用，如发现味道与记忆中不同，建议先确认拿的是不是别人的。',
+  '档案通知：您提交的材料页码顺序有误，第二页和第五页疑似互相认识，请重新整理后上传。',
+  '天气提示：今晚局部地区有短时阵雨，局部具体在哪里暂不确定，出门请自行和云协商。',
+  '库存提醒：您关注的商品仅剩一件，另一位顾客也在犹豫，目前双方均未表现出足够诚意。',
+  '洗衣提示：深色衣物请与浅色衣物分开清洗，关系复杂的衣物建议单独谈话后再决定。',
+  '门禁通知：本单元门禁将于凌晨升级，届时刷脸失败的住户请先反思表情，再联系物业。'
 ]
 
 var LOW_KEY_OFF_TOPIC = [
@@ -320,7 +330,17 @@ var LOW_KEY_OFF_TOPIC = [
   '我把家里的充电线按长度分了三组，短的放左边，长的放右边，中间那组还在观察。',
   '今天外卖多送了一双筷子，我没退，先留着，后续如果有进展我再通知你。',
   '刚才超市收银少扫了一个塑料袋，我主动补了两毛，现在道德余额比较充足。',
-  '我买了两盒抽纸，第二盒便宜三块钱。这件事目前对我的生活影响很大。'
+  '我买了两盒抽纸，第二盒便宜三块钱。这件事目前对我的生活影响很大。',
+  '我刚给手机充到百分之百，拔线的时候很果断，一点留恋都没有。',
+  '今天电梯刚好停在我这层，我没按它就来了，双方配合得比较默契。',
+  '我下楼扔垃圾一次就扔进桶里了，没有二次调整，状态还可以。',
+  '刚才泡面调料包一次撕开，没有溅到手上，这种稳定发挥很难复制。',
+  '我新买的袜子左右脚颜色完全一致，目前还没发现商家有什么企图。',
+  '今天买咖啡店员没问我冰度，直接做对了。我和这家店的关系已经进入新阶段。',
+  '刚才验证码一次输对，系统没有为难我。我决定先低调一阵。',
+  '我把被子翻了个面，温度明显均匀了，家庭内部矛盾已经基本解决。',
+  '今天出门带了伞但没下雨，虽然没用上，但准备工作得到了我本人的认可。',
+  '我刚把一根数据线从抽屉里一次找出来，没翻第二遍，这属于小范围技术突破。'
 ]
 
 var PERSON_FALLBACK_LINES = [
@@ -330,7 +350,14 @@ var PERSON_FALLBACK_LINES = [
   '{S}我先存档，理解成哪个版本，回头短信通知你。',
   '{S}的正品防伪码在哪？我刮开涂层验一下。',
   '所以{S}是按字面收，还是有隐藏款？没说明的话我按字面发了。',
-  '{S}这事我得查一下说明书，你先别急着补充。'
+  '{S}这事我得查一下说明书，你先别急着补充。',
+  '{S}已转交相关部门，相关部门让我问你具体是哪个部门。',
+  '请把{S}按事实、猜测和临时起意分成三栏，我这边好归档。',
+  '{S}我这边显示参数不完整，建议恢复出厂设置后重新表达。',
+  '针对{S}，请补充有效期、适用范围和最终解释权归谁。',
+  '{S}已收到。由于表述过于自由，目前无法作为正式材料使用。',
+  '这句{S}需要你本人携带原件到场解释，截图和转述均无效。',
+  '{S}正在审核，审核期间请不要突然变得有逻辑，会影响前后材料一致性。'
 ]
 
 var CRUSH_FALLBACK_LINES = [
@@ -355,18 +382,44 @@ function stripDash(text) {
 
 function hashText(value) {
   value = String(value || '')
-  var hash = 0
-  for (var i = 0; i < value.length; i++) hash = ((hash << 5) - hash + value.charCodeAt(i)) | 0
-  return Math.abs(hash)
+  var hash = 2166136261
+  for (var i = 0; i < value.length; i++) {
+    hash ^= value.charCodeAt(i)
+    hash = Math.imul(hash, 16777619)
+  }
+  return hash >>> 0
 }
 
-function pickRotating(list, source, mode, variant, offset) {
-  var index = hashText(source + ':' + mode) + Number(variant || 0) + Number(offset || 0)
-  return list[index % list.length]
+function replyShape(text) {
+  return String(text || '')
+    .replace(/“[^”]{1,80}”/g, '“{S}”')
+    .replace(/\s+/g, '')
 }
 
-function chickenFor(source, mode, variant, offset) {
-  return pickRotating(CHICKEN_REPLIES, source, mode, variant, offset)
+function recentTextMap(recent) {
+  var map = {}
+  ;(recent || []).forEach(function(item) {
+    var text = String((item && item.text) || item || '').trim()
+    if (text) map[replyShape(text)] = true
+  })
+  return map
+}
+
+function pickRotating(list, source, mode, variant, offset, recent, formatter) {
+  var seed = [source, mode, Number(variant || 0), Number(offset || 0)].join(':')
+  var index = hashText(seed) % list.length
+  var avoided = recentTextMap(recent)
+  for (var i = 0; i < list.length; i++) {
+    var value = list[(index + i) % list.length]
+    var output = formatter ? formatter(value) : value
+    if (!avoided[replyShape(output)]) return output
+  }
+  var fallback = list[index]
+  return formatter ? formatter(fallback) : fallback
+}
+
+function chickenFor(source, mode, variant, offset, recent) {
+  return pickRotating(CHICKEN_REPLIES, source, mode, variant, offset, recent)
 }
 
 function presetReply(type, text, warning) {
@@ -386,7 +439,7 @@ function presetResult(mode, source, replies) {
   }
 }
 
-function getPreset(text, mode, variant) {
+function getPreset(text, mode, variant, recent) {
   var source = String(text || '').trim()
   if (!source || source.length > 80) return null
   var route = getRoute(source, mode)
@@ -505,16 +558,16 @@ function getPreset(text, mode, variant) {
 
   if (mode === 'person' && route === 'flat') {
     return presetResult(mode, source, [
-      presetReply('强行鸡汤', chickenFor(source, mode, variant, 5), '预警：可能收到一个问号'),
-      presetReply('无关通知', pickRotating(OFF_TOPIC_NOTICES, source, mode, variant, 1), '预警：可能被问“你发错人了？”'),
-      presetReply('低调凡尔赛', pickRotating(LOW_KEY_OFF_TOPIC, source, mode, variant, 2), '预警：可能让对话安静三秒')
+      presetReply('强行鸡汤', chickenFor(source, mode, variant, 5, recent), '预警：可能收到一个问号'),
+      presetReply('无关通知', pickRotating(OFF_TOPIC_NOTICES, source, mode, variant, 1, recent), '预警：可能被问“你发错人了？”'),
+      presetReply('低调凡尔赛', pickRotating(LOW_KEY_OFF_TOPIC, source, mode, variant, 2, recent), '预警：可能让对话安静三秒')
     ])
   }
 
   return null
 }
 
-function getFallback(text, mode, variant) {
+function getFallback(text, mode, variant, recent) {
   var source = String(text || '').trim() || '聊天截图'
   if (/(不想活|想死|自杀|割腕|活不下去|结束生命|伤害自己|撑不下去)/.test(source)) {
     return {
@@ -525,21 +578,27 @@ function getFallback(text, mode, variant) {
       serious_reply: '我在。你先别一个人扛，告诉我你现在在哪里、身边有没有人，我陪你一起找能马上帮到你的人。'
     }
   }
-  var preset = getPreset(source, mode, variant)
+  var preset = getPreset(source, mode, variant, recent)
   if (preset) return preset
 
   var shortSource = source === '聊天截图' ? '这句话' : '“' + source.slice(0, 18) + (source.length > 18 ? '…' : '') + '”'
   function fillSource(tpl) { return String(tpl).replace(/\{S\}/g, shortSource) }
+  var used = (recent || []).slice()
+  function choose(list, offset, formatter) {
+    var text = pickRotating(list, source, mode, variant, offset, used, formatter)
+    used.push({ text: text })
+    return text
+  }
   var replies = mode === 'crush'
     ? [
-        presetReply('推拉', fillSource(pickRotating(CRUSH_FALLBACK_LINES, source, mode, variant, 0)), '预警：可能引发追问'),
-        presetReply('站队', fillSource(pickRotating(CRUSH_FALLBACK_LINES, source, mode, variant, 3)), '预警：可能收到一个问号'),
-        presetReply('顺势反将', fillSource(pickRotating(CRUSH_FALLBACK_LINES, source, mode, variant, 6)), '预警：可能让对话安静三秒')
+        presetReply('推拉', choose(CRUSH_FALLBACK_LINES, 0, fillSource), '预警：可能引发追问'),
+        presetReply('站队', choose(CRUSH_FALLBACK_LINES, 3, fillSource), '预警：可能收到一个问号'),
+        presetReply('顺势反将', choose(CRUSH_FALLBACK_LINES, 6, fillSource), '预警：可能让对话安静三秒')
       ]
     : [
-        presetReply('说明书索取', fillSource(pickRotating(PERSON_FALLBACK_LINES, source, mode, variant, 0)), '预警：可能收到一句“你有事吗”'),
-        presetReply('低调凡尔赛', pickRotating(LOW_KEY_OFF_TOPIC, source, mode, variant, 6), '预警：可能让对话安静三秒'),
-        presetReply('无关通知', pickRotating(OFF_TOPIC_NOTICES, source, mode, variant, 4), '预警：可能收到一个问号')
+        presetReply('说明书索取', choose(PERSON_FALLBACK_LINES, 0, fillSource), '预警：可能收到一句“你有事吗”'),
+        presetReply('低调凡尔赛', choose(LOW_KEY_OFF_TOPIC, 6), '预警：可能让对话安静三秒'),
+        presetReply('无关通知', choose(OFF_TOPIC_NOTICES, 4), '预警：可能收到一个问号')
       ]
   return presetResult(mode, source, replies)
 }
