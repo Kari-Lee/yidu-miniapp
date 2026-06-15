@@ -1,0 +1,41 @@
+<view class="updates-page">
+  <view style="height: {{statusBarHeight}}px"></view>
+
+  <view class="updates-topbar">
+    <text class="updates-back" bindtap="goBack">← 返回</text>
+    <text class="updates-brand">YIDU</text>
+  </view>
+
+  <view class="updates-head">
+    <view class="updates-head-no">UP</view>
+    <view class="updates-kicker">WHAT'S NEW</view>
+    <view class="updates-title">版本更新</view>
+    <view class="updates-intro">每次改了什么，都在这里留个案底。</view>
+  </view>
+
+  <view wx:for="{{releases}}" wx:key="id" class="release-sheet">
+    <view class="release-meta">
+      <text>{{index === 0 ? 'LATEST RELEASE' : 'RELEASE'}}</text>
+      <text>{{item.date}}</text>
+    </view>
+    <view class="release-title">{{item.title}}</view>
+    <view class="release-summary">{{item.summary}}</view>
+
+    <view class="release-list">
+      <view wx:for="{{item.items}}" wx:for-item="change" wx:key="*this" class="release-item">
+        <text>{{index + 1}}</text>
+        <view>{{change}}</view>
+      </view>
+    </view>
+
+    <view
+      wx:if="{{item.actionUrl}}"
+      class="release-action"
+      data-url="{{item.actionUrl}}"
+      bindtap="openAction"
+    >
+      <text>{{item.actionLabel}}</text>
+      <text>↗</text>
+    </view>
+  </view>
+</view>

@@ -171,6 +171,14 @@
       <view class="action-arrow">↗</view>
     </view>
 
+    <view
+      class="quiet-link"
+      bindtap="goUpdates"
+      hover-class="quiet-link-pressed"
+      hover-start-time="20"
+      hover-stay-time="100"
+    >查看版本更新</view>
+
     <view class="type-strip">
       <view wx:for="{{types}}" wx:key="key" class="type-row">
         <view style="color: {{item.color}};">{{item.label}}</view>
@@ -195,6 +203,28 @@
     <view class="tab-item {{activeTab === 'record' ? 'active' : ''}}" data-tab="record" bindtap="switchHomeTab" hover-class="tab-item-pressed" hover-start-time="0" hover-stay-time="80">
       <view class="tab-line"></view>
       <text>记录</text>
+    </view>
+  </view>
+
+  <view wx:if="{{showUpdateNotice && updateNotice}}" class="update-mask" catchtouchmove="noop" bindtap="closeUpdateNotice">
+    <view class="update-sheet" catchtap="noop">
+      <view class="update-kicker">{{updateNotice.kicker}}</view>
+      <view class="update-title">{{updateNotice.title}}</view>
+      <view class="update-summary">{{updateNotice.summary}}</view>
+
+      <view class="update-list">
+        <view wx:for="{{updateNotice.items}}" wx:key="*this" class="update-item">
+          <text>{{index < 9 ? '0' + (index + 1) : index + 1}}</text>
+          <view>{{item}}</view>
+        </view>
+      </view>
+
+      <view class="update-actions">
+        <view class="update-primary" bindtap="tryLatestUpdate">{{updateNotice.actionLabel}}</view>
+        <view class="update-secondary" bindtap="closeUpdateNotice">知道了</view>
+      </view>
+
+      <view class="update-all" bindtap="goUpdates">查看全部更新 ↗</view>
     </view>
   </view>
 </view>

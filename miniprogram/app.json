@@ -10,7 +10,8 @@
     "pages/history/history",
     "pages/profiles/profiles",
     "pages/profile-detail/profile-detail",
-    "pages/history-detail/history-detail"
+    "pages/history-detail/history-detail",
+    "pages/updates/updates"
   ],
   "window": {
     "navigationBarBackgroundColor": "#F4F8FB",

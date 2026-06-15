@@ -1,11 +1,14 @@
 var data = require('../../utils/data')
 var Share = require('../../utils/share')
+var Releases = require('../../utils/releases')
 
 Page({
   data: {
     statusBarHeight: 0,
     activeTab: 'test',
     dailyQuote: '',
+    updateNotice: null,
+    showUpdateNotice: false,
     misreadSample: {
       input: '你吃饭了吗',
       output: '随便吃了点。前两天朋友从筑地给我顺了块蓝鳍金枪鱼中腹，我解冻手法不太行，有点辜负……那个米一年就给我寄二十斤，吃一斤少一斤，所以我现在不太敢吃饭。'
@@ -26,6 +29,13 @@ Page({
       activeTab: options && options.tab ? options.tab : 'test'
     })
     this.startMisreadSamples()
+  },
+  onShow: function() {
+    if (!Releases.shouldShowLatest()) return
+    this.setData({
+      updateNotice: Releases.getLatest(),
+      showUpdateNotice: true
+    })
   },
   onUnload: function() {
     if (this._misreadTimer) clearInterval(this._misreadTimer)
@@ -56,6 +66,26 @@ Page({
   goPredict: function() { wx.navigateTo({ url: '/pages/predict/predict' }) },
   goHistory: function() { wx.navigateTo({ url: '/pages/history/history' }) },
   goProfiles: function() { wx.navigateTo({ url: '/pages/profiles/profiles' }) },
+  goUpdates: function() {
+    this.markUpdateSeen()
+    this.setData({ showUpdateNotice: false })
+    wx.navigateTo({ url: '/pages/updates/updates' })
+  },
+  markUpdateSeen: function() {
+    var notice = this.data.updateNotice || Releases.getLatest()
+    if (notice) Releases.markSeen(notice.id)
+  },
+  closeUpdateNotice: function() {
+    this.markUpdateSeen()
+    this.setData({ showUpdateNotice: false })
+  },
+  tryLatestUpdate: function() {
+    var notice = this.data.updateNotice
+    this.markUpdateSeen()
+    this.setData({ showUpdateNotice: false })
+    if (notice && notice.actionUrl) wx.navigateTo({ url: notice.actionUrl })
+  },
+  noop: function() {},
   switchHomeTab: function(e) { this.setData({ activeTab: e.currentTarget.dataset.tab }) },
   onShareAppMessage: function() { return Share.home() },
 })

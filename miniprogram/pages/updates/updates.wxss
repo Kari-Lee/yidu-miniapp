@@ -1,0 +1,144 @@
+.updates-page {
+  min-height: 100vh;
+  padding: 0 36rpx 120rpx;
+  box-sizing: border-box;
+  background: #F3F4F8;
+  overflow-x: hidden;
+}
+
+.updates-topbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  min-height: 76rpx;
+  border-bottom: 2rpx solid rgba(45,47,51,0.07);
+}
+
+.updates-back {
+  color: #2D2F33;
+  font-size: 25rpx;
+  font-weight: 900;
+}
+
+.updates-brand {
+  color: rgba(45,47,51,0.34);
+  font-size: 17rpx;
+  font-weight: 900;
+  letter-spacing: 5rpx;
+}
+
+.updates-head {
+  position: relative;
+  padding: 52rpx 4rpx 44rpx;
+  overflow: hidden;
+}
+
+.updates-head-no {
+  position: absolute;
+  top: 20rpx;
+  right: 0;
+  color: transparent;
+  -webkit-text-stroke: 2rpx rgba(45,47,51,0.08);
+  font-size: 142rpx;
+  font-weight: 900;
+  line-height: 1;
+}
+
+.updates-kicker,
+.release-meta text:first-child {
+  position: relative;
+  color: #10A8E8;
+  font-size: 18rpx;
+  font-weight: 900;
+  letter-spacing: 4rpx;
+}
+
+.updates-title {
+  position: relative;
+  margin-top: 18rpx;
+  color: #2D2F33;
+  font-size: 64rpx;
+  font-weight: 900;
+  line-height: 1.12;
+}
+
+.updates-intro {
+  position: relative;
+  margin-top: 20rpx;
+  color: rgba(45,47,51,0.54);
+  font-size: 25rpx;
+  line-height: 1.72;
+}
+
+.release-sheet {
+  margin-bottom: 28rpx;
+  padding: 34rpx 30rpx 0;
+  border-top: 7rpx solid #10A8E8;
+  background: #FFFFFF;
+  box-shadow: 0 16rpx 40rpx rgba(45,47,51,0.05);
+}
+
+.release-meta,
+.release-action,
+.release-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 20rpx;
+}
+
+.release-meta text:last-child {
+  color: #B8BDC8;
+  font-size: 20rpx;
+}
+
+.release-title {
+  margin-top: 24rpx;
+  color: #2D2F33;
+  font-size: 38rpx;
+  font-weight: 900;
+  line-height: 1.38;
+}
+
+.release-summary {
+  margin-top: 14rpx;
+  color: rgba(45,47,51,0.6);
+  font-size: 24rpx;
+  line-height: 1.7;
+}
+
+.release-list {
+  margin-top: 26rpx;
+  border-top: 2rpx solid rgba(45,47,51,0.08);
+}
+
+.release-item {
+  justify-content: flex-start;
+  align-items: flex-start;
+  padding: 22rpx 0;
+  border-bottom: 2rpx solid rgba(45,47,51,0.08);
+}
+
+.release-item text {
+  width: 46rpx;
+  flex-shrink: 0;
+  color: #10A8E8;
+  font-size: 19rpx;
+  font-weight: 900;
+}
+
+.release-item view {
+  flex: 1;
+  color: #2D2F33;
+  font-size: 24rpx;
+  font-weight: 800;
+  line-height: 1.6;
+}
+
+.release-action {
+  min-height: 92rpx;
+  margin-top: 8rpx;
+  color: #2D2F33;
+  font-size: 25rpx;
+  font-weight: 900;
+}

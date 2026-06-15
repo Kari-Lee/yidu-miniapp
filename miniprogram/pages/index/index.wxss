@@ -526,3 +526,130 @@
   from { opacity: 0; transform: translateY(18rpx); }
   to { opacity: 1; transform: translateY(0); }
 }
+
+.update-mask {
+  position: fixed;
+  inset: 0;
+  z-index: 100;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: calc(40rpx + env(safe-area-inset-top)) 46rpx calc(40rpx + env(safe-area-inset-bottom));
+  box-sizing: border-box;
+  background: rgba(21,22,25,0.58);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  animation: update-mask-in 180ms ease both;
+}
+
+.update-sheet {
+  width: 100%;
+  max-width: 660rpx;
+  padding: 44rpx 38rpx 32rpx;
+  box-sizing: border-box;
+  border-top: 6rpx solid #10A8E8;
+  border-radius: 24rpx;
+  background: #FFFFFF;
+  box-shadow: 0 28rpx 80rpx rgba(0,0,0,0.22);
+  animation: update-sheet-in 260ms cubic-bezier(.2,.9,.3,1) both;
+}
+
+.update-kicker {
+  color: #10A8E8;
+  font-size: 18rpx;
+  font-weight: 900;
+  letter-spacing: 4rpx;
+  text-align: center;
+}
+
+.update-title {
+  margin-top: 18rpx;
+  color: #2D2F33;
+  font-size: 42rpx;
+  font-weight: 900;
+  line-height: 1.22;
+  text-align: center;
+}
+
+.update-summary {
+  margin-top: 16rpx;
+  color: rgba(45,47,51,0.58);
+  font-size: 24rpx;
+  line-height: 1.72;
+  text-align: center;
+}
+
+.update-list {
+  margin-top: 30rpx;
+  border-top: 2rpx solid rgba(45,47,51,0.08);
+}
+
+.update-item {
+  display: flex;
+  align-items: flex-start;
+  gap: 20rpx;
+  padding: 22rpx 0;
+  border-bottom: 2rpx solid rgba(45,47,51,0.08);
+}
+
+.update-item text {
+  width: 48rpx;
+  flex-shrink: 0;
+  color: #10A8E8;
+  font-size: 18rpx;
+  font-weight: 900;
+}
+
+.update-item view {
+  flex: 1;
+  color: #2D2F33;
+  font-size: 24rpx;
+  font-weight: 800;
+  line-height: 1.55;
+}
+
+.update-actions {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 18rpx;
+  margin-top: 30rpx;
+}
+
+.update-primary,
+.update-secondary {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 88rpx;
+  border-radius: 18rpx;
+  font-size: 26rpx;
+  font-weight: 900;
+}
+
+.update-primary {
+  background: #2D2F33;
+  color: #FFFFFF;
+}
+
+.update-secondary {
+  background: #F3F4F8;
+  color: #7F8590;
+}
+
+.update-all {
+  margin-top: 24rpx;
+  color: #9BA1AE;
+  font-size: 21rpx;
+  font-weight: 800;
+  text-align: center;
+}
+
+@keyframes update-mask-in {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes update-sheet-in {
+  from { opacity: 0; transform: translateY(24rpx) scale(0.98); }
+  to { opacity: 1; transform: translateY(0); }
+}
