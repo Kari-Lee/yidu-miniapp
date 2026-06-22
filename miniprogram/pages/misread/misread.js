@@ -16,6 +16,7 @@ var PLACEHOLDERS = [
 ]
 var LOADING_MESSAGES = ['正在认真地读歪……', '正在假装没看懂……']
 var VARIANT_KEY = 'yidu_misread_reply_variant_v1'
+var FEEDBACK_PROMPT_VERSION = 'misread_v2'
 
 function safeDecode(value) {
   try { return decodeURIComponent(value || '') } catch (e) { return value || '' }
@@ -31,6 +32,10 @@ function nextReplyVariant() {
   value = (value + 1) % 10000
   try { wx.setStorageSync(VARIANT_KEY, value) } catch (e) {}
   return value
+}
+
+function createBatchId() {
+  return 'b_' + Date.now().toString(36) + '_' + Math.random().toString(36).slice(2, 10)
 }
 
 function recentReplies(mode) {
@@ -123,6 +128,9 @@ Page({
     err: '',
     res: null,
     copiedIndex: -1,
+    batchId: '',
+    feedbackStates: [],
+    feedbackTarget: -1,
     profileId: '',
     profileName: '',
     profileRelation: '',
@@ -330,6 +338,8 @@ Page({
     if (result && result.safety_message) result.safety_message = Prompt.stripDash(result.safety_message)
     if (result && result.serious_reply) result.serious_reply = Prompt.stripDash(result.serious_reply)
     var weapons = result.safe ? result.replies.map(function(item) { return item.type }) : []
+    var batchId = result.safe ? createBatchId() : ''
+    var route = result.safe ? Prompt.getRoute(result.source, self.data.mode) : ''
     if (result.safe) Quality.remember(result.source, self.data.mode, result.replies)
     if (result.safe) Quality.rememberRecent(self.data.mode, result.replies)
     H.addRecord({
@@ -350,8 +360,21 @@ Page({
       step: result.safe ? 'result' : 'safety',
       res: result,
       submitting: false,
-      previousWeapons: weapons
+      previousWeapons: weapons,
+      batchId: batchId,
+      feedbackStates: result.safe ? ['', '', ''] : [],
+      feedbackTarget: -1
     })
+    if (result.safe) {
+      Report.reportServeBatch({
+        mode: self.data.mode,
+        route: route,
+        batchId: batchId,
+        promptVersion: FEEDBACK_PROMPT_VERSION,
+        source: result.source,
+        replies: result.replies
+      })
+    }
   },
 
   submit: function() {
@@ -427,6 +450,10 @@ Page({
           mode: self.data.mode,
           route: Prompt.getRoute((self.data.res && self.data.res.source) || self.data.text, self.data.mode),
           source: (self.data.res && self.data.res.source) || self.data.text,
+          batchId: self.data.batchId,
+          replyId: self.data.batchId ? self.data.batchId + '_' + index : '',
+          replyIndex: index,
+          promptVersion: FEEDBACK_PROMPT_VERSION,
           weapon: item.type,
           text: item.text
         })
@@ -439,7 +466,58 @@ Page({
     })
   },
 
+  rateReply: function(e) {
+    var index = Number(e.currentTarget.dataset.index)
+    var verdict = e.currentTarget.dataset.verdict
+    if (index < 0 || index !== Math.floor(index) || !this.data.res || !this.data.res.replies[index]) return
+    if (verdict !== 'positive' && verdict !== 'negative') return
+    if (this.data.feedbackStates[index]) return
+    if (verdict === 'negative') {
+      this.setData({ feedbackTarget: index })
+      return
+    }
+    this.submitRating(index, 'positive', 'can_send')
+  },
+
+  chooseFeedbackReason: function(e) {
+    var index = Number(e.currentTarget.dataset.index)
+    var reason = e.currentTarget.dataset.reason
+    if (index < 0 || index !== Math.floor(index) || !reason) return
+    this.submitRating(index, 'negative', reason)
+  },
+
+  submitRating: function(index, verdict, reason) {
+    var item = this.data.res && this.data.res.replies && this.data.res.replies[index]
+    if (!item || this.data.feedbackStates[index]) return
+    var states = this.data.feedbackStates.slice()
+    states[index] = verdict
+    Report.reportRating({
+      mode: this.data.mode,
+      route: Prompt.getRoute(this.data.res.source || this.data.text, this.data.mode),
+      batchId: this.data.batchId,
+      replyId: this.data.batchId + '_' + index,
+      replyIndex: index,
+      promptVersion: FEEDBACK_PROMPT_VERSION,
+      weapon: item.type,
+      source: this.data.res.source || this.data.text,
+      text: item.text,
+      verdict: verdict,
+      reason: reason
+    })
+    this.setData({ feedbackStates: states, feedbackTarget: -1 })
+    wx.showToast({ title: '已记下', icon: 'none', duration: 900 })
+  },
+
   refresh: function() {
+    if (this.data.batchId && this.data.res) {
+      Report.reportRefresh({
+        mode: this.data.mode,
+        route: Prompt.getRoute(this.data.res.source || this.data.text, this.data.mode),
+        batchId: this.data.batchId,
+        promptVersion: FEEDBACK_PROMPT_VERSION,
+        source: this.data.res.source || this.data.text
+      })
+    }
     this.submit()
   },
 
@@ -456,6 +534,9 @@ Page({
       err: '',
       res: null,
       copiedIndex: -1,
+      batchId: '',
+      feedbackStates: [],
+      feedbackTarget: -1,
       profileId: '',
       profileName: '',
       profileRelation: '',
@@ -479,7 +560,12 @@ Page({
 
   onShareAppMessage: function() {
     var source = this.data.res && this.data.res.source
-    Report.reportShare({ mode: this.data.mode, source: source })
+    Report.reportShare({
+      mode: this.data.mode,
+      batchId: this.data.batchId,
+      promptVersion: FEEDBACK_PROMPT_VERSION,
+      source: source
+    })
     return Share.misread(source)
   }
 })

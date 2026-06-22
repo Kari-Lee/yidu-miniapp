@@ -84,6 +84,22 @@
             {{copiedIndex === index ? '✓ 已复制' : '复制'}}
           </button>
         </view>
+        <view wx:if="{{feedbackStates[index]}}" class="candidate-feedback-done">
+          {{feedbackStates[index] === 'positive' ? '已记下 · 这条能发' : '已记下 · 下次会避开'}}
+        </view>
+        <view wx:else class="candidate-feedback">
+          <text>这条能发吗？</text>
+          <view class="feedback-choices">
+            <text data-index="{{index}}" data-verdict="positive" bindtap="rateReply">能发</text>
+            <text data-index="{{index}}" data-verdict="negative" bindtap="rateReply">不行</text>
+          </view>
+        </view>
+        <view wx:if="{{feedbackTarget === index && !feedbackStates[index]}}" class="feedback-reasons">
+          <text data-index="{{index}}" data-reason="awkward" bindtap="chooseFeedbackReason">太尬</text>
+          <text data-index="{{index}}" data-reason="missed_context" bindtap="chooseFeedbackReason">没接住</text>
+          <text data-index="{{index}}" data-reason="too_offensive" bindtap="chooseFeedbackReason">太冒犯</text>
+          <text data-index="{{index}}" data-reason="wrong_mode" bindtap="chooseFeedbackReason">模式不对</text>
+        </view>
       </view>
     </view>
 

@@ -1,4 +1,4 @@
-// 轻量埋点：复制/分享即上报，收集被用户验证过的「金句」。
+// 轻量埋点：展示/复制/评分即上报，收集被用户验证过的「金句」。
 // fire-and-forget：失败静默，绝不影响交互。
 
 var app = getApp()
@@ -32,16 +32,65 @@ function post(payload) {
   } catch (e) {}
 }
 
-function reportCopy(info) {
+function replyPayload(event, info) {
   info = info || {}
-  post({
-    event: 'copy',
+  return {
+    event: event,
     task: 'misread',
     mode: info.mode || '',
     route: info.route || '',
-    source: redact(info.source, 1200),
+    batchId: info.batchId || '',
+    replyId: info.replyId || '',
+    replyIndex: typeof info.replyIndex === 'number' ? info.replyIndex : null,
+    promptVersion: info.promptVersion || '',
     weapon: info.weapon || '',
+    source: redact(info.source, 1200),
     text: redact(info.text, 500),
+    ts: Date.now()
+  }
+}
+
+function reportServeBatch(info) {
+  info = info || {}
+  var replies = info.replies || []
+  replies.forEach(function(item, index) {
+    item = item || {}
+    post(replyPayload('serve', {
+      mode: info.mode,
+      route: info.route,
+      batchId: info.batchId,
+      replyId: info.batchId + '_' + index,
+      replyIndex: index,
+      promptVersion: info.promptVersion,
+      weapon: item.type,
+      source: info.source,
+      text: item.text
+    }))
+  })
+}
+
+function reportCopy(info) {
+  post(replyPayload('copy', info))
+}
+
+function reportRating(info) {
+  info = info || {}
+  var payload = replyPayload('rating', info)
+  payload.verdict = info.verdict || ''
+  payload.reason = info.reason || ''
+  post(payload)
+}
+
+function reportRefresh(info) {
+  info = info || {}
+  post({
+    event: 'refresh',
+    task: 'misread',
+    mode: info.mode || '',
+    route: info.route || '',
+    batchId: info.batchId || '',
+    promptVersion: info.promptVersion || '',
+    source: redact(info.source, 1200),
     ts: Date.now()
   })
 }
@@ -52,9 +101,17 @@ function reportShare(info) {
     event: 'share',
     task: 'misread',
     mode: info.mode || '',
+    batchId: info.batchId || '',
+    promptVersion: info.promptVersion || '',
     source: redact(info.source, 1200),
     ts: Date.now()
   })
 }
 
-module.exports = { reportCopy: reportCopy, reportShare: reportShare }
+module.exports = {
+  reportServeBatch: reportServeBatch,
+  reportCopy: reportCopy,
+  reportRating: reportRating,
+  reportRefresh: reportRefresh,
+  reportShare: reportShare
+}
