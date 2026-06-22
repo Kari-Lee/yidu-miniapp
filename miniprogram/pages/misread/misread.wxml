@@ -80,9 +80,14 @@
         <view class="candidate-text">{{item.text}}</view>
         <view class="candidate-footer">
           <text>△ {{item.warning}}</text>
-          <button class="{{copiedIndex === index ? 'copied' : ''}}" data-index="{{index}}" bindtap="copyReply">
-            {{copiedIndex === index ? '✓ 已复制' : '复制'}}
-          </button>
+          <view class="candidate-actions">
+            <button class="{{copiedIndex === index ? 'copied' : ''}}" data-index="{{index}}" bindtap="copyReply">
+              {{copiedIndex === index ? '✓ 已复制' : '复制'}}
+            </button>
+            <button class="poster-button" disabled="{{posterSaving}}" data-index="{{index}}" bindtap="saveReplyPoster">
+              {{posterSaving && posterReplyIndex === index ? '生成中' : '分享图'}}
+            </button>
+          </view>
         </view>
         <view wx:if="{{feedbackStates[index]}}" class="candidate-feedback-done">
           {{feedbackStates[index] === 'positive' ? '已记下 · 这条能发' : '已记下 · 下次会避开'}}
@@ -140,4 +145,5 @@
     <view class="active" data-tab="tools" bindtap="goHomeTab">工具</view>
     <view data-tab="record" bindtap="goHomeTab">记录</view>
   </view>
+  <canvas type="2d" id="misreadPoster" class="misread-poster-canvas"></canvas>
 </view>

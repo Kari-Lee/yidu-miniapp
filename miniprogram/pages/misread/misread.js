@@ -131,6 +131,9 @@ Page({
     batchId: '',
     feedbackStates: [],
     feedbackTarget: -1,
+    posterPath: '',
+    posterReplyIndex: -1,
+    posterSaving: false,
     profileId: '',
     profileName: '',
     profileRelation: '',
@@ -141,6 +144,8 @@ Page({
   _placeholderTimer: null,
   _loadingTimer: null,
   _copyTimer: null,
+  _posterPromise: null,
+  _miniCodePromise: null,
   _submitting: false,
   _replyVariant: 0,
 
@@ -165,6 +170,7 @@ Page({
       ctx: safeDecode(options.ctx)
     })
     this.startPlaceholder()
+    this.ensureMiniCode()
   },
 
   onShow: function() {
@@ -363,7 +369,10 @@ Page({
       previousWeapons: weapons,
       batchId: batchId,
       feedbackStates: result.safe ? ['', '', ''] : [],
-      feedbackTarget: -1
+      feedbackTarget: -1,
+      posterPath: '',
+      posterReplyIndex: -1,
+      posterSaving: false
     })
     if (result.safe) {
       Report.reportServeBatch({
@@ -508,6 +517,188 @@ Page({
     wx.showToast({ title: '已记下', icon: 'none', duration: 900 })
   },
 
+  ensureMiniCode: function() {
+    if (this._miniCodePromise) return this._miniCodePromise
+    var filePath = wx.env.USER_DATA_PATH + '/yidu-misread-code.png'
+    var fs = wx.getFileSystemManager()
+    this._miniCodePromise = new Promise(function(resolve) {
+      fs.access({
+        path: filePath,
+        success: function() { resolve(filePath) },
+        fail: function() {
+          wx.request({
+            url: getApp().globalData.apiBaseUrl + '/wxacode',
+            method: 'GET',
+            responseType: 'arraybuffer',
+            timeout: 8000,
+            success: function(res) {
+              if (res.statusCode !== 200 || !res.data) {
+                resolve('')
+                return
+              }
+              fs.writeFile({
+                filePath: filePath,
+                data: res.data,
+                success: function() { resolve(filePath) },
+                fail: function() { resolve('') }
+              })
+            },
+            fail: function() { resolve('') }
+          })
+        }
+      })
+    })
+    return this._miniCodePromise
+  },
+
+  renderReplyPoster: function(index) {
+    var item = this.data.res && this.data.res.replies && this.data.res.replies[index]
+    if (!item) return Promise.reject(new Error('暂无可分享的回复'))
+    if (this.data.posterPath && this.data.posterReplyIndex === index) {
+      return Promise.resolve(this.data.posterPath)
+    }
+    if (this._posterPromise) return this._posterPromise
+
+    var self = this
+    this._posterPromise = new Promise(function(resolve, reject) {
+      wx.createSelectorQuery().in(self).select('#misreadPoster').fields({ node: true, size: true }).exec(function(res) {
+        var canvasInfo = res && res[0]
+        if (!canvasInfo || !canvasInfo.node || !canvasInfo.width || !canvasInfo.height) {
+          reject(new Error('分享图画布加载失败'))
+          return
+        }
+        var canvas = canvasInfo.node
+        var ctx = canvas.getContext('2d')
+        var dpr = wx.getSystemInfoSync().pixelRatio || 2
+        canvas.width = canvasInfo.width * dpr
+        canvas.height = canvasInfo.height * dpr
+        ctx.scale(dpr, dpr)
+
+        withTimeout(self.ensureMiniCode(), 1800, '').then(function(codePath) {
+          return loadCanvasImage(canvas, codePath)
+        }).then(function(codeImage) {
+          self.drawReplyPoster(ctx, canvasInfo.width, canvasInfo.height, index, codeImage)
+          return exportPoster(canvas, canvasInfo.width, canvasInfo.height, dpr, self)
+        }).then(function(path) {
+          self.setData({ posterPath: path, posterReplyIndex: index })
+          resolve(path)
+        }).catch(reject)
+      })
+    })
+    this._posterPromise.then(function() {
+      self._posterPromise = null
+    }, function() {
+      self._posterPromise = null
+    })
+    return this._posterPromise
+  },
+
+  drawReplyPoster: function(ctx, width, height, index, codeImage) {
+    var item = this.data.res.replies[index]
+    var source = this.data.res.source || this.data.text || '聊天截图'
+    var modeLabel = this.data.mode === 'crush' ? 'CRUSH MODE' : 'PERSON MODE'
+
+    ctx.clearRect(0, 0, width, height)
+    ctx.fillStyle = '#F2F3F5'
+    ctx.fillRect(0, 0, width, height)
+
+    ctx.strokeStyle = 'rgba(23,25,28,0.07)'
+    ctx.lineWidth = 1
+    ctx.font = '900 94px sans-serif'
+    ctx.strokeText('YIDU', 18, 91)
+
+    ctx.fillStyle = '#17191C'
+    ctx.font = '900 10px sans-serif'
+    ctx.fillText('YIDU / MISREAD REPLY', 24, 34)
+    ctx.fillStyle = '#2D9EE0'
+    ctx.fillRect(width - 48, 27, 24, 4)
+
+    ctx.fillStyle = '#8B9198'
+    ctx.font = '800 9px sans-serif'
+    ctx.fillText('TA SAID', 24, 92)
+
+    roundRect(ctx, 16, 103, width - 32, 90, 18)
+    ctx.fillStyle = '#E4E6E9'
+    ctx.fill()
+    ctx.fillStyle = '#4A4E54'
+    drawWrappedPosterText(ctx, source, 34, 127, width - 68, 18, source.length > 80 ? '700 11px sans-serif' : '700 13px sans-serif', 4)
+
+    ctx.fillStyle = '#17191C'
+    ctx.font = '900 28px sans-serif'
+    ctx.fillText('挑一句，直接发。', 24, 228)
+    ctx.fillStyle = '#9AA0A6'
+    ctx.font = '700 10px sans-serif'
+    ctx.fillText(modeLabel + ' / ' + String(item.type || '阅读失败').toUpperCase(), 24, 250)
+
+    roundRect(ctx, 16, 267, width - 32, 191, 20)
+    ctx.fillStyle = '#FFFFFF'
+    ctx.fill()
+    ctx.fillStyle = '#2D9EE0'
+    ctx.font = '900 9px sans-serif'
+    ctx.fillText(String(item.type || '阅读失败'), 34, 295)
+    ctx.fillStyle = '#17191C'
+    var replyFont = item.text.length > 88 ? '900 14px sans-serif' : (item.text.length > 55 ? '900 16px sans-serif' : '900 19px sans-serif')
+    var replyLineHeight = item.text.length > 88 ? 23 : 27
+    drawWrappedPosterText(ctx, item.text, 34, 327, width - 68, replyLineHeight, replyFont, 5)
+
+    ctx.fillStyle = '#A4A9AF'
+    drawWrappedPosterText(ctx, '△ ' + (item.warning || '预警：Ta可能会停顿三秒'), 34, 438, width - 68, 14, '700 9px sans-serif', 2)
+
+    ctx.strokeStyle = 'rgba(23,25,28,0.1)'
+    ctx.beginPath()
+    ctx.moveTo(24, height - 72)
+    ctx.lineTo(width - 24, height - 72)
+    ctx.stroke()
+
+    ctx.fillStyle = '#17191C'
+    ctx.font = '900 11px sans-serif'
+    ctx.fillText('微信小程序｜已读 Yidu', 24, height - 42)
+    ctx.fillStyle = '#8B9198'
+    ctx.font = '700 9px sans-serif'
+    ctx.fillText('把聊天发来，帮你读歪', 24, height - 25)
+
+    if (codeImage) {
+      ctx.drawImage(codeImage, width - 81, height - 66, 48, 48)
+    } else {
+      ctx.fillStyle = '#2D9EE0'
+      ctx.font = '900 9px sans-serif'
+      ctx.textAlign = 'right'
+      ctx.fillText('MISREAD REPLY', width - 24, height - 34)
+      ctx.textAlign = 'left'
+    }
+  },
+
+  saveReplyPoster: function(e) {
+    if (this.data.posterSaving) return
+    var index = Number(e.currentTarget.dataset.index)
+    if (index < 0 || index !== Math.floor(index)) return
+    var self = this
+    self.setData({ posterSaving: true, posterReplyIndex: index })
+    wx.showLoading({ title: '生成分享图中' })
+    self.renderReplyPoster(index).then(function(path) {
+      return new Promise(function(resolve, reject) {
+        wx.saveImageToPhotosAlbum({ filePath: path, success: resolve, fail: reject })
+      })
+    }).then(function() {
+      wx.hideLoading()
+      self.setData({ posterSaving: false })
+      wx.showToast({ title: '已保存到相册', icon: 'success' })
+    }).catch(function(err) {
+      wx.hideLoading()
+      self.setData({ posterSaving: false })
+      if (err && err.errMsg && err.errMsg.indexOf('auth deny') !== -1) {
+        wx.showModal({
+          title: '需要相册权限',
+          content: '开启相册权限后，才能保存分享图。',
+          confirmText: '去设置',
+          success: function(result) { if (result.confirm) wx.openSetting() }
+        })
+        return
+      }
+      wx.showToast({ title: (err && err.message) || '保存失败，请重试', icon: 'none' })
+    })
+  },
+
   refresh: function() {
     if (this.data.batchId && this.data.res) {
       Report.reportRefresh({
@@ -537,6 +728,9 @@ Page({
       batchId: '',
       feedbackStates: [],
       feedbackTarget: -1,
+      posterPath: '',
+      posterReplyIndex: -1,
+      posterSaving: false,
       profileId: '',
       profileName: '',
       profileRelation: '',
@@ -566,6 +760,89 @@ Page({
       promptVersion: FEEDBACK_PROMPT_VERSION,
       source: source
     })
-    return Share.misread(source)
+    var share = Share.misread(source)
+    if (this.data.posterPath) share.imageUrl = this.data.posterPath
+    return share
   }
 })
+
+function loadCanvasImage(canvas, path) {
+  if (!path) return Promise.resolve(null)
+  return new Promise(function(resolve) {
+    var image = canvas.createImage()
+    image.onload = function() { resolve(image) }
+    image.onerror = function() { resolve(null) }
+    image.src = path
+  })
+}
+
+function withTimeout(promise, timeout, fallback) {
+  return Promise.race([
+    promise,
+    new Promise(function(resolve) {
+      setTimeout(function() { resolve(fallback) }, timeout)
+    })
+  ])
+}
+
+function exportPoster(canvas, width, height, dpr, page) {
+  return new Promise(function(resolve, reject) {
+    setTimeout(function() {
+      wx.canvasToTempFilePath({
+        canvas: canvas,
+        fileType: 'png',
+        quality: 1,
+        destWidth: Math.round(width * dpr),
+        destHeight: Math.round(height * dpr),
+        success: function(result) { resolve(result.tempFilePath) },
+        fail: function() { reject(new Error('分享图生成失败')) }
+      }, page)
+    }, 50)
+  })
+}
+
+function roundRect(ctx, x, y, width, height, radius) {
+  var r = Math.min(radius, width / 2, height / 2)
+  ctx.beginPath()
+  ctx.moveTo(x + r, y)
+  ctx.arcTo(x + width, y, x + width, y + height, r)
+  ctx.arcTo(x + width, y + height, x, y + height, r)
+  ctx.arcTo(x, y + height, x, y, r)
+  ctx.arcTo(x, y, x + width, y, r)
+  ctx.closePath()
+}
+
+function drawWrappedPosterText(ctx, text, x, y, maxWidth, lineHeight, font, maxLines) {
+  ctx.font = font
+  var chars = String(text || '').split('')
+  var lines = []
+  var line = ''
+  for (var i = 0; i < chars.length; i++) {
+    if (chars[i] === '\n') {
+      if (line) lines.push(line)
+      line = ''
+      if (lines.length >= maxLines) break
+      continue
+    }
+    var test = line + chars[i]
+    if (ctx.measureText(test).width > maxWidth && line) {
+      lines.push(line)
+      line = chars[i]
+      if (lines.length >= maxLines) break
+    } else {
+      line = test
+    }
+  }
+  if (line && lines.length < maxLines) lines.push(line)
+  var consumed = lines.join('').length
+  if (consumed < chars.length && lines.length) {
+    var last = lines.length - 1
+    while (ctx.measureText(lines[last] + '…').width > maxWidth && lines[last]) {
+      lines[last] = lines[last].slice(0, -1)
+    }
+    lines[last] += '…'
+  }
+  lines.forEach(function(item, index) {
+    ctx.fillText(item, x, y + index * lineHeight)
+  })
+}
