@@ -145,7 +145,6 @@ Page({
   _loadingTimer: null,
   _copyTimer: null,
   _posterPromise: null,
-  _miniCodePromise: null,
   _submitting: false,
   _replyVariant: 0,
 
@@ -170,7 +169,6 @@ Page({
       ctx: safeDecode(options.ctx)
     })
     this.startPlaceholder()
-    this.ensureMiniCode()
   },
 
   onShow: function() {
@@ -517,40 +515,6 @@ Page({
     wx.showToast({ title: '已记下', icon: 'none', duration: 900 })
   },
 
-  ensureMiniCode: function() {
-    if (this._miniCodePromise) return this._miniCodePromise
-    var filePath = wx.env.USER_DATA_PATH + '/yidu-misread-code.png'
-    var fs = wx.getFileSystemManager()
-    this._miniCodePromise = new Promise(function(resolve) {
-      fs.access({
-        path: filePath,
-        success: function() { resolve(filePath) },
-        fail: function() {
-          wx.request({
-            url: getApp().globalData.apiBaseUrl + '/wxacode',
-            method: 'GET',
-            responseType: 'arraybuffer',
-            timeout: 8000,
-            success: function(res) {
-              if (res.statusCode !== 200 || !res.data) {
-                resolve('')
-                return
-              }
-              fs.writeFile({
-                filePath: filePath,
-                data: res.data,
-                success: function() { resolve(filePath) },
-                fail: function() { resolve('') }
-              })
-            },
-            fail: function() { resolve('') }
-          })
-        }
-      })
-    })
-    return this._miniCodePromise
-  },
-
   renderReplyPoster: function(index) {
     var item = this.data.res && this.data.res.replies && this.data.res.replies[index]
     if (!item) return Promise.reject(new Error('暂无可分享的回复'))
@@ -574,9 +538,7 @@ Page({
         canvas.height = canvasInfo.height * dpr
         ctx.scale(dpr, dpr)
 
-        withTimeout(self.ensureMiniCode(), 1800, '').then(function(codePath) {
-          return loadCanvasImage(canvas, codePath)
-        }).then(function(codeImage) {
+        loadCanvasImage(canvas, '/assets/misread-wxacode.jpg').then(function(codeImage) {
           self.drawReplyPoster(ctx, canvasInfo.width, canvasInfo.height, index, codeImage)
           return exportPoster(canvas, canvasInfo.width, canvasInfo.height, dpr, self)
         }).then(function(path) {
@@ -646,8 +608,8 @@ Page({
 
     ctx.strokeStyle = 'rgba(23,25,28,0.1)'
     ctx.beginPath()
-    ctx.moveTo(24, height - 72)
-    ctx.lineTo(width - 24, height - 72)
+    ctx.moveTo(24, height - 92)
+    ctx.lineTo(width - 24, height - 92)
     ctx.stroke()
 
     ctx.fillStyle = '#17191C'
@@ -658,7 +620,7 @@ Page({
     ctx.fillText('把聊天发来，帮你读歪', 24, height - 25)
 
     if (codeImage) {
-      ctx.drawImage(codeImage, width - 81, height - 66, 48, 48)
+      ctx.drawImage(codeImage, width - 82, height - 74, 62, 62)
     } else {
       ctx.fillStyle = '#2D9EE0'
       ctx.font = '900 9px sans-serif'
@@ -774,15 +736,6 @@ function loadCanvasImage(canvas, path) {
     image.onerror = function() { resolve(null) }
     image.src = path
   })
-}
-
-function withTimeout(promise, timeout, fallback) {
-  return Promise.race([
-    promise,
-    new Promise(function(resolve) {
-      setTimeout(function() { resolve(fallback) }, timeout)
-    })
-  ])
 }
 
 function exportPoster(canvas, width, height, dpr, page) {

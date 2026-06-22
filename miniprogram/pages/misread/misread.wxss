@@ -469,13 +469,23 @@
   line-height: 1.2;
 }
 
+.poster-code-preload,
 .misread-poster-canvas {
   position: fixed;
   left: -2000rpx;
   top: 0;
+  pointer-events: none;
+}
+
+.poster-code-preload {
+  width: 200rpx;
+  height: 200rpx;
+  opacity: 0;
+}
+
+.misread-poster-canvas {
   width: 630rpx;
   height: 1120rpx;
-  pointer-events: none;
 }
 
 .result-actions {
