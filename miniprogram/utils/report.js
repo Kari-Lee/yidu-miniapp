@@ -50,6 +50,21 @@ function replyPayload(event, info) {
   }
 }
 
+function toolPayload(event, info) {
+  info = info || {}
+  return {
+    event: event,
+    task: info.task || '',
+    mode: info.mode || '',
+    route: info.route || '',
+    title: redact(info.title, 160),
+    summary: redact(info.summary, 500),
+    source: redact(info.source, 1200),
+    text: redact(info.text, 500),
+    ts: Date.now()
+  }
+}
+
 function reportServeBatch(info) {
   info = info || {}
   var replies = info.replies || []
@@ -108,10 +123,30 @@ function reportShare(info) {
   })
 }
 
+function reportToolEvent(event, info) {
+  post(toolPayload(event, info))
+}
+
+function reportToolCopy(info) {
+  reportToolEvent('copy', info)
+}
+
+function reportToolShare(info) {
+  reportToolEvent('share', info)
+}
+
+function reportPosterSave(info) {
+  reportToolEvent('poster_save', info)
+}
+
 module.exports = {
   reportServeBatch: reportServeBatch,
   reportCopy: reportCopy,
   reportRating: reportRating,
   reportRefresh: reportRefresh,
-  reportShare: reportShare
+  reportShare: reportShare,
+  reportToolEvent: reportToolEvent,
+  reportToolCopy: reportToolCopy,
+  reportToolShare: reportToolShare,
+  reportPosterSave: reportPosterSave
 }

@@ -7,6 +7,7 @@ var Format = require('../../utils/format')
 var Profiles = require('../../utils/profiles')
 var OSS = require('../../utils/oss')
 var Poster = require('../../utils/resultPoster')
+var Report = require('../../utils/report')
 
 var GRADS = {
   anxious: "linear-gradient(135deg,#E17055,#D63031,#C0392B)",
@@ -375,6 +376,7 @@ Page({
   },
 
   onShareAppMessage: function() {
+    this.reportResultEvent('share')
     var share = Share.diagnose()
     if (this.data.posterPath) share.imageUrl = this.data.posterPath
     return share
@@ -404,7 +406,28 @@ Page({
 
   copyResult: function() {
     if (!this.data.res) return
-    wx.setClipboardData({ data: Format.diagnose(this.data.res) })
+    var text = Format.diagnose(this.data.res)
+    var self = this
+    wx.setClipboardData({
+      data: text,
+      success: function() { self.reportResultEvent('copy', text) }
+    })
+  },
+
+  reportResultEvent: function(event, text) {
+    if (!this.data.res) return
+    var res = this.data.res || {}
+    var payload = {
+      task: 'diagnose',
+      route: 'result',
+      title: '你：' + (res.user_label || '未知') + ' / Ta：' + (res.partner_label || '未知'),
+      summary: res.match || res.partner_advice || '',
+      source: this.data.text,
+      text: text || Format.diagnose(res)
+    }
+    if (event === 'copy') Report.reportToolCopy(payload)
+    else if (event === 'share') Report.reportToolShare(payload)
+    else if (event === 'poster_save') Report.reportPosterSave(payload)
   },
 
   buildPosterData: function() {
@@ -439,6 +462,7 @@ Page({
     }).then(function() {
       wx.hideLoading()
       self.setData({ posterSaving: false })
+      self.reportResultEvent('poster_save')
       wx.showToast({ title: '已保存到相册', icon: 'success' })
     }).catch(function(err) {
       wx.hideLoading()

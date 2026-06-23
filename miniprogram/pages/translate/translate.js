@@ -5,6 +5,7 @@ var N = require('../../utils/normalize')
 var Share = require('../../utils/share')
 var Format = require('../../utils/format')
 var Poster = require('../../utils/resultPoster')
+var Report = require('../../utils/report')
 var MSGS = ["解码潜台词", "翻译真实意图"]
 
 Page({
@@ -62,6 +63,7 @@ Page({
   },
 
   onShareAppMessage: function() {
+    this.reportResultEvent('share')
     var share = Share.translate()
     if (this.data.posterPath) share.imageUrl = this.data.posterPath
     return share
@@ -69,7 +71,28 @@ Page({
 
   copyResult: function() {
     if (!this.data.res) return
-    wx.setClipboardData({ data: Format.translate(this.data.res) })
+    var text = Format.translate(this.data.res)
+    var self = this
+    wx.setClipboardData({
+      data: text,
+      success: function() { self.reportResultEvent('copy', text) }
+    })
+  },
+
+  reportResultEvent: function(event, text) {
+    if (!this.data.res) return
+    var first = this.data.res.translations && this.data.res.translations[0] || {}
+    var payload = {
+      task: 'translate',
+      route: 'result',
+      title: first.original || '潜台词翻译',
+      summary: first.verdict || first.most_likely || '',
+      source: this.data.text,
+      text: text || Format.translate(this.data.res)
+    }
+    if (event === 'copy') Report.reportToolCopy(payload)
+    else if (event === 'share') Report.reportToolShare(payload)
+    else if (event === 'poster_save') Report.reportPosterSave(payload)
   },
 
   buildPosterData: function() {
@@ -103,6 +126,7 @@ Page({
     }).then(function() {
       wx.hideLoading()
       self.setData({ posterSaving: false })
+      self.reportResultEvent('poster_save')
       wx.showToast({ title: '已保存到相册', icon: 'success' })
     }).catch(function(err) {
       wx.hideLoading()

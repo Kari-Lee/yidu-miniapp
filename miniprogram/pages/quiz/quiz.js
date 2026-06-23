@@ -2,6 +2,7 @@ var D = require('../../utils/data')
 var H = require('../../utils/history')
 var Share = require('../../utils/share')
 var Format = require('../../utils/format')
+var Report = require('../../utils/report')
 
 var GRADS = {
   anxious: "linear-gradient(135deg,#E17055,#D63031,#C0392B)",
@@ -204,16 +205,37 @@ Page({
 
   copyResult: function() {
     if (!this.data.typeInfo) return
+    var text = Format.quiz(this.data.typeInfo, this.data.scoreList)
+    var self = this
     wx.setClipboardData({
-      data: Format.quiz(this.data.typeInfo, this.data.scoreList)
+      data: text,
+      success: function() { self.reportResultEvent('copy', text, 'result') }
     })
   },
 
   copyShareCaption: function() {
     if (!this.data.posterData) return
+    var text = this.data.posterData.caption + '\n\n微信小程序：已读 Yidu'
+    var self = this
     wx.setClipboardData({
-      data: this.data.posterData.caption + '\n\n微信小程序：已读 Yidu'
+      data: text,
+      success: function() { self.reportResultEvent('copy', text, 'share_caption') }
     })
+  },
+
+  reportResultEvent: function(event, text, route) {
+    if (!this.data.typeInfo) return
+    var payload = {
+      task: 'quiz',
+      route: route || 'result',
+      title: this.data.typeInfo.label || '依恋人格测试',
+      summary: this.data.typeInfo.desc || this.data.typeInfo.advice || '',
+      source: 'attachment_quiz',
+      text: text || Format.quiz(this.data.typeInfo, this.data.scoreList)
+    }
+    if (event === 'copy') Report.reportToolCopy(payload)
+    else if (event === 'share') Report.reportToolShare(payload)
+    else if (event === 'poster_save') Report.reportPosterSave(payload)
   },
 
   renderPoster: function() {
@@ -358,6 +380,7 @@ Page({
     }).then(function() {
       wx.hideLoading()
       self.setData({ posterSaving: false })
+      self.reportResultEvent('poster_save', '', 'poster')
       wx.showToast({ title: '已保存到相册', icon: 'success' })
     }).catch(function(err) {
       wx.hideLoading()
@@ -376,6 +399,7 @@ Page({
   },
 
   onShareAppMessage: function() {
+    this.reportResultEvent('share', '', 'app_message')
     var share = Share.quiz(this.data.typeInfo && this.data.typeInfo.label)
     if (this.data.posterData) share.title = this.data.posterData.shareTitle
     if (this.data.posterPath) share.imageUrl = this.data.posterPath
@@ -383,6 +407,7 @@ Page({
   },
 
   onShareTimeline: function() {
+    this.reportResultEvent('share', '', 'timeline')
     var share = {
       title: this.data.posterData ? this.data.posterData.shareTitle : '24题测出你的依恋人格',
       query: ''

@@ -642,6 +642,23 @@ Page({
     }).then(function() {
       wx.hideLoading()
       self.setData({ posterSaving: false })
+      var item = self.data.res && self.data.res.replies && self.data.res.replies[index]
+      if (item) {
+        Report.reportPosterSave({
+          task: 'misread',
+          mode: self.data.mode,
+          route: Prompt.getRoute((self.data.res && self.data.res.source) || self.data.text, self.data.mode),
+          batchId: self.data.batchId,
+          replyId: self.data.batchId ? self.data.batchId + '_' + index : '',
+          replyIndex: index,
+          promptVersion: FEEDBACK_PROMPT_VERSION,
+          weapon: item.type,
+          title: item.type || '已读乱回',
+          summary: item.warning || '',
+          source: (self.data.res && self.data.res.source) || self.data.text,
+          text: item.text
+        })
+      }
       wx.showToast({ title: '已保存到相册', icon: 'success' })
     }).catch(function(err) {
       wx.hideLoading()

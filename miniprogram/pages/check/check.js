@@ -6,6 +6,7 @@ var Share = require('../../utils/share')
 var Format = require('../../utils/format')
 var ChatImages = require('../../utils/chatImages')
 var Poster = require('../../utils/resultPoster')
+var Report = require('../../utils/report')
 var MSGS = ["评估杀伤力", "模拟Ta反应"]
 var REPLY_MSGS = ["拆解当前局面", "压低情绪浓度", "生成可发版本"]
 
@@ -208,6 +209,7 @@ Page({
   },
 
   onShareAppMessage: function() {
+    this.reportResultEvent('share')
     var share = Share.check(this.data.isReplyMode ? '下一句怎么回' : (this.data.res && this.data.res.verdict))
     if (this.data.posterPath) share.imageUrl = this.data.posterPath
     return share
@@ -215,7 +217,29 @@ Page({
 
   copyResult: function() {
     if (!this.data.res) return
-    wx.setClipboardData({ data: this.data.isReplyMode ? Format.reply(this.data.res) : Format.check(this.data.res) })
+    var text = this.data.isReplyMode ? Format.reply(this.data.res) : Format.check(this.data.res)
+    var self = this
+    wx.setClipboardData({
+      data: text,
+      success: function() { self.reportResultEvent('copy', text) }
+    })
+  },
+
+  reportResultEvent: function(event, text) {
+    if (!this.data.res) return
+    var res = this.data.res || {}
+    var task = this.data.isReplyMode ? 'reply' : 'check'
+    var payload = {
+      task: task,
+      route: this.data.isReplyMode ? 'reply_result' : 'check_result',
+      title: this.data.isReplyMode ? '下一句怎么回' : (res.verdict || '发不发检测'),
+      summary: this.data.isReplyMode ? (res.strategy || res.note || '') : (res.reason || res.prediction || ''),
+      source: this.data.text || this.data.replyTask || '',
+      text: text || (this.data.isReplyMode ? Format.reply(res) : Format.check(res))
+    }
+    if (event === 'copy') Report.reportToolCopy(payload)
+    else if (event === 'share') Report.reportToolShare(payload)
+    else if (event === 'poster_save') Report.reportPosterSave(payload)
   },
 
   buildPosterData: function() {
@@ -263,6 +287,7 @@ Page({
     }).then(function() {
       wx.hideLoading()
       self.setData({ posterSaving: false })
+      self.reportResultEvent('poster_save')
       wx.showToast({ title: '已保存到相册', icon: 'success' })
     }).catch(function(err) {
       wx.hideLoading()

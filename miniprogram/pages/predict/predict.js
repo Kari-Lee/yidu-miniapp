@@ -5,6 +5,7 @@ var Share = require('../../utils/share')
 var Format = require('../../utils/format')
 var ChatImages = require('../../utils/chatImages')
 var Poster = require('../../utils/resultPoster')
+var Report = require('../../utils/report')
 var MSGS = ["扫描关系轨迹", "模拟未来走向"]
 
 function safeDecode(v) {
@@ -163,6 +164,7 @@ Page({
   },
 
   onShareAppMessage: function() {
+    this.reportResultEvent('share')
     var share = Share.predict(this.data.res && this.data.res.stage)
     if (this.data.posterPath) share.imageUrl = this.data.posterPath
     return share
@@ -192,7 +194,28 @@ Page({
 
   copyResult: function() {
     if (!this.data.res) return
-    wx.setClipboardData({ data: Format.predict(this.data.res) })
+    var text = Format.predict(this.data.res)
+    var self = this
+    wx.setClipboardData({
+      data: text,
+      success: function() { self.reportResultEvent('copy', text) }
+    })
+  },
+
+  reportResultEvent: function(event, text) {
+    if (!this.data.res) return
+    var res = this.data.res || {}
+    var payload = {
+      task: 'predict',
+      route: 'result',
+      title: res.stage || '感情预测',
+      summary: res.stage_desc || res.todo || '',
+      source: this.data.text,
+      text: text || Format.predict(res)
+    }
+    if (event === 'copy') Report.reportToolCopy(payload)
+    else if (event === 'share') Report.reportToolShare(payload)
+    else if (event === 'poster_save') Report.reportPosterSave(payload)
   },
 
   buildPosterData: function() {
@@ -228,6 +251,7 @@ Page({
     }).then(function() {
       wx.hideLoading()
       self.setData({ posterSaving: false })
+      self.reportResultEvent('poster_save')
       wx.showToast({ title: '已保存到相册', icon: 'success' })
     }).catch(function(err) {
       wx.hideLoading()
