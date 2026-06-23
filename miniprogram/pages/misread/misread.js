@@ -538,10 +538,8 @@ Page({
         canvas.height = canvasInfo.height * dpr
         ctx.scale(dpr, dpr)
 
-        loadCanvasImage(canvas, '/assets/misread-wxacode.jpg').then(function(codeImage) {
-          self.drawReplyPoster(ctx, canvasInfo.width, canvasInfo.height, index, codeImage)
-          return exportPoster(canvas, canvasInfo.width, canvasInfo.height, dpr, self)
-        }).then(function(path) {
+        self.drawReplyPoster(ctx, canvasInfo.width, canvasInfo.height, index)
+        exportPoster(canvas, canvasInfo.width, canvasInfo.height, dpr, self).then(function(path) {
           self.setData({ posterPath: path, posterReplyIndex: index })
           resolve(path)
         }).catch(reject)
@@ -555,7 +553,7 @@ Page({
     return this._posterPromise
   },
 
-  drawReplyPoster: function(ctx, width, height, index, codeImage) {
+  drawReplyPoster: function(ctx, width, height, index) {
     var item = this.data.res.replies[index]
     var source = this.data.res.source || this.data.text || '聊天截图'
     var modeLabel = this.data.mode === 'crush' ? 'CRUSH MODE' : 'PERSON MODE'
@@ -619,15 +617,14 @@ Page({
     ctx.font = '700 9px sans-serif'
     ctx.fillText('把聊天发来，帮你读歪', 24, height - 25)
 
-    if (codeImage) {
-      ctx.drawImage(codeImage, width - 82, height - 74, 62, 62)
-    } else {
-      ctx.fillStyle = '#2D9EE0'
-      ctx.font = '900 9px sans-serif'
-      ctx.textAlign = 'right'
-      ctx.fillText('MISREAD REPLY', width - 24, height - 34)
-      ctx.textAlign = 'left'
-    }
+    ctx.fillStyle = '#2D9EE0'
+    ctx.font = '900 9px sans-serif'
+    ctx.textAlign = 'right'
+    ctx.fillText('MISREAD REPLY', width - 24, height - 43)
+    ctx.fillStyle = '#8B9198'
+    ctx.font = '700 8px sans-serif'
+    ctx.fillText('SAVE & SHARE', width - 24, height - 25)
+    ctx.textAlign = 'left'
   },
 
   saveReplyPoster: function(e) {
@@ -727,16 +724,6 @@ Page({
     return share
   }
 })
-
-function loadCanvasImage(canvas, path) {
-  if (!path) return Promise.resolve(null)
-  return new Promise(function(resolve) {
-    var image = canvas.createImage()
-    image.onload = function() { resolve(image) }
-    image.onerror = function() { resolve(null) }
-    image.src = path
-  })
-}
 
 function exportPoster(canvas, width, height, dpr, page) {
   return new Promise(function(resolve, reject) {

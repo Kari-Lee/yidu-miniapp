@@ -145,6 +145,5 @@
     <view class="active" data-tab="tools" bindtap="goHomeTab">工具</view>
     <view data-tab="record" bindtap="goHomeTab">记录</view>
   </view>
-  <image class="poster-code-preload" src="/assets/misread-wxacode.jpg" mode="aspectFit"></image>
   <canvas type="2d" id="misreadPoster" class="misread-poster-canvas"></canvas>
 </view>
