@@ -59,7 +59,7 @@ function isChickenText(text) {
   return /(世界上所有的惊喜和好运|当你学会了装傻|让别人羡慕太容易了|生活不会一直为难你|慢慢来，很多事情|人这一生最重要的|每一次沉默|真正的成长不是|有些路看起来很远|愿你成为自己的太阳|人生没有白走的路|别跟往事过不去|成年人的崩溃|你要悄悄拔尖|所有的相遇都是久别重逢)/.test(String(text || ''))
 }
 
-function inspect(result, mode, oppositeReplies) {
+function inspect(result, mode, oppositeReplies, recentReplies) {
   if (!result || result.safe === false) return []
   var replies = result.replies || []
   var source = String(result.source || '')
@@ -335,6 +335,16 @@ function inspect(result, mode, oppositeReplies) {
     })
   })
 
+  ;(recentReplies || []).forEach(function(oldItem) {
+    var oldText = String((oldItem && oldItem.text) || oldItem || '')
+    if (!oldText) return
+    texts.forEach(function(text) {
+      if (compact(text) === compact(oldText) || similarity(text, oldText) >= 0.46) {
+        addIssue(issues, '与最近同模式回答过于相似')
+      }
+    })
+  })
+
   return issues
 }
 
@@ -400,7 +410,13 @@ function rememberRecent(mode, replies) {
     }
   }).filter(function(item) { return item.text })
   if (!fresh.length) return
-  var list = fresh.concat(readRecent()).slice(0, RECENT_MAX)
+  var seen = {}
+  var list = fresh.concat(readRecent()).filter(function(item) {
+    var key = [item.mode || '', compact(item.weapon || ''), compact(item.text || '')].join(':')
+    if (!compact(item.text || '') || seen[key]) return false
+    seen[key] = true
+    return true
+  }).slice(0, RECENT_MAX)
   try { wx.setStorageSync(RECENT_KEY, list) } catch (e) {}
 }
 

@@ -420,7 +420,8 @@ Page({
       if (recognizedPreset) result = recognizedPreset
       if (!result.safe) return result
       var oppositeReplies = Quality.getOppositeReplies(result.source, self.data.mode)
-      var issues = Quality.inspect(result, self.data.mode, oppositeReplies)
+      var recent = Quality.getRecent(self.data.mode, 30)
+      var issues = Quality.inspect(result, self.data.mode, oppositeReplies, recent)
       if (raw && raw.mode && raw.mode !== self.data.mode) issues.unshift('模型返回了错误模式')
       if (!issues.length) return result
       // preset 已是人工校准，直接走原兜底；模型生成结果先交终审重写
@@ -429,7 +430,7 @@ Page({
       }
       self.setData({ loadingMsg: '正在重读一遍，挑更好的……' })
       return self.reviewResult(result, issues, options).then(function(reviewed) {
-        var reviewIssues = Quality.inspect(reviewed, self.data.mode, oppositeReplies)
+        var reviewIssues = Quality.inspect(reviewed, self.data.mode, oppositeReplies, recent)
         if (reviewed.mode && reviewed.mode !== self.data.mode) reviewIssues.unshift('终审返回了错误模式')
         return reviewIssues.length
           ? fallbackResult(reviewed.source || result.source, self.data.mode, self._replyVariant)
