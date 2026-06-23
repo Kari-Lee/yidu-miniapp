@@ -118,11 +118,13 @@
     </view>
 
     <button class="tool-primary" bindtap="goReply"><text>帮我写下一句</text><text>↗</text></button>
-    <view class="result-action-grid">
+    <view class="result-action-grid has-poster">
       <button class="result-action" bindtap="resetInput">重新预测</button>
       <button class="result-action" bindtap="copyResult">复制结果</button>
+      <button class="result-action" disabled="{{posterSaving}}" bindtap="saveResultPoster">{{posterSaving ? '生成中' : '保存结果图'}}</button>
       <button class="result-action dark" open-type="share">分享给朋友 ↗</button>
     </view>
     <view class="disclaimer">关系会被新的选择改写。预测结果不是结局通知书，只是提醒你别重复同一个坑。</view>
   </view>
+  <canvas type="2d" id="resultPoster" class="result-poster-canvas"></canvas>
 </view>

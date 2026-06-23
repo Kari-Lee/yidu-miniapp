@@ -4,12 +4,14 @@ var H = require('../../utils/history')
 var N = require('../../utils/normalize')
 var Share = require('../../utils/share')
 var Format = require('../../utils/format')
+var Poster = require('../../utils/resultPoster')
 var MSGS = ["解码潜台词", "翻译真实意图"]
 
 Page({
   data: {
     statusBarHeight: 0, step: 'input', text: '', err: null,
     hasInput: false, submitting: false, loadingMsg: '', res: null,
+    posterSaving: false, posterPath: '',
     colors: ['rgba(225,112,85,0.85)', 'rgba(230,168,23,0.85)', 'rgba(99,110,114,0.85)']
   },
   _timer: null,
@@ -24,7 +26,7 @@ Page({
   onInput: function(e) { this.setData({ text: e.detail.value, hasInput: !!e.detail.value.trim() }) },
   resetInput: function() {
     this._submitting = false
-    this.setData({ step: 'input', text: '', err: null, res: null, hasInput: false, submitting: false })
+    this.setData({ step: 'input', text: '', err: null, res: null, hasInput: false, submitting: false, posterSaving: false, posterPath: '' })
   },
 
   submit: function() {
@@ -51,7 +53,7 @@ Page({
         input: self.data.text.slice(0, 80),
         result: res
       })
-      self.setData({ step: 'result', res: res, submitting: false })
+      self.setData({ step: 'result', res: res, submitting: false, posterSaving: false, posterPath: '' })
     }).catch(function(e) {
       self.stopLoading()
       self._submitting = false
@@ -60,11 +62,52 @@ Page({
   },
 
   onShareAppMessage: function() {
-    return Share.translate()
+    var share = Share.translate()
+    if (this.data.posterPath) share.imageUrl = this.data.posterPath
+    return share
   },
 
   copyResult: function() {
     if (!this.data.res) return
     wx.setClipboardData({ data: Format.translate(this.data.res) })
+  },
+
+  buildPosterData: function() {
+    var first = this.data.res && this.data.res.translations && this.data.res.translations[0] || {}
+    var top = first.possibilities && first.possibilities[0] || {}
+    return {
+      kicker: 'SUBTEXT TRANSLATOR',
+      title: '人话版本已经翻译完了',
+      subtitle: first.verdict || '一句话不够判断真心，但足够看出语气和试探。',
+      accent: '#10A8E8',
+      sections: [
+        { label: 'TA SAID', title: first.original || this.data.text || 'Ta 的原话', body: first.verdict || '已生成潜台词分析' },
+        { label: 'MOST LIKELY', title: first.most_likely || top.meaning || '最可能的意思', body: first.why || top.reason || '看后续行动，比反复审一句话更有用。', dark: true },
+        { label: 'NEXT', title: '先观察后续动作', body: '不要把一句话当判决书。真正有用的是 Ta 接下来怎么做。' }
+      ],
+      footer: '潜台词不是读心术'
+    }
+  },
+
+  saveResultPoster: function() {
+    if (!this.data.res || this.data.posterSaving) return
+    var self = this
+    self.setData({ posterSaving: true })
+    wx.showLoading({ title: '生成结果图中' })
+    var task = self.data.posterPath
+      ? Promise.resolve(self.data.posterPath)
+      : Poster.render(self, '#resultPoster', self.buildPosterData())
+    task.then(function(path) {
+      self.setData({ posterPath: path })
+      return Poster.save(path)
+    }).then(function() {
+      wx.hideLoading()
+      self.setData({ posterSaving: false })
+      wx.showToast({ title: '已保存到相册', icon: 'success' })
+    }).catch(function(err) {
+      wx.hideLoading()
+      self.setData({ posterSaving: false })
+      Poster.handleSaveError(err)
+    })
   }
 })

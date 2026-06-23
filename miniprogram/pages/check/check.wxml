@@ -94,9 +94,10 @@
       <view class="result-copy">{{res.reason}}</view>
     </view>
 
-    <view class="result-action-grid">
+    <view class="result-action-grid has-poster">
       <button class="result-action" bindtap="resetInput">重新检测</button>
       <button class="result-action" bindtap="copyResult">复制结果</button>
+      <button class="result-action" disabled="{{posterSaving}}" bindtap="saveResultPoster">{{posterSaving ? '生成中' : '保存结果图'}}</button>
       <button class="result-action dark" open-type="share">分享给朋友 ↗</button>
     </view>
     <view class="disclaimer">发送建议只基于当前文本和所选类型，不代表对方一定会这样反应。</view>
@@ -121,11 +122,13 @@
     </view>
     <view wx:if="{{res.note}}" class="type-note"><text>类型提醒</text><view>{{res.note}}</view></view>
 
-    <view class="result-action-grid">
+    <view class="result-action-grid has-poster">
       <button class="result-action" bindtap="resetInput">重新生成</button>
       <button class="result-action" bindtap="copyResult">复制回复</button>
+      <button class="result-action" disabled="{{posterSaving}}" bindtap="saveResultPoster">{{posterSaving ? '生成中' : '保存结果图'}}</button>
       <button class="result-action dark" open-type="share">分享给朋友 ↗</button>
     </view>
     <view class="disclaimer">回复建议基于你提供的背景生成。别为了显得体面而憋死自己，也别为了爽一下把局面炸了。</view>
   </view>
+  <canvas type="2d" id="resultPoster" class="result-poster-canvas"></canvas>
 </view>

@@ -55,11 +55,13 @@
       <view class="likely-line"><text>最可能是 {{item.most_likely}}</text><view>{{item.why}}</view></view>
     </view>
 
-    <view class="result-action-grid">
+    <view class="result-action-grid has-poster">
       <button class="result-action" bindtap="resetInput">重新翻译</button>
       <button class="result-action" bindtap="copyResult">复制结果</button>
+      <button class="result-action" disabled="{{posterSaving}}" bindtap="saveResultPoster">{{posterSaving ? '生成中' : '保存结果图'}}</button>
       <button class="result-action dark" open-type="share">分享给朋友 ↗</button>
     </view>
     <view class="disclaimer">潜台词不是读心术。真正有用的是看 Ta 后续怎么做，而不是把一句话审到天亮。</view>
   </view>
+  <canvas type="2d" id="resultPoster" class="result-poster-canvas"></canvas>
 </view>

@@ -6,6 +6,7 @@ var Share = require('../../utils/share')
 var Format = require('../../utils/format')
 var Profiles = require('../../utils/profiles')
 var OSS = require('../../utils/oss')
+var Poster = require('../../utils/resultPoster')
 
 var GRADS = {
   anxious: "linear-gradient(135deg,#E17055,#D63031,#C0392B)",
@@ -184,7 +185,9 @@ Page({
     ctxEnabled: false, initialCtxEnabled: false, ctxPreviewOpen: false,
     hasInput: false, submitting: false, loadingMsg: '', res: null,
     userTI: null, partnerTI: null, userGrad: '', partnerGrad: '', userBg: '', partnerBg: '',
-    profileSynced: false
+    profileSynced: false,
+    posterSaving: false,
+    posterPath: ''
   },
   _timer: null,
 
@@ -295,7 +298,9 @@ Page({
       hasInput: false,
       res: null,
       submitting: false,
-      profileSynced: false
+      profileSynced: false,
+      posterSaving: false,
+      posterPath: ''
     })
   },
 
@@ -358,6 +363,8 @@ Page({
         userBg: BGS[res.user_type] || BGS.secure,
         partnerBg: BGS[res.partner_type] || BGS.secure,
         profileSynced: false,
+        posterSaving: false,
+        posterPath: '',
         submitting: false
       })
     }).catch(function(e) {
@@ -368,7 +375,9 @@ Page({
   },
 
   onShareAppMessage: function() {
-    return Share.diagnose()
+    var share = Share.diagnose()
+    if (this.data.posterPath) share.imageUrl = this.data.posterPath
+    return share
   },
 
   goReply: function() {
@@ -396,6 +405,46 @@ Page({
   copyResult: function() {
     if (!this.data.res) return
     wx.setClipboardData({ data: Format.diagnose(this.data.res) })
+  },
+
+  buildPosterData: function() {
+    var res = this.data.res || {}
+    var signal = res.signals && res.signals[0] || {}
+    return {
+      kicker: 'CHAT DIAGNOSIS',
+      title: '你们不是没感情，是模式在互相点火',
+      subtitle: '你：' + (res.user_label || '未知') + ' / Ta：' + (res.partner_label || '未知'),
+      accent: '#10A8E8',
+      sections: [
+        { label: 'INTERACTION LOOP', title: '互动循环', body: res.match || '已生成双方依恋分析。', dark: true },
+        { label: 'SIGNAL', title: signal.who ? signal.who + ' 暴露的信号' : '聊天里暴露的信号', body: signal.msg ? '「' + signal.msg + '」 ' + (signal.meaning || '') : '重点看谁在靠近，谁在撤退。' },
+        { label: 'FOR YOU', title: '给你', body: res.user_advice || '先看见自己的模式，再决定下一句怎么说。' },
+        { label: 'FOR TA', title: '应对 Ta', body: res.partner_advice || '别把对方的反应当成你的全部责任。' }
+      ],
+      footer: '关系档案，分开分析'
+    }
+  },
+
+  saveResultPoster: function() {
+    if (!this.data.res || this.data.posterSaving) return
+    var self = this
+    self.setData({ posterSaving: true })
+    wx.showLoading({ title: '生成结果图中' })
+    var task = self.data.posterPath
+      ? Promise.resolve(self.data.posterPath)
+      : Poster.render(self, '#resultPoster', self.buildPosterData())
+    task.then(function(path) {
+      self.setData({ posterPath: path })
+      return Poster.save(path)
+    }).then(function() {
+      wx.hideLoading()
+      self.setData({ posterSaving: false })
+      wx.showToast({ title: '已保存到相册', icon: 'success' })
+    }).catch(function(err) {
+      wx.hideLoading()
+      self.setData({ posterSaving: false })
+      Poster.handleSaveError(err)
+    })
   },
 
   syncPartnerType: function() {

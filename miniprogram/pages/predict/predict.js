@@ -4,6 +4,7 @@ var N = require('../../utils/normalize')
 var Share = require('../../utils/share')
 var Format = require('../../utils/format')
 var ChatImages = require('../../utils/chatImages')
+var Poster = require('../../utils/resultPoster')
 var MSGS = ["扫描关系轨迹", "模拟未来走向"]
 
 function safeDecode(v) {
@@ -25,6 +26,7 @@ Page({
     initialCtx: '', profileId: '', profileName: '', profileHistoryCount: 0, contextTip: '',
     ctxEnabled: false, initialCtxEnabled: false, ctxPreviewOpen: false,
     hasInput: false, submitting: false, loadingMsg: '', res: null,
+    posterSaving: false, posterPath: '',
     predBgs: ['#FFF5F3', '#FFF9E6', '#F0FFF4']
   },
   _timer: null,
@@ -111,7 +113,9 @@ Page({
       err: null,
       res: null,
       submitting: false,
-      hasInput: false
+      hasInput: false,
+      posterSaving: false,
+      posterPath: ''
     })
   },
 
@@ -150,7 +154,7 @@ Page({
         profileName: self.data.profileName,
         result: res
       })
-      self.setData({ step: 'result', res: res, submitting: false })
+      self.setData({ step: 'result', res: res, submitting: false, posterSaving: false, posterPath: '' })
     }).catch(function(e) {
       self.stopLoading()
       self._submitting = false
@@ -159,7 +163,9 @@ Page({
   },
 
   onShareAppMessage: function() {
-    return Share.predict(this.data.res && this.data.res.stage)
+    var share = Share.predict(this.data.res && this.data.res.stage)
+    if (this.data.posterPath) share.imageUrl = this.data.posterPath
+    return share
   },
 
   goReply: function() {
@@ -187,5 +193,46 @@ Page({
   copyResult: function() {
     if (!this.data.res) return
     wx.setClipboardData({ data: Format.predict(this.data.res) })
+  },
+
+  buildPosterData: function() {
+    var res = this.data.res || {}
+    var first = res.predictions && res.predictions[0] || {}
+    var second = res.predictions && res.predictions[1] || {}
+    return {
+      kicker: 'RELATION FORECAST',
+      title: res.stage || '这段关系会走到哪里',
+      subtitle: res.stage_desc || '不是算命，是看你们正在重复什么。',
+      accent: '#E17055',
+      sections: [
+        { label: 'CURRENT STAGE', title: res.stage || '当前阶段', body: res.stage_desc || '互动模式正在影响走向。', dark: true },
+        { label: first.time || 'NEXT', title: first.prob !== undefined ? '可能性 ' + first.prob + '%' : '下一步走向', body: first.scene || '看你们下一次怎么处理转折点。' },
+        { label: second.time || 'TURNING POINT', title: res.turning || '转折点', body: second.scene || res.turning || '关系会被新的选择改写。' },
+        { label: 'DO THIS NOW', title: '现在该做', body: res.todo || '别重复同一个坑。' }
+      ],
+      footer: '关系走向，不是结局通知书'
+    }
+  },
+
+  saveResultPoster: function() {
+    if (!this.data.res || this.data.posterSaving) return
+    var self = this
+    self.setData({ posterSaving: true })
+    wx.showLoading({ title: '生成结果图中' })
+    var task = self.data.posterPath
+      ? Promise.resolve(self.data.posterPath)
+      : Poster.render(self, '#resultPoster', self.buildPosterData())
+    task.then(function(path) {
+      self.setData({ posterPath: path })
+      return Poster.save(path)
+    }).then(function() {
+      wx.hideLoading()
+      self.setData({ posterSaving: false })
+      wx.showToast({ title: '已保存到相册', icon: 'success' })
+    }).catch(function(err) {
+      wx.hideLoading()
+      self.setData({ posterSaving: false })
+      Poster.handleSaveError(err)
+    })
   }
 })

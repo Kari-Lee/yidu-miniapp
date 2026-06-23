@@ -5,6 +5,7 @@ var N = require('../../utils/normalize')
 var Share = require('../../utils/share')
 var Format = require('../../utils/format')
 var ChatImages = require('../../utils/chatImages')
+var Poster = require('../../utils/resultPoster')
 var MSGS = ["评估杀伤力", "模拟Ta反应"]
 var REPLY_MSGS = ["拆解当前局面", "压低情绪浓度", "生成可发版本"]
 
@@ -27,7 +28,7 @@ Page({
     initialPType: '', profileId: '', profileName: '', profileHistoryCount: 0, contextTip: '',
     ctxEnabled: false, initialCtxEnabled: false, ctxPreviewOpen: false,
     isReplyMode: false,
-    hasInput: false, submitting: false, loadingMsg: '', res: null,
+    hasInput: false, submitting: false, loadingMsg: '', res: null, posterSaving: false, posterPath: '',
     typeOptions: [
       { key:'avoidant', emoji:'🧊', label:'回避型', color:'#0984E3', bg:'rgba(9,132,227,0.08)' },
       { key:'anxious', emoji:'🔥', label:'焦虑型', color:'#E17055', bg:'rgba(225,112,85,0.08)' },
@@ -139,6 +140,8 @@ Page({
       err: null,
       res: null,
       submitting: false,
+      posterSaving: false,
+      posterPath: '',
       hasInput: hasInput('', [], this.data.isReplyMode, this.data.replyTask)
     })
   },
@@ -196,7 +199,7 @@ Page({
         profileName: self.data.profileName,
         result: res
       })
-      self.setData({ step: 'result', res: res, submitting: false })
+      self.setData({ step: 'result', res: res, submitting: false, posterSaving: false, posterPath: '' })
     }).catch(function(e) {
       self.stopLoading()
       self._submitting = false
@@ -205,11 +208,66 @@ Page({
   },
 
   onShareAppMessage: function() {
-    return Share.check(this.data.isReplyMode ? '下一句怎么回' : (this.data.res && this.data.res.verdict))
+    var share = Share.check(this.data.isReplyMode ? '下一句怎么回' : (this.data.res && this.data.res.verdict))
+    if (this.data.posterPath) share.imageUrl = this.data.posterPath
+    return share
   },
 
   copyResult: function() {
     if (!this.data.res) return
     wx.setClipboardData({ data: this.data.isReplyMode ? Format.reply(this.data.res) : Format.check(this.data.res) })
+  },
+
+  buildPosterData: function() {
+    var res = this.data.res || {}
+    if (this.data.isReplyMode) {
+      var drafts = res.drafts || []
+      return {
+        kicker: 'REPLY WRITER',
+        title: '下一句先稳住局面',
+        subtitle: res.strategy || '把情绪降下来，把边界留下来。',
+        accent: '#10A8E8',
+        sections: [
+          { label: 'STRATEGY', title: '回复策略', body: res.strategy || '先说清楚，不急着赢。' },
+          { label: drafts[0] && drafts[0].label || 'DRAFT 1', title: drafts[0] && drafts[0].text || '可发送版本', body: drafts[0] && drafts[0].why || '能直接发，不卑微、不攻击。', dark: true },
+          { label: drafts[1] && drafts[1].label || 'DRAFT 2', title: drafts[1] && drafts[1].text || res.avoid || '别把局面炸了', body: drafts[1] && drafts[1].why || res.note || '体面不是憋死自己。' }
+        ],
+        footer: '下一句，别让情绪替你按发送'
+      }
+    }
+    return {
+      kicker: 'MESSAGE CHECK',
+      title: '这句话到底发不发',
+      subtitle: res.verdict || '先看风险，再决定要不要发送。',
+      accent: res.danger ? '#E17055' : '#00B894',
+      sections: [
+        { label: 'VERDICT', title: res.verdict || '发送风险', body: res.reason || res.type_note || '已生成发送建议。' },
+        { label: 'REACTION', title: res.trigger || '可能触发的点', body: res.prediction || 'Ta 看到后的第一反应会影响走向。', dark: true },
+        { label: 'SEND THIS', title: res.alternative || '先换一种说法', body: res.danger ? '风险高时，先发更稳的版本。' : '这句可发，但别把一句话当判决书。' }
+      ],
+      footer: '先看风险，再决定要不要发'
+    }
+  },
+
+  saveResultPoster: function() {
+    if (!this.data.res || this.data.posterSaving) return
+    var self = this
+    self.setData({ posterSaving: true })
+    wx.showLoading({ title: '生成结果图中' })
+    var task = self.data.posterPath
+      ? Promise.resolve(self.data.posterPath)
+      : Poster.render(self, '#resultPoster', self.buildPosterData())
+    task.then(function(path) {
+      self.setData({ posterPath: path })
+      return Poster.save(path)
+    }).then(function() {
+      wx.hideLoading()
+      self.setData({ posterSaving: false })
+      wx.showToast({ title: '已保存到相册', icon: 'success' })
+    }).catch(function(err) {
+      wx.hideLoading()
+      self.setData({ posterSaving: false })
+      Poster.handleSaveError(err)
+    })
   }
 })

@@ -619,3 +619,21 @@ page {
   font-size: 20rpx;
   letter-spacing: 2rpx;
 }
+
+.result-action-grid.has-poster .result-action.dark {
+  grid-column: auto;
+  min-height: 82rpx;
+  border-color: transparent;
+  background: #2D2F33;
+  color: #FFFFFF;
+  letter-spacing: 0;
+}
+
+.result-poster-canvas {
+  position: fixed;
+  left: -2000rpx;
+  top: 0;
+  width: 630rpx;
+  height: 1120rpx;
+  pointer-events: none;
+}
