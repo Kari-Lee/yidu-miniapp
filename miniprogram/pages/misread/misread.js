@@ -623,7 +623,7 @@ Page({
     ctx.fillText('MISREAD REPLY', width - 24, height - 43)
     ctx.fillStyle = '#8B9198'
     ctx.font = '700 8px sans-serif'
-    ctx.fillText('SAVE & SHARE', width - 24, height - 25)
+    ctx.fillText('YIDU TOOL', width - 24, height - 25)
     ctx.textAlign = 'left'
   },
 

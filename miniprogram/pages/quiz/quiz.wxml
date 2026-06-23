@@ -83,7 +83,7 @@
     </view>
 
     <view class="share-preview">
-      <view class="share-preview-kicker">朋友圈人格海报</view>
+      <view class="share-preview-kicker">人格结果海报</view>
       <view class="share-preview-title">{{posterData.caption}}</view>
       <view class="share-preview-foot">
         <text>保存海报，再配这句文案</text>
@@ -91,9 +91,9 @@
       </view>
     </view>
 
-    <button class="poster-save-btn" disabled="{{posterSaving}}" bindtap="savePoster">保存朋友圈海报</button>
+    <button class="poster-save-btn" disabled="{{posterSaving}}" bindtap="savePoster">保存结果海报</button>
     <view class="share-actions">
-      <button bindtap="copyShareCaption">复制朋友圈文案</button>
+      <button bindtap="copyShareCaption">复制配套文案</button>
       <button open-type="share">发给朋友</button>
     </view>
 

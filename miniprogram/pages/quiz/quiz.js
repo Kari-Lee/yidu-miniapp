@@ -365,7 +365,7 @@ Page({
       if (err && err.errMsg && err.errMsg.indexOf('auth deny') !== -1) {
         wx.showModal({
           title: '需要相册权限',
-          content: '开启相册权限后，才能保存朋友圈海报。',
+          content: '开启相册权限后，才能保存结果海报。',
           confirmText: '去设置',
           success: function(r) { if (r.confirm) wx.openSetting() }
         })
