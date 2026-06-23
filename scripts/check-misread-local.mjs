@@ -18,10 +18,16 @@ const cases = [
   { mode: "person", source: "你就是想太多" },
   { mode: "person", source: "我就是嘴硬" },
   { mode: "person", source: "在吗" },
+  { mode: "person", source: "你到底要我怎样" },
+  { mode: "person", source: "今天打算做什么呢" },
+  { mode: "person", source: "我今天真的好累" },
+  { mode: "person", source: "刚买的奶茶洒了一半" },
+  { mode: "person", source: "堵车堵得我想下车走" },
   { mode: "crush", source: "你喜欢我啊" },
   { mode: "crush", source: "你想我吗" },
   { mode: "crush", source: "跟哪个女的约会去了" },
   { mode: "crush", source: "看得我也想结婚了" },
+  { mode: "crush", source: "记得吃饭，别老熬夜" },
 ];
 
 function assertClean(result, mode, label, recent = []) {

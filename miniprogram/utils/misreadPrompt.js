@@ -238,6 +238,12 @@ var ROUTE_RULES = {
     '三条候选分别使用：①材料免交但本人到场；②把“怎么办”改成“什么时候”；③对方负责开头、我负责后续。',
     '禁止空头永远、霸总命令、当晚堵门和夸自己魅力。'
   ].join('\n'),
+  crush_care: [
+    '【本题强制路线：Crush 关心提醒】',
+    'Ta 在关心吃饭、熬夜、休息，不是发疯。必须接住关心，但不能肉麻。',
+    '三条分别用：①把关心当成证据存档；②乖一点但嘴上不承认；③把 Ta 的管束权轻轻递回去。',
+    '禁止冷处理、无关鸡汤、说明书复读、攻击式确诊。'
+  ].join('\n'),
   crush_general: [
     '【本题路线：crush 通用 · 推拉暧昧默认】',
     '没命中专属题型，但这是心动对象：必须用推拉暧昧接住，禁止落回 person 的强行鸡汤、说明书复读、凡尔赛长文、特质再就业这套冷处理。',
@@ -267,6 +273,18 @@ var ROUTE_RULES = {
     '三条候选限定为：①关键词对应的完整真实说明书/菜谱；②只问一个最无关的具体细节；③逐字照搬鸡汤库。',
     '禁止关心伤势、给处理建议、编“我上次”经历、人生比喻、改装鸡汤。',
     '无关细节问完就停。'
+  ].join('\n'),
+  daily_plan: [
+    '【本题强制路线：日程询问】',
+    '对方问今天、明天或周末干什么。不要正常报备，不要认真规划。',
+    '三条分别用：①一本正经的低能日程；②把计划拆成荒谬行政事项；③无关细节追问。',
+    '必须像真的在回答问题，只是重点错了。'
+  ].join('\n'),
+  relationship_demand: [
+    '【本题强制路线：对方逼问“你到底要我怎样”】',
+    '先把这个问题当成材料不完整、需求不明确或验收标准缺失。',
+    '三条分别用：①三栏归档；②窗口补材料；③验收标准缺失。',
+    '禁止讲道理、道歉、解释关系，也不要输出鸡汤。'
   ].join('\n'),
   flat: [
     '【本题强制路线：零把手】',
@@ -547,6 +565,30 @@ function getPreset(text, mode, variant, recent) {
     ])
   }
 
+  if (mode === 'crush' && route === 'crush_care') {
+    return presetResult(mode, source, [
+      presetReply('证据存档', '收到。我先理解成你在关心我，理解错了也不改。'),
+      presetReply('乖但不认', '饭会吃，夜少熬一点。你这句话我先存档，后面想你的时候当证据。', '预警：可能被问“谁让你想了”'),
+      presetReply('轻交权限', '你管得挺像那么回事，继续保持，别突然撤回。', '预警：可能让对话安静三秒')
+    ])
+  }
+
+  if (mode === 'person' && route === 'relationship_demand') {
+    return presetResult(mode, source, [
+      presetReply('三栏归档', '请把“你到底要我怎样”按事实、猜测和临时起意分成三栏，我这边好归档。'),
+      presetReply('窗口补材料', '这个问题需要本人携带样本到窗口说明，“怎样”目前没有单位，系统不让录。', '预警：可能收到一句“你正常点”'),
+      presetReply('验收缺失', '要求已收到，但验收标准缺失。请补充完成截图、失败示例和最终解释权归谁。', '预警：可能引发继续追问')
+    ])
+  }
+
+  if (mode === 'person' && route === 'daily_plan') {
+    return presetResult(mode, source, [
+      presetReply('低能日程', '上午维持基本运转，下午观察自己有没有变成熟，晚上视情况装作今天很有收获。'),
+      presetReply('事项拆分', '今日计划已生成：起床、吃饭、回消息。第三项视对方态度决定是否延期。', '预警：可能被追问第三项'),
+      presetReply('无关细节', '请把“今天”精确到上午、下午、晚上，我这边不能整天承包。', '预警：可能收到一个问号')
+    ])
+  }
+
   if (mode === 'person' && route === 'boast' && /最厉害/.test(source)) {
     return presetResult(mode, source, [
       presetReply('排名追问', '第二是谁？给个联系方式，第一我已经认识了。'),
@@ -560,6 +602,30 @@ function getPreset(text, mode, variant, recent) {
       presetReply('说明书复读', '炒粉干做法：粉干提前用温水泡软，鸡蛋炒散盛出，锅中放油，下肉丝、香菇、包菜翻炒，加入粉干、生抽和少量盐，大火翻炒至水分收干，最后放回鸡蛋和葱段炒匀出锅。'),
       presetReply('无关细节', '用的是什么牌子的油。', '预警：可能收到一句“这是重点吗”'),
       presetReply('强行鸡汤', chickenFor(source, mode, variant, 4), '预警：可能收到一个问号')
+    ])
+  }
+
+  if (mode === 'person' && route === 'daily_incident' && /(好累|累死|困死|好困|上班|加班|老板.*加活)/.test(source)) {
+    return presetResult(mode, source, [
+      presetReply('设备说明', '人体连续运行后可能出现响应变慢、语言变少和看谁都像任务弹窗。请先接入晚饭，再观察二十分钟。'),
+      presetReply('无关细节', '你这个累是全款累，还是分期累。', '预警：可能收到一句“都累”'),
+      presetReply('强行鸡汤', chickenFor(source, mode, variant, 6, recent), '预警：可能收到一个问号')
+    ])
+  }
+
+  if (mode === 'person' && route === 'daily_incident' && /奶茶.*洒|洒.*奶茶/.test(source)) {
+    return presetResult(mode, source, [
+      presetReply('事故登记', '请提供奶茶品牌、甜度、冰量和案发地面材质，我这边先按液体出逃处理。'),
+      presetReply('极简冷接', '剩下一半现在归谁管。', '预警：可能收到一个问号'),
+      presetReply('强行鸡汤', chickenFor(source, mode, variant, 7, recent), '预警：可能收到一个问号')
+    ])
+  }
+
+  if (mode === 'person' && route === 'daily_incident' && /堵车/.test(source)) {
+    return presetResult(mode, source, [
+      presetReply('道路播报', '前方拥堵不是路的问题，是所有人都临时决定和你同路。'),
+      presetReply('无关细节', '你下车走的话，车同意吗。', '预警：可能收到一句“你有病吧”'),
+      presetReply('强行鸡汤', chickenFor(source, mode, variant, 8, recent), '预警：可能收到一个问号')
     ])
   }
 
@@ -635,14 +701,17 @@ function getRoute(text, mode) {
   if (mode === 'crush' && /(想我吗|在乎我吗|爱我吗|想不想我)/.test(text)) return 'crush_true_test'
   if (mode === 'crush' && /(想结婚了|也想结婚|想要结婚)/.test(text)) return 'crush_marriage'
   if (mode === 'crush' && /(喜欢上你了|我喜欢你了|我爱上你了|我喜欢你$|我爱你$)/.test(text)) return 'crush_confession'
+  if (mode === 'crush' && /(记得吃饭|别老熬夜|早点睡|注意休息|照顾好自己)/.test(text)) return 'crush_care'
   if (mode === 'crush') return 'crush_general'
   if (/(喜欢上你了|我喜欢你了|我爱上你了|我喜欢你$|我爱你$)/.test(text)) return 'reference_confession'
+  if (/(你到底要我怎样|你要我怎样|你想怎么样|还要我怎样|你到底想怎样)/.test(text)) return 'relationship_demand'
   if (/(好心疼你|心疼你|心疼我|替你心疼)/.test(text)) return 'sympathy_literal'
   if (/不要花那么多时间难过.*更多时间快乐/.test(text)) return 'quote_flip'
   if (/(我要控制你|想控制你|控制一下你)/.test(text)) return 'control_manual'
   if (/(太认真|容易认真|想太多|嘴硬|记仇|疑心|敏感|逐字|脑补)/.test(text)) return 'trait'
   if (/(最厉害|最清醒|看透|无敌|第一名|很优秀|比.*厉害)/.test(text)) return 'boast'
-  if (/(被油溅|摔了|堵车|烫到|坏了|洒了|失眠|好困|上班|加班)/.test(text)) return 'daily_incident'
+  if (/(今天|明天|周末).*(打算|准备|计划|干嘛|做什么)|在干嘛呢/.test(text)) return 'daily_plan'
+  if (/(被油溅|摔了|堵车|烫到|坏了|洒了|失眠|好困|困死|好累|累死|上班|加班|老板.*加活)/.test(text)) return 'daily_incident'
   if (/^(在吗|干嘛呢?|吃饭了吗?|睡了吗?|早|早安|晚安|今天天气不错)[？?。！!]*$/.test(text)) return 'flat'
   if (/(发疯|笑死|变哑巴|手指断|我们是SHE|蔡徐坤|秦始皇)/.test(text)) return 'already_joking'
   return 'general'

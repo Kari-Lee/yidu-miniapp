@@ -311,11 +311,44 @@ function inspect(result, mode, oppositeReplies, recentReplies) {
     }
   }
   if (route === 'daily_incident') {
-    var hasManual = texts.some(function(text) {
-      return /(做法|步骤|锅中|倒入|加入|翻炒|使用方法|注意事项)/.test(text) && text.length >= 45
-    })
     var hasChicken = hasReplyType(replies, /鸡汤/)
-    if (!hasManual || !hasChicken) addIssue(issues, '日常小事没有完整说明书和原版鸡汤')
+    if (/(炒粉干|粉干|被油溅)/.test(source)) {
+      var hasManual = texts.some(function(text) {
+        return /(做法|步骤|锅中|倒入|加入|翻炒|使用方法|注意事项)/.test(text) && text.length >= 45
+      })
+      if (!hasManual || !hasChicken) addIssue(issues, '日常小事没有完整说明书和原版鸡汤')
+    } else if (/(好累|累死|困死|好困|上班|加班|老板.*加活)/.test(source)) {
+      if (!texts.some(function(text) { return /(连续运行|任务弹窗|全款累|分期累)/.test(text) })) {
+        addIssue(issues, '疲惫题没有误读成设备运行或疲劳计费')
+      }
+    } else if (/奶茶.*洒|洒.*奶茶/.test(source)) {
+      if (!texts.some(function(text) { return /(奶茶品牌|甜度|冰量|液体出逃|剩下一半)/.test(text) })) {
+        addIssue(issues, '奶茶洒了没有误读成事故登记')
+      }
+    } else if (/堵车/.test(source)) {
+      if (!texts.some(function(text) { return /(同路|下车走|车同意)/.test(text) })) {
+        addIssue(issues, '堵车题没有读歪到车和道路')
+      }
+    }
+  }
+  if (route === 'daily_plan') {
+    if (!texts.some(function(text) { return /(今日计划|上午|下午|晚上|今天|整天承包)/.test(text) })) {
+      addIssue(issues, '日程题没有生成错重点计划')
+    }
+  }
+  if (route === 'relationship_demand') {
+    if (!texts.some(function(text) { return /(事实、猜测和临时起意|三栏|窗口|验收标准|最终解释权)/.test(text) })) {
+      addIssue(issues, '逼问题没有转成材料或验收问题')
+    }
+    if (texts.some(isChickenText)) addIssue(issues, '逼问题不应使用无关鸡汤')
+  }
+  if (route === 'crush_care') {
+    if (hasReplyType(replies, /鸡汤/) || texts.some(isChickenText)) {
+      addIssue(issues, 'Crush 关心题不应使用无关鸡汤')
+    }
+    if (!texts.some(function(text) { return /(关心|饭会吃|少熬|管得|撤回|存档)/.test(text) })) {
+      addIssue(issues, 'Crush 关心题没有接住关心')
+    }
   }
   if (route === 'flat') {
     texts.forEach(function(text) {
