@@ -166,6 +166,7 @@ function callWithBase64Fallback(self, um, uploadError, requestOptions) {
     var fallbackOptions = {
       onRetry: requestOptions.onRetry,
       clientMeta: {
+        task: 'diagnose',
         imageTransport: 'base64-fallback',
         uploadFallbackCode: uploadError && uploadError.code ? uploadError.code : 'UNKNOWN',
         uploadFallbackDetail: uploadError && uploadError.detail ? uploadError.detail : ''
@@ -318,7 +319,8 @@ Page({
     var um = (ctx ? '关系背景：' + ctx + '\n\n' : '') +
       (self.data.text.trim() ? '聊天记录：\n' + self.data.text : '请分析这些聊天记录截图')
     var requestOptions = {
-      onRetry: function() { self.setData({ loadingMsg: '连接波动，正在自动重试' }) }
+      onRetry: function() { self.setData({ loadingMsg: '连接波动，正在自动重试' }) },
+      clientMeta: { task: 'diagnose' }
     }
 
     var uploadImages = totalImageBytes(self.data.imgs) > MAX_TOTAL_BYTES
@@ -334,7 +336,7 @@ Page({
         self.setData({ loadingMsg: '识别聊天内容' })
         return API.callAI(D.P.diagnose, um, null, imageKeys, {
           onRetry: requestOptions.onRetry,
-          clientMeta: { imageTransport: 'oss' }
+          clientMeta: { task: 'diagnose', imageTransport: 'oss' }
         })
       }, function(err) {
         return callWithBase64Fallback(self, um, err, requestOptions)

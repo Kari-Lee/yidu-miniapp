@@ -1,6 +1,7 @@
 var app = getApp()
 var REQUEST_TIMEOUT = 115000
 var RETRY_DELAY = 800
+var RETRY_MAX_ELAPSED = 12000
 var pendingRequests = {}
 
 function getErrorMessage(r) {
@@ -36,6 +37,7 @@ function parseResponse(data) {
 
 function requestOnce(body) {
   return new Promise(function(resolve, reject) {
+    var startedAt = Date.now()
     wx.request({
       url: app.globalData.apiBaseUrl + '/chat',
       method: 'POST',
@@ -52,6 +54,7 @@ function requestOnce(body) {
         } else {
           var err = new Error(getErrorMessage(r))
           err.statusCode = r.statusCode
+          err.elapsedMs = Date.now() - startedAt
           err.retryable = r.statusCode === 502 || r.statusCode === 503
           reject(err)
         }
@@ -62,6 +65,7 @@ function requestOnce(body) {
           ? '这次分析超时了，内容已保留，请直接重试'
           : '网络连接失败'
         var err = new Error(msg)
+        err.elapsedMs = Date.now() - startedAt
         err.retryable = !timedOut
         reject(err)
       }
@@ -101,6 +105,7 @@ function callAI(sys, message, images, imageKeys, options) {
 
   var promise = requestOnce(body).catch(function(err) {
     if (!err.retryable) throw err
+    if (err.elapsedMs && err.elapsedMs > RETRY_MAX_ELAPSED) throw err
     if (options.onRetry) options.onRetry()
     return wait(RETRY_DELAY).then(function() { return requestOnce(body) })
   })

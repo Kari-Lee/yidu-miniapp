@@ -139,7 +139,8 @@ Page({
     ChatImages.callAI(D.P.predict, um, self.data.imgs, {
       onRetry: function() { self.setData({ loadingMsg: '连接波动，正在自动重试' }) },
       onStatus: function(message) { self.setData({ loadingMsg: message }) },
-      onPrepared: function(imgs) { self.setData({ imgs: imgs }) }
+      onPrepared: function(imgs) { self.setData({ imgs: imgs }) },
+      clientMeta: { task: 'predict' }
     }).then(function(res) {
       self.stopLoading()
       self._submitting = false

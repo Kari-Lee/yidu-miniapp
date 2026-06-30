@@ -40,7 +40,8 @@ Page({
     self._timer = setInterval(function() { n++; self.setData({ loadingMsg: MSGS[n % MSGS.length] }) }, 1200)
 
     API.callAI(D.P.translate, 'Ta说的话：\n' + self.data.text, null, null, {
-      onRetry: function() { self.setData({ loadingMsg: '连接波动，正在自动重试' }) }
+      onRetry: function() { self.setData({ loadingMsg: '连接波动，正在自动重试' }) },
+      clientMeta: { task: 'translate' }
     }).then(function(res) {
       self.stopLoading()
       self._submitting = false

@@ -179,7 +179,8 @@ Page({
     var requestOptions = {
       onRetry: function() { self.setData({ loadingMsg: '连接波动，正在自动重试' }) },
       onStatus: function(message) { self.setData({ loadingMsg: message }) },
-      onPrepared: function(imgs) { self.setData({ imgs: imgs }) }
+      onPrepared: function(imgs) { self.setData({ imgs: imgs }) },
+      clientMeta: { task: self.data.isReplyMode ? 'reply' : 'check' }
     }
     var request = self.data.isReplyMode
       ? API.callAI(prompt, um, null, null, requestOptions)
