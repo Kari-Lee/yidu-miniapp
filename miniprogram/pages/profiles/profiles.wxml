@@ -105,14 +105,8 @@
     </view>
 
     <view class="profile-detail-link">
-      <text>查看完整档案</text>
+      <text>打开档案分析</text>
       <text>↗</text>
-    </view>
-
-    <view class="profile-tools">
-      <view catchtap="goDiagnose" data-id="{{item.id}}">聊天确诊</view>
-      <view catchtap="goCheck" data-id="{{item.id}}">发不发</view>
-      <view catchtap="goPredict" data-id="{{item.id}}">感情预测</view>
     </view>
 
     <view class="profile-manage">

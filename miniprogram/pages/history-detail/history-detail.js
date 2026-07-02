@@ -4,11 +4,22 @@ var D = require('../../utils/data')
 var Profiles = require('../../utils/profiles')
 var ProfileContext = require('../../utils/profileContext')
 
+function feedbackView(feedback) {
+  if (!feedback || (!feedback.action && !feedback.response)) return null
+  var actionMap = { sent: '已发', skipped: '不发了', thinking: '再想想' }
+  var responseMap = { replied: '回了', silent: '没回', cold: '很敷衍' }
+  return {
+    action: actionMap[feedback.action] || '',
+    response: responseMap[feedback.response] || ''
+  }
+}
+
 Page({
   data: {
     statusBarHeight: 0,
     record: null,
     res: null,
+    feedbackView: null,
     profileSynced: false
   },
 
@@ -19,7 +30,12 @@ Page({
 
   loadRecord: function(id) {
     var record = H.getRecord(id)
-    this.setData({ record: record, res: record && record.result || null, profileSynced: false })
+    this.setData({
+      record: record,
+      res: record && record.result || null,
+      feedbackView: record ? feedbackView(record.feedback) : null,
+      profileSynced: false
+    })
   },
 
   goBack: function() {
@@ -82,7 +98,7 @@ Page({
     } else if (record.kind === 'diagnose') {
       wx.navigateTo({ url: '/pages/diagnose/diagnose' + joiner })
     } else if (record.kind === 'translate') {
-      wx.navigateTo({ url: '/pages/translate/translate' })
+      wx.navigateTo({ url: '/pages/translate/translate' + joiner })
     } else if (record.kind === 'check') {
       var profile = record.profileId ? ProfileContext.findProfile(record.profileId) : null
       var checkParams = profile && profile.type ? 'pType=' + profile.type + (params ? '&' + params : '') : params

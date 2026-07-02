@@ -5,7 +5,7 @@ var Releases = require('../../utils/releases')
 Page({
   data: {
     statusBarHeight: 0,
-    activeTab: 'test',
+    activeTab: 'relation',
     dailyQuote: '',
     updateNotice: null,
     showUpdateNotice: false,
@@ -26,7 +26,7 @@ Page({
     this.setData({
       statusBarHeight: app.globalData.statusBarHeight,
       dailyQuote: data.getDailyQuote(),
-      activeTab: options && options.tab ? options.tab : 'test'
+      activeTab: options && options.tab && options.tab !== 'tools' ? options.tab : 'relation'
     })
     this.startMisreadSamples()
   },

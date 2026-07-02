@@ -185,5 +185,19 @@
       <button bindtap="copyRecord">复制结果</button>
       <button class="dark" bindtap="reAnalyze">再分析一次 ↗</button>
     </view>
+
+    <view wx:if="{{feedbackView}}" class="record-feedback">
+      <view class="feedback-kicker">FOLLOW UP</view>
+      <view class="feedback-grid">
+        <view wx:if="{{feedbackView.action}}">
+          <text>你的动作</text>
+          <view>{{feedbackView.action}}</view>
+        </view>
+        <view wx:if="{{feedbackView.response}}">
+          <text>Ta 的反应</text>
+          <view>{{feedbackView.response}}</view>
+        </view>
+      </view>
+    </view>
   </view>
 </view>

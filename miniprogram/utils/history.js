@@ -57,8 +57,28 @@ function removeRecord(id) {
   wx.setStorageSync(KEY, list)
 }
 
+function updateRecord(id, patch) {
+  var updated = null
+  var list = getRecords().map(function(item) {
+    if (item.id !== id) return item
+    updated = Object.assign({}, item, patch || {})
+    return updated
+  })
+  if (updated) wx.setStorageSync(KEY, list)
+  return updated
+}
+
+function setRecordFeedback(id, feedback) {
+  var value = Object.assign({
+    updatedAt: Date.now()
+  }, feedback || {})
+  return updateRecord(id, { feedback: value })
+}
+
 module.exports = {
   addRecord: addRecord,
+  updateRecord: updateRecord,
+  setRecordFeedback: setRecordFeedback,
   getRecords: getRecords,
   getRecord: getRecord,
   getRecordsByProfile: getRecordsByProfile,

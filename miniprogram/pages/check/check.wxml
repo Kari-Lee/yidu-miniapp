@@ -100,6 +100,20 @@
       <button class="result-action" disabled="{{posterSaving}}" bindtap="saveResultPoster">{{posterSaving ? '生成中' : '保存结果图'}}</button>
       <button class="result-action dark" open-type="share">分享给朋友 ↗</button>
     </view>
+    <view wx:if="{{currentRecordId}}" class="daily-feedback">
+      <view class="feedback-title">这次你准备怎么做？</view>
+      <view class="feedback-row">
+        <view class="{{feedbackAction === 'sent' ? 'active' : ''}}" data-value="sent" bindtap="markAction">已发</view>
+        <view class="{{feedbackAction === 'skipped' ? 'active' : ''}}" data-value="skipped" bindtap="markAction">不发了</view>
+        <view class="{{feedbackAction === 'thinking' ? 'active' : ''}}" data-value="thinking" bindtap="markAction">再想想</view>
+      </view>
+      <view class="feedback-title sub">Ta 后来回了吗？</view>
+      <view class="feedback-row">
+        <view class="{{feedbackResponse === 'replied' ? 'active' : ''}}" data-value="replied" bindtap="markResponse">回了</view>
+        <view class="{{feedbackResponse === 'silent' ? 'active' : ''}}" data-value="silent" bindtap="markResponse">没回</view>
+        <view class="{{feedbackResponse === 'cold' ? 'active' : ''}}" data-value="cold" bindtap="markResponse">很敷衍</view>
+      </view>
+    </view>
     <view class="disclaimer">发送建议只基于当前文本和所选类型，不代表对方一定会这样反应。</view>
   </view>
 
@@ -127,6 +141,20 @@
       <button class="result-action" bindtap="copyResult">复制回复</button>
       <button class="result-action" disabled="{{posterSaving}}" bindtap="saveResultPoster">{{posterSaving ? '生成中' : '保存结果图'}}</button>
       <button class="result-action dark" open-type="share">分享给朋友 ↗</button>
+    </view>
+    <view wx:if="{{currentRecordId}}" class="daily-feedback">
+      <view class="feedback-title">这次你准备怎么做？</view>
+      <view class="feedback-row">
+        <view class="{{feedbackAction === 'sent' ? 'active' : ''}}" data-value="sent" bindtap="markAction">已发</view>
+        <view class="{{feedbackAction === 'skipped' ? 'active' : ''}}" data-value="skipped" bindtap="markAction">不发了</view>
+        <view class="{{feedbackAction === 'thinking' ? 'active' : ''}}" data-value="thinking" bindtap="markAction">再想想</view>
+      </view>
+      <view class="feedback-title sub">Ta 后来回了吗？</view>
+      <view class="feedback-row">
+        <view class="{{feedbackResponse === 'replied' ? 'active' : ''}}" data-value="replied" bindtap="markResponse">回了</view>
+        <view class="{{feedbackResponse === 'silent' ? 'active' : ''}}" data-value="silent" bindtap="markResponse">没回</view>
+        <view class="{{feedbackResponse === 'cold' ? 'active' : ''}}" data-value="cold" bindtap="markResponse">很敷衍</view>
+      </view>
     </view>
     <view class="disclaimer">回复建议基于你提供的背景生成。别为了显得体面而憋死自己，也别为了爽一下把局面炸了。</view>
   </view>

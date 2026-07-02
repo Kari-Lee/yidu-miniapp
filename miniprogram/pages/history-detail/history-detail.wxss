@@ -533,6 +533,48 @@
   color: #FFFFFF;
 }
 
+.record-feedback {
+  margin-top: 18rpx;
+  padding: 28rpx 26rpx;
+  border-top: 6rpx solid #10A8E8;
+  background: #FFFFFF;
+}
+
+.feedback-kicker {
+  color: #10A8E8;
+  font-size: 18rpx;
+  font-weight: 900;
+  letter-spacing: 4rpx;
+}
+
+.feedback-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 14rpx;
+  margin-top: 20rpx;
+}
+
+.feedback-grid > view {
+  min-height: 92rpx;
+  padding: 18rpx 20rpx;
+  box-sizing: border-box;
+  background: #F3F4F8;
+}
+
+.feedback-grid text {
+  display: block;
+  color: rgba(45,47,51,0.44);
+  font-size: 19rpx;
+  font-weight: 900;
+}
+
+.feedback-grid view view {
+  margin-top: 6rpx;
+  color: #2D2F33;
+  font-size: 28rpx;
+  font-weight: 900;
+}
+
 .record-missing {
   position: relative;
   margin-top: 46rpx;

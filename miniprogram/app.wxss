@@ -629,6 +629,49 @@ page {
   letter-spacing: 0;
 }
 
+.daily-feedback {
+  margin-top: 26rpx;
+  padding: 28rpx 26rpx;
+  border-top: 6rpx solid #10A8E8;
+  background: #FFFFFF;
+  box-sizing: border-box;
+}
+
+.feedback-title {
+  color: #2D2F33;
+  font-size: 24rpx;
+  font-weight: 900;
+}
+
+.feedback-title.sub {
+  margin-top: 24rpx;
+}
+
+.feedback-row {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 12rpx;
+  margin-top: 16rpx;
+}
+
+.feedback-row view {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 70rpx;
+  border-radius: 18rpx;
+  background: #F3F4F8;
+  color: #7F8590;
+  font-size: 22rpx;
+  font-weight: 900;
+  text-align: center;
+}
+
+.feedback-row view.active {
+  background: #2D2F33;
+  color: #FFFFFF;
+}
+
 .result-poster-canvas {
   position: fixed;
   left: -2000rpx;

@@ -116,7 +116,7 @@
   align-items: flex-end;
   justify-content: space-between;
   gap: 24rpx;
-  margin: 22rpx 4rpx 18rpx;
+  margin: 18rpx 4rpx 16rpx;
 }
 
 .section-heading view {
@@ -125,64 +125,108 @@
   text-align: right;
 }
 
-.quick-tools {
-  border-top: 2rpx solid rgba(45,47,51,0.09);
+.action-heading {
+  margin-top: 28rpx;
 }
 
-.tool-entry {
+.today-card {
+  position: relative;
+  padding: 28rpx 28rpx 26rpx;
+  border-left: 6rpx solid #10A8E8;
+  background: #FFFFFF;
+  overflow: hidden;
+}
+
+.today-kicker {
+  position: relative;
+  z-index: 1;
+  color: #10A8E8;
+  font-size: 18rpx;
+  font-weight: 900;
+  letter-spacing: 4rpx;
+}
+
+.today-title {
+  position: relative;
+  z-index: 1;
+  margin-top: 14rpx;
+  color: #2D2F33;
+  font-size: 34rpx;
+  font-weight: 900;
+  line-height: 1.34;
+}
+
+.today-copy {
+  position: relative;
+  z-index: 1;
+  width: 100%;
+  margin-top: 10rpx;
+  color: rgba(45,47,51,0.56);
+  font-size: 23rpx;
+  line-height: 1.62;
+}
+
+.today-action {
+  position: relative;
+  z-index: 1;
   display: flex;
   align-items: center;
-  gap: 22rpx;
-  min-height: 116rpx;
+  justify-content: space-between;
+  gap: 20rpx;
+  min-height: 78rpx;
+  margin-top: 22rpx;
   padding: 0 24rpx;
-  border-bottom: 2rpx solid rgba(45,47,51,0.09);
+  background: #2D2F33;
+  color: #FFFFFF;
+  font-size: 25rpx;
+  font-weight: 900;
   box-sizing: border-box;
+}
+
+.today-action text:last-child {
+  color: #10A8E8;
+  font-size: 30rpx;
+}
+
+.analysis-list {
   background: #FFFFFF;
 }
 
-.tool-entry-dark {
-  border-bottom-color: rgba(255,255,255,0.12);
-  background: #2D2F33;
+.analysis-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 22rpx;
+  min-height: 108rpx;
+  padding: 0 26rpx;
+  border-bottom: 2rpx solid rgba(45,47,51,0.07);
+  box-sizing: border-box;
 }
 
-.tool-no {
-  width: 44rpx;
-  flex-shrink: 0;
-  color: #B8BDC8;
-  font-size: 18rpx;
-  font-weight: 900;
+.analysis-row:last-child {
+  border-bottom: none;
 }
 
-.tool-entry-dark .tool-no {
-  color: #10A8E8;
-}
-
-.tool-copy {
+.analysis-copy {
   flex: 1;
   min-width: 0;
 }
 
-.tool-title {
+.analysis-title {
   color: #2D2F33;
-  font-size: 29rpx;
+  font-size: 28rpx;
   font-weight: 900;
+  line-height: 1.34;
 }
 
-.tool-desc {
+.analysis-desc {
   margin-top: 6rpx;
-  color: rgba(45,47,51,0.48);
-  font-size: 21rpx;
+  color: rgba(45,47,51,0.46);
+  font-size: 20rpx;
+  font-weight: 800;
 }
 
-.tool-entry-dark .tool-title {
-  color: #FFFFFF;
-}
-
-.tool-entry-dark .tool-desc {
-  color: rgba(255,255,255,0.46);
-}
-
-.tool-arrow,
+.analysis-arrow,
 .timeline-arrow {
   flex-shrink: 0;
   color: #2D2F33;
@@ -190,16 +234,36 @@
   font-weight: 900;
 }
 
-.tool-entry-dark .tool-arrow {
+.minor-actions {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 12rpx;
+  margin-top: 12rpx;
+}
+
+.minor-actions view {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 72rpx;
+  background: #FFFFFF;
+  color: rgba(45,47,51,0.58);
+  font-size: 22rpx;
+  font-weight: 900;
+  text-align: center;
+}
+
+.minor-actions .dark {
+  background: #2D2F33;
   color: #FFFFFF;
 }
 
 .history-section {
-  margin-top: 44rpx;
+  margin-top: 34rpx;
 }
 
 .history-heading {
-  margin-top: 44rpx;
+  margin-top: 34rpx;
 }
 
 .latest-sheet {
@@ -253,8 +317,8 @@
 
 .empty-history {
   position: relative;
-  padding: 48rpx 30rpx 30rpx;
-  border-top: 6rpx solid #10A8E8;
+  padding: 28rpx 30rpx;
+  border-left: 6rpx solid rgba(45,47,51,0.12);
   background: #FFFFFF;
   overflow: hidden;
 }
@@ -275,14 +339,14 @@
 .missing-title {
   position: relative;
   color: #2D2F33;
-  font-size: 34rpx;
+  font-size: 30rpx;
   font-weight: 900;
 }
 
 .empty-copy,
 .missing-copy {
   position: relative;
-  width: 82%;
+  width: 100%;
   margin-top: 12rpx;
   color: rgba(45,47,51,0.52);
   font-size: 23rpx;

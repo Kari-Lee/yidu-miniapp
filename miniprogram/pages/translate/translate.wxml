@@ -14,6 +14,20 @@
     </view>
 
     <view wx:if="{{err}}" class="tool-error">{{err}}</view>
+    <view wx:if="{{contextTip}}" class="context-tip">
+      <view class="context-tip-head">
+        <view style="flex: 1;">
+          <view class="context-tip-title">带入关系历史</view>
+          <view class="context-tip-sub">{{ctxEnabled ? '本次会参考档案和最近记录' : '本次只翻译这句话'}}</view>
+        </view>
+        <switch checked="{{ctxEnabled}}" color="#2D2F33" bindchange="toggleCtxEnabled" style="transform: scale(0.78);"></switch>
+      </view>
+      <view class="context-actions">
+        <text class="context-link" bindtap="toggleCtxPreview">{{ctxPreviewOpen ? '收起内容' : '查看内容'}}</text>
+        <text class="context-muted">{{profileHistoryCount}} 条历史摘要</text>
+      </view>
+      <view wx:if="{{ctxPreviewOpen}}" class="context-preview">{{ctx}}</view>
+    </view>
     <view class="tool-surface">
       <view class="surface-label">PASTE THE MESSAGE</view>
       <textarea class="tool-textarea" maxlength="-1" auto-height placeholder="把 Ta 的原话贴在这里，可一行一句…" placeholder-style="color: #B7BBC4" value="{{text}}" bindinput="onInput"></textarea>
@@ -60,6 +74,20 @@
       <button class="result-action" bindtap="copyResult">复制结果</button>
       <button class="result-action" disabled="{{posterSaving}}" bindtap="saveResultPoster">{{posterSaving ? '生成中' : '保存结果图'}}</button>
       <button class="result-action dark" open-type="share">分享给朋友 ↗</button>
+    </view>
+    <view wx:if="{{currentRecordId}}" class="daily-feedback">
+      <view class="feedback-title">这次你准备怎么做？</view>
+      <view class="feedback-row">
+        <view class="{{feedbackAction === 'sent' ? 'active' : ''}}" data-value="sent" bindtap="markAction">已发</view>
+        <view class="{{feedbackAction === 'skipped' ? 'active' : ''}}" data-value="skipped" bindtap="markAction">不发了</view>
+        <view class="{{feedbackAction === 'thinking' ? 'active' : ''}}" data-value="thinking" bindtap="markAction">再想想</view>
+      </view>
+      <view class="feedback-title sub">Ta 后来回了吗？</view>
+      <view class="feedback-row">
+        <view class="{{feedbackResponse === 'replied' ? 'active' : ''}}" data-value="replied" bindtap="markResponse">回了</view>
+        <view class="{{feedbackResponse === 'silent' ? 'active' : ''}}" data-value="silent" bindtap="markResponse">没回</view>
+        <view class="{{feedbackResponse === 'cold' ? 'active' : ''}}" data-value="cold" bindtap="markResponse">很敷衍</view>
+      </view>
     </view>
     <view class="disclaimer">潜台词不是读心术。真正有用的是看 Ta 后续怎么做，而不是把一句话审到天亮。</view>
   </view>

@@ -475,7 +475,7 @@
   z-index: 20;
   height: 112rpx;
   display: grid;
-  grid-template-columns: repeat(4, 1fr);
+  grid-template-columns: repeat(3, 1fr);
   border-radius: 38rpx;
   background: rgba(255,255,255,0.86);
   box-shadow: 18rpx 18rpx 48rpx rgba(172,178,190,0.28), -10rpx -10rpx 30rpx rgba(255,255,255,0.88);

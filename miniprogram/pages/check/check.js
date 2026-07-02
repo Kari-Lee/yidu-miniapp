@@ -30,6 +30,7 @@ Page({
     ctxEnabled: false, initialCtxEnabled: false, ctxPreviewOpen: false,
     isReplyMode: false,
     hasInput: false, submitting: false, loadingMsg: '', res: null, posterSaving: false, posterPath: '',
+    currentRecordId: '', feedbackAction: '', feedbackResponse: '',
     typeOptions: [
       { key:'avoidant', emoji:'🧊', label:'回避型', color:'#0984E3', bg:'rgba(9,132,227,0.08)' },
       { key:'anxious', emoji:'🔥', label:'焦虑型', color:'#E17055', bg:'rgba(225,112,85,0.08)' },
@@ -143,6 +144,9 @@ Page({
       submitting: false,
       posterSaving: false,
       posterPath: '',
+      currentRecordId: '',
+      feedbackAction: '',
+      feedbackResponse: '',
       hasInput: hasInput('', [], this.data.isReplyMode, this.data.replyTask)
     })
   },
@@ -190,7 +194,7 @@ Page({
       self.stopLoading()
       self._submitting = false
       res = self.data.isReplyMode ? N.normalizeReply(res) : N.normalizeCheck(res)
-      H.addRecord({
+      var record = H.addRecord({
         kind: self.data.isReplyMode ? 'reply' : 'check',
         kindLabel: self.data.isReplyMode ? '回复建议' : '发不发',
         title: self.data.isReplyMode ? '下一句怎么回' : (res.verdict || '消息检测'),
@@ -201,7 +205,16 @@ Page({
         profileName: self.data.profileName,
         result: res
       })
-      self.setData({ step: 'result', res: res, submitting: false, posterSaving: false, posterPath: '' })
+      self.setData({
+        step: 'result',
+        res: res,
+        submitting: false,
+        posterSaving: false,
+        posterPath: '',
+        currentRecordId: record.id,
+        feedbackAction: '',
+        feedbackResponse: ''
+      })
     }).catch(function(e) {
       self.stopLoading()
       self._submitting = false
@@ -272,6 +285,28 @@ Page({
       ],
       footer: '先看风险，再决定要不要发'
     }
+  },
+
+  markAction: function(e) {
+    var value = e.currentTarget.dataset.value
+    if (!this.data.currentRecordId) return
+    H.setRecordFeedback(this.data.currentRecordId, {
+      action: value,
+      response: this.data.feedbackResponse
+    })
+    this.setData({ feedbackAction: value })
+    wx.showToast({ title: '已记入档案', icon: 'success' })
+  },
+
+  markResponse: function(e) {
+    var value = e.currentTarget.dataset.value
+    if (!this.data.currentRecordId) return
+    H.setRecordFeedback(this.data.currentRecordId, {
+      action: this.data.feedbackAction,
+      response: value
+    })
+    this.setData({ feedbackResponse: value })
+    wx.showToast({ title: '已记入档案', icon: 'success' })
   },
 
   saveResultPoster: function() {
