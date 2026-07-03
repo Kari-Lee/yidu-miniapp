@@ -129,6 +129,116 @@
   margin-top: 28rpx;
 }
 
+.weekly-card {
+  padding: 30rpx 28rpx 28rpx;
+  border-left: 6rpx solid rgba(45,47,51,0.16);
+  background: #FFFFFF;
+}
+
+.weekly-card.ready {
+  border-left-color: #10A8E8;
+}
+
+.weekly-top {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 24rpx;
+}
+
+.weekly-kicker {
+  color: #10A8E8;
+  font-size: 18rpx;
+  font-weight: 900;
+  letter-spacing: 4rpx;
+}
+
+.weekly-title {
+  margin-top: 12rpx;
+  color: #2D2F33;
+  font-size: 38rpx;
+  font-weight: 900;
+  line-height: 1.28;
+}
+
+.weekly-count {
+  flex-shrink: 0;
+  min-width: 92rpx;
+  padding-top: 2rpx;
+  color: #B8BDC8;
+  font-size: 34rpx;
+  font-weight: 900;
+  text-align: right;
+}
+
+.weekly-card.ready .weekly-count {
+  color: #10A8E8;
+}
+
+.weekly-verdict {
+  margin-top: 22rpx;
+  color: #2D2F33;
+  font-size: 28rpx;
+  font-weight: 900;
+  line-height: 1.5;
+}
+
+.weekly-copy,
+.weekly-advice {
+  margin-top: 10rpx;
+  color: rgba(45,47,51,0.58);
+  font-size: 23rpx;
+  line-height: 1.68;
+}
+
+.weekly-progress {
+  height: 7rpx;
+  margin-top: 24rpx;
+  background: rgba(45,47,51,0.08);
+  overflow: hidden;
+}
+
+.weekly-progress view {
+  height: 100%;
+  background: #10A8E8;
+}
+
+.weekly-stats {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  margin-top: 24rpx;
+  border-top: 2rpx solid rgba(45,47,51,0.08);
+  border-left: 2rpx solid rgba(45,47,51,0.08);
+}
+
+.weekly-stats > view {
+  min-height: 92rpx;
+  padding: 14rpx 12rpx;
+  border-right: 2rpx solid rgba(45,47,51,0.08);
+  border-bottom: 2rpx solid rgba(45,47,51,0.08);
+  box-sizing: border-box;
+}
+
+.weekly-stats text {
+  display: block;
+  color: rgba(45,47,51,0.42);
+  font-size: 18rpx;
+  font-weight: 900;
+}
+
+.weekly-stats view view {
+  margin-top: 8rpx;
+  color: #2D2F33;
+  font-size: 24rpx;
+  font-weight: 900;
+  line-height: 1.25;
+}
+
+.weekly-advice {
+  padding-top: 20rpx;
+  border-top: 2rpx solid rgba(45,47,51,0.08);
+}
+
 .today-card {
   position: relative;
   padding: 28rpx 28rpx 26rpx;
@@ -186,6 +296,76 @@
 .today-action text:last-child {
   color: #10A8E8;
   font-size: 30rpx;
+}
+
+.start-card {
+  padding: 34rpx 30rpx 28rpx;
+  border-left: 6rpx solid #10A8E8;
+  background: #FFFFFF;
+}
+
+.start-kicker {
+  color: #10A8E8;
+  font-size: 18rpx;
+  font-weight: 900;
+  letter-spacing: 4rpx;
+}
+
+.start-title {
+  margin-top: 16rpx;
+  color: #2D2F33;
+  font-size: 38rpx;
+  font-weight: 900;
+  line-height: 1.3;
+}
+
+.start-copy {
+  margin-top: 14rpx;
+  color: rgba(45,47,51,0.58);
+  font-size: 23rpx;
+  line-height: 1.68;
+}
+
+.start-action {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 20rpx;
+  min-height: 82rpx;
+  margin-top: 28rpx;
+  padding: 0 24rpx;
+  background: #2D2F33;
+  color: #FFFFFF;
+  font-size: 25rpx;
+  font-weight: 900;
+  box-sizing: border-box;
+}
+
+.start-action text:last-child {
+  color: #10A8E8;
+  font-size: 30rpx;
+}
+
+.start-progress {
+  display: flex;
+  align-items: center;
+  gap: 16rpx;
+  margin-top: 22rpx;
+  color: rgba(45,47,51,0.42);
+  font-size: 20rpx;
+  font-weight: 900;
+}
+
+.start-progress > view {
+  flex: 1;
+  height: 6rpx;
+  background: rgba(45,47,51,0.08);
+  overflow: hidden;
+}
+
+.start-progress > view view {
+  height: 100%;
+  background: #10A8E8;
 }
 
 .analysis-list {

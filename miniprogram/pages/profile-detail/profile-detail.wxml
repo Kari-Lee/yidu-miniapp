@@ -35,12 +35,39 @@
       </view>
     </view>
 
-    <view class="section-heading">
-      <text>TODAY</text>
-      <view>今天先处理一个动作</view>
+    <view wx:if="{{hasRecords}}" class="section-heading">
+      <text>7-DAY REPORT</text>
+      <view>{{weeklyReport.ready ? '本周趋势' : '生成进度'}}</view>
     </view>
 
-    <view class="today-card">
+    <view wx:if="{{hasRecords}}" class="weekly-card {{weeklyReport.ready ? 'ready' : ''}}">
+      <view class="weekly-top">
+        <view>
+          <view class="weekly-kicker">{{weeklyReport.ready ? 'RELATION TREND' : 'REPORT PROGRESS'}}</view>
+          <view class="weekly-title">{{weeklyReport.status}}</view>
+        </view>
+        <view class="weekly-count">{{weeklyReport.total}}/3</view>
+      </view>
+      <view class="weekly-verdict">{{weeklyReport.verdict}}</view>
+      <view class="weekly-copy">{{weeklyReport.trend}}</view>
+      <view class="weekly-progress">
+        <view style="width: {{weeklyReport.progress}}%;"></view>
+      </view>
+      <view wx:if="{{weeklyReport.ready}}" class="weekly-stats">
+        <view><text>主线</text><view>{{weeklyReport.mainKind}}</view></view>
+        <view><text>已发</text><view>{{weeklyReport.sent}}</view></view>
+        <view><text>有效回应</text><view>{{weeklyReport.replied}}</view></view>
+        <view><text>弱回应</text><view>{{weeklyReport.weak}}</view></view>
+      </view>
+      <view class="weekly-advice">{{weeklyReport.advice}}</view>
+    </view>
+
+    <view wx:if="{{hasRecords}}" class="section-heading action-heading">
+      <text>TODAY</text>
+      <view>继续补充材料</view>
+    </view>
+
+    <view wx:if="{{hasRecords}}" class="today-card">
       <view class="today-kicker">{{todayPlan.kicker}}</view>
       <view class="today-title">{{todayPlan.title}}</view>
       <view class="today-copy">{{todayPlan.copy}}</view>
@@ -50,9 +77,24 @@
       </view>
     </view>
 
+    <view wx:if="{{!hasRecords}}" class="start-card">
+      <view class="start-kicker">START FILE</view>
+      <view class="start-title">先给这段关系留第一条记录</view>
+      <view class="start-copy">七日关系报告需要 3 条记录。先上传一段聊天，或从一句话开始，后面再看趋势。</view>
+      <view class="start-action" bindtap="goTodayAction">
+        <text>{{todayPlan.actionLabel}}</text>
+        <text>↗</text>
+      </view>
+      <view class="start-progress">
+        <text>周报进度</text>
+        <view><view style="width: {{weeklyReport.progress}}%;"></view></view>
+        <text>{{weeklyReport.total}}/3</text>
+      </view>
+    </view>
+
     <view class="section-heading action-heading">
       <text>CONTINUE</text>
-      <view>常用分析</view>
+      <view>{{hasRecords ? '常用分析' : '也可以从这里开始'}}</view>
     </view>
 
     <view class="analysis-list">
@@ -105,14 +147,9 @@
       </view>
     </view>
 
-    <view class="section-heading history-heading">
+    <view wx:if="{{hasRecords}}" class="section-heading history-heading">
       <text>PRIVATE HISTORY</text>
       <view>专属历史 · {{records.length}} 条</view>
-    </view>
-
-    <view wx:if="{{!records.length}}" class="empty-history">
-      <view class="empty-title">暂无历史</view>
-      <view class="empty-copy">用上面的分析后，会自动归到这个 Ta 的档案里。</view>
     </view>
 
     <view
