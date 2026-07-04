@@ -3,6 +3,20 @@ var SEEN_KEY = 'yidu_seen_release_v1'
 // 每次发布功能更新时，把新版本放在数组最前面并更换 id。
 var RELEASES = [
   {
+    id: '2026-07-04-weekly-report',
+    date: '2026.07.04',
+    kicker: 'YIDU UPDATE · 07.04',
+    title: '关系档案开始写周报了。',
+    summary: '同一个 Ta 的分析会汇总成七日关系报告，看趋势，不只看一句话。',
+    items: [
+      '关系档案新增七日关系周报',
+      '满 3 条记录后生成阶段结论、行动反馈和下周建议',
+      '周报支持分享，只分享结论，不带聊天内容'
+    ],
+    actionLabel: '去看关系档案',
+    actionUrl: '/pages/profiles/profiles'
+  },
+  {
     id: '2026-06-15-misread-repeat',
     date: '2026.06.15',
     kicker: 'YIDU UPDATE · 06.15',
