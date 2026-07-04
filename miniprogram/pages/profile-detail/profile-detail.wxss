@@ -239,6 +239,25 @@
   border-top: 2rpx solid rgba(45,47,51,0.08);
 }
 
+.weekly-link {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 18rpx;
+  min-height: 72rpx;
+  margin-top: 20rpx;
+  padding-top: 20rpx;
+  border-top: 2rpx solid rgba(45,47,51,0.08);
+  color: #2D2F33;
+  font-size: 23rpx;
+  font-weight: 900;
+}
+
+.weekly-link text:last-child {
+  color: #10A8E8;
+  font-size: 30rpx;
+}
+
 .today-card {
   position: relative;
   padding: 28rpx 28rpx 26rpx;

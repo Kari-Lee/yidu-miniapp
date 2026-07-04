@@ -39,6 +39,17 @@ function profiles() {
   return page('给每个Ta建个关系档案，别混着分析', '/pages/profiles/profiles')
 }
 
+function weeklyReport(profile, report) {
+  var name = profile && profile.name ? profile.name : '这段关系'
+  var title = report && report.ready
+    ? '我和' + name + '的七日关系周报：' + report.verdict
+    : '我正在给' + name + '生成七日关系周报'
+  var path = profile && profile.id
+    ? '/pages/weekly-report/weekly-report?id=' + encodeURIComponent(profile.id)
+    : '/pages/profiles/profiles'
+  return page(title, path)
+}
+
 module.exports = {
   home: home,
   quiz: quiz,
@@ -47,5 +58,6 @@ module.exports = {
   check: check,
   misread: misread,
   predict: predict,
-  profiles: profiles
+  profiles: profiles,
+  weeklyReport: weeklyReport
 }

@@ -10,6 +10,7 @@
     "pages/history/history",
     "pages/profiles/profiles",
     "pages/profile-detail/profile-detail",
+    "pages/weekly-report/weekly-report",
     "pages/history-detail/history-detail",
     "pages/updates/updates"
   ],

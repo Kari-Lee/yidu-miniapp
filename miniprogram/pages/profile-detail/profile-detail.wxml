@@ -40,7 +40,7 @@
       <view>{{weeklyReport.ready ? '本周趋势' : '生成进度'}}</view>
     </view>
 
-    <view wx:if="{{hasRecords}}" class="weekly-card {{weeklyReport.ready ? 'ready' : ''}}">
+    <view wx:if="{{hasRecords}}" class="weekly-card {{weeklyReport.ready ? 'ready' : ''}}" bindtap="openWeeklyReport">
       <view class="weekly-top">
         <view>
           <view class="weekly-kicker">{{weeklyReport.ready ? 'RELATION TREND' : 'REPORT PROGRESS'}}</view>
@@ -60,6 +60,10 @@
         <view><text>弱回应</text><view>{{weeklyReport.weak}}</view></view>
       </view>
       <view class="weekly-advice">{{weeklyReport.advice}}</view>
+      <view class="weekly-link">
+        <text>{{weeklyReport.ready ? '查看完整周报' : '查看生成进度'}}</text>
+        <text>↗</text>
+      </view>
     </view>
 
     <view wx:if="{{hasRecords}}" class="section-heading action-heading">
