@@ -86,6 +86,29 @@
       <view class="action-arrow">↗</view>
     </view>
 
+    <view
+      wx:if="{{weeklyCard}}"
+      class="weekly-home-card {{weeklyCard.ready ? 'ready' : ''}}"
+      bindtap="goWeeklyCard"
+      hover-class="weekly-home-card-pressed"
+      hover-start-time="20"
+      hover-stay-time="120"
+    >
+      <view class="weekly-home-head">
+        <text>{{weeklyCard.badge}}</text>
+        <view>{{weeklyCard.countText}}</view>
+      </view>
+      <view class="weekly-home-title">{{weeklyCard.title}}</view>
+      <view class="weekly-home-copy">{{weeklyCard.copy}}</view>
+      <view class="weekly-home-progress">
+        <view style="width: {{weeklyCard.progress}}%;"></view>
+      </view>
+      <view class="weekly-home-action">
+        <text>{{weeklyCard.action}}</text>
+        <text>↗</text>
+      </view>
+    </view>
+
     <view class="step-list">
       <view class="step-row">
         <text>01</text>

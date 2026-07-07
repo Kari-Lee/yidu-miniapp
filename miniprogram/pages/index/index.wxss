@@ -150,6 +150,103 @@
   color: #FFFFFF;
 }
 
+.weekly-home-card {
+  margin-top: 30rpx;
+  padding: 28rpx 30rpx 26rpx;
+  border-radius: 34rpx;
+  background: #FFFFFF;
+  box-shadow: 18rpx 22rpx 48rpx rgba(172,178,190,0.22), -12rpx -12rpx 32rpx rgba(255,255,255,0.74);
+  transform: translateY(0) scale(1);
+  transition: transform 160ms ease, box-shadow 160ms ease;
+}
+
+.weekly-home-card.ready {
+  background: #2D2F33;
+  box-shadow: 18rpx 22rpx 48rpx rgba(45,47,51,0.16), -12rpx -12rpx 32rpx rgba(255,255,255,0.68);
+}
+
+.weekly-home-card-pressed {
+  transform: translateY(4rpx) scale(0.993);
+  box-shadow: 8rpx 10rpx 22rpx rgba(172,178,190,0.22), -5rpx -5rpx 14rpx rgba(255,255,255,0.58);
+}
+
+.weekly-home-head,
+.weekly-home-action {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 18rpx;
+}
+
+.weekly-home-head text {
+  color: #10A8E8;
+  font-size: 17rpx;
+  font-weight: 900;
+  letter-spacing: 4rpx;
+}
+
+.weekly-home-head view {
+  color: #B8BDC8;
+  font-size: 24rpx;
+  font-weight: 900;
+}
+
+.weekly-home-title {
+  margin-top: 16rpx;
+  color: #2D2F33;
+  font-size: 34rpx;
+  font-weight: 900;
+  line-height: 1.28;
+}
+
+.weekly-home-card.ready .weekly-home-title {
+  color: #FFFFFF;
+}
+
+.weekly-home-copy {
+  margin-top: 10rpx;
+  color: rgba(45,47,51,0.56);
+  font-size: 23rpx;
+  line-height: 1.58;
+}
+
+.weekly-home-card.ready .weekly-home-copy {
+  color: rgba(255,255,255,0.68);
+}
+
+.weekly-home-progress {
+  height: 7rpx;
+  margin-top: 22rpx;
+  background: rgba(45,47,51,0.08);
+  overflow: hidden;
+}
+
+.weekly-home-card.ready .weekly-home-progress {
+  background: rgba(255,255,255,0.12);
+}
+
+.weekly-home-progress view {
+  height: 100%;
+  background: #10A8E8;
+}
+
+.weekly-home-action {
+  min-height: 58rpx;
+  margin-top: 18rpx;
+  color: #2D2F33;
+  font-size: 23rpx;
+  font-weight: 900;
+}
+
+.weekly-home-card.ready .weekly-home-action {
+  color: #FFFFFF;
+}
+
+.weekly-home-action text:last-child {
+  color: #10A8E8;
+  font-size: 30rpx;
+}
+
 .quiet-link {
   color: rgba(45,47,51,0.46);
   font-size: 24rpx;

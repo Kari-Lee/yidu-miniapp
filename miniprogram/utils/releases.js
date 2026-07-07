@@ -3,6 +3,20 @@ var SEEN_KEY = 'yidu_seen_release_v1'
 // 每次发布功能更新时，把新版本放在数组最前面并更换 id。
 var RELEASES = [
   {
+    id: '2026-07-07-weekly-retention',
+    date: '2026.07.07',
+    kicker: 'YIDU UPDATE · 07.07',
+    title: '这次会提醒你回来补材料。',
+    summary: '关系页新增周报进度卡，满 3 条记录后会提示周报已生成，也能保存周报分享图。',
+    items: [
+      '首页关系页新增七日周报进度卡',
+      '满 3 条记录后自动提示周报已生成',
+      '周报页新增保存分享图，只展示结论不展示聊天'
+    ],
+    actionLabel: '去看关系页',
+    actionUrl: '/pages/index/index?tab=relation'
+  },
+  {
     id: '2026-07-04-weekly-report',
     date: '2026.07.04',
     kicker: 'YIDU UPDATE · 07.04',

@@ -26,11 +26,14 @@
         <view style="width: {{report.progress}}%;"></view>
       </view>
       <view wx:if="{{report.ready}}" class="share-strip">
-        <view>
+        <view class="share-copy">
           <text>SHARE REPORT</text>
           <view>只分享结论，不带聊天内容</view>
         </view>
-        <button open-type="share">分享</button>
+        <view class="share-actions">
+          <button disabled="{{posterSaving}}" bindtap="saveWeeklyPoster">{{posterSaving ? '生成中' : '保存图'}}</button>
+          <button open-type="share">转发</button>
+        </view>
       </view>
     </view>
 
@@ -128,7 +131,9 @@
         <view bindtap="goTranslate">Ta 这句话什么意思 <text>↗</text></view>
         <view bindtap="goCheck">我这句能不能发 <text>↗</text></view>
       </view>
-      <button wx:if="{{report.ready}}" class="bottom-share" open-type="share">分享这份周报</button>
+      <button wx:if="{{report.ready}}" class="bottom-share" disabled="{{posterSaving}}" bindtap="saveWeeklyPoster">{{posterSaving ? '生成中' : '保存周报分享图'}}</button>
     </view>
   </view>
+
+  <canvas type="2d" id="weeklyPoster" class="result-poster-canvas"></canvas>
 </view>

@@ -1,6 +1,36 @@
 var data = require('../../utils/data')
 var Share = require('../../utils/share')
 var Releases = require('../../utils/releases')
+var Profiles = require('../../utils/profiles')
+var H = require('../../utils/history')
+var Weekly = require('../../utils/weeklyReport')
+
+function buildWeeklyCard() {
+  var profiles = Profiles.getProfiles()
+  if (!profiles.length) return null
+  var cards = profiles.map(function(profile) {
+    var report = Weekly.build(profile, H.getRecordsByProfile(profile.id))
+    return { profile: profile, report: report }
+  })
+  cards.sort(function(a, b) {
+    if (a.report.ready !== b.report.ready) return a.report.ready ? -1 : 1
+    if (a.report.total !== b.report.total) return b.report.total - a.report.total
+    return (b.profile.updatedAt || 0) - (a.profile.updatedAt || 0)
+  })
+  var best = cards[0]
+  var profile = best.profile
+  var report = best.report
+  return {
+    profileId: profile.id,
+    ready: report.ready,
+    progress: report.progress,
+    countText: report.total + '/' + report.target,
+    badge: report.ready ? 'READY REPORT' : '7-DAY REPORT',
+    title: report.ready ? '七日关系周报已生成' : profile.name + ' 的七日周报 ' + report.total + '/' + report.target,
+    copy: report.ready ? profile.name + '｜' + report.verdict : '还差 ' + report.needed + ' 条记录，补完就能看趋势。',
+    action: report.ready ? '查看周报' : '补一条记录'
+  }
+}
 
 Page({
   data: {
@@ -9,6 +39,7 @@ Page({
     dailyQuote: '',
     updateNotice: null,
     showUpdateNotice: false,
+    weeklyCard: null,
     misreadSample: {
       input: '你吃饭了吗',
       output: '随便吃了点。前两天朋友从筑地给我顺了块蓝鳍金枪鱼中腹，我解冻手法不太行，有点辜负……那个米一年就给我寄二十斤，吃一斤少一斤，所以我现在不太敢吃饭。'
@@ -31,6 +62,7 @@ Page({
     this.startMisreadSamples()
   },
   onShow: function() {
+    this.setData({ weeklyCard: buildWeeklyCard() })
     if (!Releases.shouldShowLatest()) return
     this.setData({
       updateNotice: Releases.getLatest(),
@@ -66,6 +98,11 @@ Page({
   goPredict: function() { wx.navigateTo({ url: '/pages/predict/predict' }) },
   goHistory: function() { wx.navigateTo({ url: '/pages/history/history' }) },
   goProfiles: function() { wx.navigateTo({ url: '/pages/profiles/profiles' }) },
+  goWeeklyCard: function() {
+    var card = this.data.weeklyCard
+    if (!card) return
+    wx.navigateTo({ url: '/pages/weekly-report/weekly-report?id=' + encodeURIComponent(card.profileId) })
+  },
   goUpdates: function() {
     this.markUpdateSeen()
     this.setData({ showUpdateNotice: false })

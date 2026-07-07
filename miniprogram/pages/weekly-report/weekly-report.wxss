@@ -95,7 +95,7 @@
   border-left: 6rpx solid #10A8E8;
 }
 
-.share-strip > view {
+.share-copy {
   flex: 1;
   min-width: 0;
 }
@@ -107,14 +107,21 @@
   letter-spacing: 3rpx;
 }
 
-.share-strip view view {
+.share-copy view {
   margin-top: 8rpx;
   color: rgba(45,47,51,0.58);
   font-size: 22rpx;
   font-weight: 800;
 }
 
-.share-strip button,
+.share-actions {
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  gap: 10rpx;
+}
+
+.share-actions button,
 .bottom-share {
   flex-shrink: 0;
   min-width: 132rpx;
@@ -130,7 +137,7 @@
   line-height: 64rpx;
 }
 
-.share-strip button::after,
+.share-actions button::after,
 .bottom-share::after {
   border: none;
 }
