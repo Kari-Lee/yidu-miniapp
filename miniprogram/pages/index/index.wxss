@@ -150,6 +150,85 @@
   color: #FFFFFF;
 }
 
+.followup-card {
+  margin-top: 30rpx;
+  padding: 28rpx 30rpx 26rpx;
+  border-radius: 34rpx;
+  background: #FFFFFF;
+  box-shadow: 18rpx 22rpx 48rpx rgba(172,178,190,0.22), -12rpx -12rpx 32rpx rgba(255,255,255,0.74);
+}
+
+.followup-head,
+.followup-link {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 18rpx;
+}
+
+.followup-head text {
+  color: #E17055;
+  font-size: 17rpx;
+  font-weight: 900;
+  letter-spacing: 4rpx;
+}
+
+.followup-head view {
+  color: #B8BDC8;
+  font-size: 21rpx;
+  font-weight: 900;
+}
+
+.followup-title {
+  margin-top: 16rpx;
+  color: #2D2F33;
+  font-size: 34rpx;
+  font-weight: 900;
+  line-height: 1.28;
+}
+
+.followup-copy {
+  margin-top: 10rpx;
+  color: rgba(45,47,51,0.56);
+  font-size: 23rpx;
+  line-height: 1.58;
+}
+
+.followup-actions {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 12rpx;
+  margin-top: 22rpx;
+}
+
+.followup-actions view {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 68rpx;
+  border-radius: 18rpx;
+  background: #F3F4F8;
+  color: #2D2F33;
+  font-size: 22rpx;
+  font-weight: 900;
+  text-align: center;
+}
+
+.followup-link {
+  min-height: 58rpx;
+  margin-top: 18rpx;
+  padding-top: 16rpx;
+  border-top: 2rpx solid rgba(45,47,51,0.07);
+  color: #9BA1AE;
+  font-size: 22rpx;
+  font-weight: 900;
+}
+
+.followup-link text:last-child {
+  color: #E17055;
+  font-size: 30rpx;
+}
+
 .weekly-home-card {
   margin-top: 30rpx;
   padding: 28rpx 30rpx 26rpx;

@@ -3,11 +3,52 @@ var Profiles = require('../../utils/profiles')
 var H = require('../../utils/history')
 var Share = require('../../utils/share')
 var ProfileContext = require('../../utils/profileContext')
+var Weekly = require('../../utils/weeklyReport')
 
 var EMPTY_FORM = { name: '', relation: '暧昧对象', type: '', note: '' }
 
 function safeDecode(v) {
   try { return decodeURIComponent(v) } catch(e) { return v || '' }
+}
+
+function hasPendingFollowup(records) {
+  return records.some(function(record) {
+    return record.feedback && record.feedback.action === 'sent' && !record.feedback.response
+  })
+}
+
+function buildProfileStatus(profile, records) {
+  var report = Weekly.build(profile, records)
+  if (hasPendingFollowup(records)) {
+    return {
+      tone: 'warn',
+      label: '等待反馈',
+      text: '有已发消息还没标记 Ta 的回应',
+      action: '去补反馈'
+    }
+  }
+  if (report.ready) {
+    return {
+      tone: 'ready',
+      label: '周报已生成',
+      text: report.verdict,
+      action: '查看周报'
+    }
+  }
+  if (report.total > 0) {
+    return {
+      tone: 'progress',
+      label: report.total + '/' + report.target,
+      text: '七日周报还差 ' + report.needed + ' 条记录',
+      action: '继续补材料'
+    }
+  }
+  return {
+    tone: 'empty',
+    label: '未开始',
+    text: '先留第一条记录，后面才能看趋势',
+    action: '开始分析'
+  }
 }
 
 Page({
@@ -44,7 +85,11 @@ Page({
   loadProfiles: function() {
     var profiles = Profiles.getProfiles().map(function(profile) {
       var latest = H.getLatestByProfile(profile.id)
-      return Object.assign({}, profile, { latest: latest })
+      var records = H.getRecordsByProfile(profile.id)
+      return Object.assign({}, profile, {
+        latest: latest,
+        status: buildProfileStatus(profile, records)
+      })
     })
     this.setData({ profiles: profiles })
   },

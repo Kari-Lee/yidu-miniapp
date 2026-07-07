@@ -32,6 +32,28 @@ function buildWeeklyCard() {
   }
 }
 
+function buildFollowupCard() {
+  var records = H.getRecords().filter(function(record) {
+    return record.feedback && record.feedback.action === 'sent' && !record.feedback.response
+  })
+  if (!records.length) return null
+  records.sort(function(a, b) {
+    var at = a.feedback && a.feedback.updatedAt || a.createdAt || 0
+    var bt = b.feedback && b.feedback.updatedAt || b.createdAt || 0
+    return bt - at
+  })
+  var record = records[0]
+  return {
+    recordId: record.id,
+    profileId: record.profileId || '',
+    profileName: record.profileName || '这段关系',
+    kindLabel: record.kindLabel || '分析记录',
+    title: record.title || '上次那句后来怎么样',
+    copy: '你标记过「已发」。补一下 Ta 后来回没回，周报会更准。',
+    timeText: record.timeText || ''
+  }
+}
+
 Page({
   data: {
     statusBarHeight: 0,
@@ -40,6 +62,7 @@ Page({
     updateNotice: null,
     showUpdateNotice: false,
     weeklyCard: null,
+    followupCard: null,
     misreadSample: {
       input: '你吃饭了吗',
       output: '随便吃了点。前两天朋友从筑地给我顺了块蓝鳍金枪鱼中腹，我解冻手法不太行，有点辜负……那个米一年就给我寄二十斤，吃一斤少一斤，所以我现在不太敢吃饭。'
@@ -62,7 +85,7 @@ Page({
     this.startMisreadSamples()
   },
   onShow: function() {
-    this.setData({ weeklyCard: buildWeeklyCard() })
+    this.refreshRetentionCards()
     if (!Releases.shouldShowLatest()) return
     this.setData({
       updateNotice: Releases.getLatest(),
@@ -98,10 +121,34 @@ Page({
   goPredict: function() { wx.navigateTo({ url: '/pages/predict/predict' }) },
   goHistory: function() { wx.navigateTo({ url: '/pages/history/history' }) },
   goProfiles: function() { wx.navigateTo({ url: '/pages/profiles/profiles' }) },
+  refreshRetentionCards: function() {
+    this.setData({
+      weeklyCard: buildWeeklyCard(),
+      followupCard: buildFollowupCard()
+    })
+  },
   goWeeklyCard: function() {
     var card = this.data.weeklyCard
     if (!card) return
     wx.navigateTo({ url: '/pages/weekly-report/weekly-report?id=' + encodeURIComponent(card.profileId) })
+  },
+  openFollowupRecord: function() {
+    var card = this.data.followupCard
+    if (!card) return
+    wx.navigateTo({ url: '/pages/history-detail/history-detail?id=' + encodeURIComponent(card.recordId) })
+  },
+  markFollowupResponse: function(e) {
+    var card = this.data.followupCard
+    if (!card) return
+    var record = H.getRecord(card.recordId)
+    if (!record) return
+    var feedback = Object.assign({}, record.feedback || {}, {
+      action: 'sent',
+      response: e.currentTarget.dataset.value
+    })
+    H.setRecordFeedback(record.id, feedback)
+    this.refreshRetentionCards()
+    wx.showToast({ title: '已记入周报', icon: 'success' })
   },
   goUpdates: function() {
     this.markUpdateSeen()

@@ -97,6 +97,14 @@
       <view>{{item.typeLabel || '未知'}}</view>
     </view>
 
+    <view class="profile-status {{item.status.tone}}">
+      <view>
+        <text>{{item.status.label}}</text>
+        <view>{{item.status.text}}</view>
+      </view>
+      <text>{{item.status.action}} ↗</text>
+    </view>
+
     <view wx:if="{{item.note}}" class="profile-note">{{item.note}}</view>
 
     <view wx:if="{{item.latest}}" class="latest-block">

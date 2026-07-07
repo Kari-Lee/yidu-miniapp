@@ -297,6 +297,68 @@
   font-weight: 900;
 }
 
+.profile-status {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 20rpx;
+  margin-top: 22rpx;
+  padding: 22rpx 24rpx;
+  background: #F3F4F8;
+  box-sizing: border-box;
+}
+
+.profile-status > view {
+  flex: 1;
+  min-width: 0;
+}
+
+.profile-status > view text {
+  display: block;
+  color: #10A8E8;
+  font-size: 18rpx;
+  font-weight: 900;
+  letter-spacing: 2rpx;
+}
+
+.profile-status > view view {
+  margin-top: 8rpx;
+  color: rgba(45,47,51,0.62);
+  font-size: 22rpx;
+  font-weight: 800;
+  line-height: 1.5;
+}
+
+.profile-status > text {
+  flex-shrink: 0;
+  color: #2D2F33;
+  font-size: 22rpx;
+  font-weight: 900;
+}
+
+.profile-status.warn > view text,
+.profile-status.warn > text {
+  color: #E17055;
+}
+
+.profile-status.ready {
+  background: #2D2F33;
+}
+
+.profile-status.ready > view text,
+.profile-status.ready > text {
+  color: #10A8E8;
+}
+
+.profile-status.ready > view view {
+  color: rgba(255,255,255,0.72);
+}
+
+.profile-status.empty > view text,
+.profile-status.empty > text {
+  color: #9BA1AE;
+}
+
 .profile-note {
   margin-top: 22rpx;
   padding-left: 20rpx;
