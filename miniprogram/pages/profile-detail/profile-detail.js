@@ -73,6 +73,26 @@ function buildTodayPlan(profile, latest, records) {
   }
 }
 
+function buildFollowupCard(records) {
+  var pending = (records || []).filter(function(record) {
+    return record.feedback && record.feedback.action === 'sent' && !record.feedback.response
+  })
+  if (!pending.length) return null
+  pending.sort(function(a, b) {
+    var at = a.feedback && a.feedback.updatedAt || a.createdAt || 0
+    var bt = b.feedback && b.feedback.updatedAt || b.createdAt || 0
+    return bt - at
+  })
+  var record = pending[0]
+  return {
+    recordId: record.id,
+    kindLabel: record.kindLabel || '分析记录',
+    title: record.title || '上次那句后来怎么样',
+    copy: '你标记过「已发」。补一下 Ta 后来回没回，周报会更准。',
+    timeText: record.timeText || ''
+  }
+}
+
 Page({
   data: {
     statusBarHeight: 0,
@@ -82,6 +102,7 @@ Page({
     latest: null,
     hasRecords: false,
     todayPlan: null,
+    followupCard: null,
     weeklyReport: null,
     typeInfo: null,
     emptyType: { label: '未知', emoji: '❔', color: '#8395A7', desc: '还没定性，先别急着给Ta判刑' }
@@ -107,6 +128,7 @@ Page({
       latest: records[0] || null,
       hasRecords: records.length > 0,
       todayPlan: profile ? buildTodayPlan(profile, records[0] || null, records) : null,
+      followupCard: profile ? buildFollowupCard(records) : null,
       weeklyReport: profile ? Weekly.build(profile, records) : null,
       typeInfo: profile && D.TI[profile.type] || this.data.emptyType
     })
@@ -120,6 +142,26 @@ Page({
     var profile = this.data.profile
     if (!profile) return
     wx.navigateTo({ url: '/pages/weekly-report/weekly-report?id=' + encodeURIComponent(profile.id) })
+  },
+
+  openFollowupRecord: function() {
+    var card = this.data.followupCard
+    if (!card) return
+    wx.navigateTo({ url: '/pages/history-detail/history-detail?id=' + encodeURIComponent(card.recordId) })
+  },
+
+  markFollowupResponse: function(e) {
+    var card = this.data.followupCard
+    if (!card) return
+    var record = H.getRecord(card.recordId)
+    if (!record) return
+    var feedback = Object.assign({}, record.feedback || {}, {
+      action: 'sent',
+      response: e.currentTarget.dataset.value
+    })
+    H.setRecordFeedback(record.id, feedback)
+    this.loadProfile()
+    wx.showToast({ title: '已记入周报', icon: 'success' })
   },
 
   touchAndGo: function(url) {

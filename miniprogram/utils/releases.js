@@ -3,6 +3,20 @@ var SEEN_KEY = 'yidu_seen_release_v1'
 // 每次发布功能更新时，把新版本放在数组最前面并更换 id。
 var RELEASES = [
   {
+    id: '2026-07-07-profile-followup',
+    date: '2026.07.07',
+    kicker: 'YIDU UPDATE · 07.07',
+    title: '进档案也能补后续了。',
+    summary: '打开某个关系档案，如果有已发但没记录回应的消息，可以直接标记 Ta 后来回没回。',
+    items: [
+      '关系档案详情页新增追问卡',
+      '可直接标记：回了、没回、很敷衍',
+      '反馈会同步进入七日周报'
+    ],
+    actionLabel: '去看关系档案',
+    actionUrl: '/pages/profiles/profiles'
+  },
+  {
     id: '2026-07-07-profile-status',
     date: '2026.07.07',
     kicker: 'YIDU UPDATE · 07.07',

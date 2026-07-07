@@ -35,6 +35,24 @@
       </view>
     </view>
 
+    <view wx:if="{{followupCard}}" class="profile-followup-card">
+      <view class="profile-followup-head">
+        <text>FOLLOW UP</text>
+        <view>{{followupCard.timeText}}</view>
+      </view>
+      <view class="profile-followup-title">Ta 后来回了吗？</view>
+      <view class="profile-followup-copy">{{followupCard.copy}}</view>
+      <view class="profile-followup-actions">
+        <view data-value="replied" bindtap="markFollowupResponse">回了</view>
+        <view data-value="silent" bindtap="markFollowupResponse">没回</view>
+        <view data-value="cold" bindtap="markFollowupResponse">很敷衍</view>
+      </view>
+      <view class="profile-followup-link" bindtap="openFollowupRecord">
+        <text>查看上次记录</text>
+        <text>↗</text>
+      </view>
+    </view>
+
     <view wx:if="{{hasRecords}}" class="section-heading">
       <text>7-DAY REPORT</text>
       <view>{{weeklyReport.ready ? '本周趋势' : '生成进度'}}</view>
