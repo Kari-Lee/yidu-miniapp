@@ -3,6 +3,20 @@ var SEEN_KEY = 'yidu_seen_release_v1'
 // 每次发布功能更新时，把新版本放在数组最前面并更换 id。
 var RELEASES = [
   {
+    id: '2026-07-08-weekly-next-plan',
+    date: '2026.07.08',
+    kicker: 'YIDU UPDATE · 07.08',
+    title: '周报现在会告诉你下一步干嘛。',
+    summary: '七日关系报告不只给结论，会根据这周的记录推荐下一次该补截图、翻译回复，还是先过发不发。',
+    items: [
+      '周报页新增下一步建议卡',
+      '建议会根据已发、没发、回应强弱动态变化',
+      '点击建议可直接回到同一个 Ta 的分析流程'
+    ],
+    actionLabel: '去看周报',
+    actionUrl: '/pages/profiles/profiles'
+  },
+  {
     id: '2026-07-07-profile-followup',
     date: '2026.07.07',
     kicker: 'YIDU UPDATE · 07.07',

@@ -16,12 +16,60 @@ function findProfile(id) {
   })[0] || null
 }
 
+function buildNextPlan(report) {
+  if (!report) return null
+  if (!report.ready) {
+    return {
+      kicker: 'NEXT SAMPLE',
+      title: '先补一条真实互动',
+      copy: '周报还差样本。先上传聊天截图，或者补一句 Ta 的原话，别让报告只靠感觉写。',
+      action: 'diagnose',
+      actionLabel: '上传聊天截图'
+    }
+  }
+  if (report.sent && report.weak >= report.sent) {
+    return {
+      kicker: 'NEXT MOVE',
+      title: '先别二连，看看 Ta 下一句',
+      copy: '这周主动后的反馈偏弱。下次有回复先翻译潜台词，再决定要不要继续推进。',
+      action: 'translate',
+      actionLabel: '翻译 Ta 的回复'
+    }
+  }
+  if (report.skipped > report.sent) {
+    return {
+      kicker: 'NEXT MOVE',
+      title: '想发的那句，先过风控',
+      copy: '这周克制比推进更多。不是让你硬冲，是把要发的话先降温，再决定发不发。',
+      action: 'check',
+      actionLabel: '我这句能不能发'
+    }
+  }
+  if (report.replied > report.weak && report.replied > 0) {
+    return {
+      kicker: 'NEXT MOVE',
+      title: '轻推进，别一次性交底',
+      copy: '回应质量暂时可看。下一句可以往前走一点，但不要把周报写成遗书发出去。',
+      action: 'reply',
+      actionLabel: '帮我回一句'
+    }
+  }
+  return {
+    kicker: 'NEXT MOVE',
+    title: '继续记录一个具体动作',
+    copy: '这段关系还没形成稳定趋势。下一次别只记情绪，优先记录 Ta 的真实回复或你的实际动作。',
+    action: 'translate',
+    actionLabel: 'Ta 这句话什么意思'
+  }
+}
+
 Page({
   data: {
     statusBarHeight: 0,
     id: '',
     profile: null,
     report: null,
+    nextPlan: null,
     posterSaving: false,
     posterPath: '',
     typeInfo: null,
@@ -42,9 +90,11 @@ Page({
   loadReport: function() {
     var profile = findProfile(this.data.id)
     var records = profile ? H.getRecordsByProfile(profile.id) : []
+    var report = profile ? Weekly.build(profile, records) : null
     this.setData({
       profile: profile,
-      report: profile ? Weekly.build(profile, records) : null,
+      report: report,
+      nextPlan: buildNextPlan(report),
       posterPath: '',
       typeInfo: profile && D.TI[profile.type] || this.data.emptyType
     })
@@ -83,6 +133,21 @@ Page({
     var profile = this.data.profile
     if (!profile) return
     this.touchAndGo('/pages/check/check?pType=' + (profile.type || '') + '&' + ProfileContext.query(profile))
+  },
+
+  goReply: function() {
+    var profile = this.data.profile
+    if (!profile) return
+    this.touchAndGo('/pages/check/check?mode=reply&pType=' + (profile.type || '') + '&' + ProfileContext.query(profile))
+  },
+
+  goNextPlan: function() {
+    var plan = this.data.nextPlan
+    if (!plan) return
+    if (plan.action === 'diagnose') this.goDiagnose()
+    else if (plan.action === 'check') this.goCheck()
+    else if (plan.action === 'reply') this.goReply()
+    else this.goTranslate()
   },
 
   openRecord: function(e) {

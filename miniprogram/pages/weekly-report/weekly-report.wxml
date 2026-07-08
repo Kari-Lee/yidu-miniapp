@@ -126,6 +126,15 @@
         <text>05 / NEXT</text>
         <view>{{report.ready ? '下周继续观察' : '先补材料'}}</view>
       </view>
+      <view wx:if="{{nextPlan}}" class="next-plan-card" bindtap="goNextPlan">
+        <view class="next-plan-kicker">{{nextPlan.kicker}}</view>
+        <view class="next-plan-title">{{nextPlan.title}}</view>
+        <view class="next-plan-copy">{{nextPlan.copy}}</view>
+        <view class="next-plan-action">
+          <text>{{nextPlan.actionLabel}}</text>
+          <text>↗</text>
+        </view>
+      </view>
       <view class="action-list">
         <view bindtap="goDiagnose">上传聊天截图 <text>↗</text></view>
         <view bindtap="goTranslate">Ta 这句话什么意思 <text>↗</text></view>

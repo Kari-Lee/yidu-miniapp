@@ -334,6 +334,53 @@
 .action-list {
   display: grid;
   gap: 12rpx;
+  margin-top: 12rpx;
+}
+
+.next-plan-card {
+  padding: 28rpx 26rpx;
+  background: #2D2F33;
+  color: #FFFFFF;
+}
+
+.next-plan-kicker {
+  color: #10A8E8;
+  font-size: 18rpx;
+  font-weight: 900;
+  letter-spacing: 4rpx;
+}
+
+.next-plan-title {
+  margin-top: 14rpx;
+  font-size: 34rpx;
+  font-weight: 900;
+  line-height: 1.35;
+}
+
+.next-plan-copy {
+  margin-top: 10rpx;
+  color: rgba(255,255,255,0.68);
+  font-size: 23rpx;
+  line-height: 1.68;
+}
+
+.next-plan-action {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 18rpx;
+  min-height: 70rpx;
+  margin-top: 22rpx;
+  padding-top: 18rpx;
+  border-top: 2rpx solid rgba(255,255,255,0.16);
+  color: #FFFFFF;
+  font-size: 24rpx;
+  font-weight: 900;
+}
+
+.next-plan-action text:last-child {
+  color: #10A8E8;
+  font-size: 30rpx;
 }
 
 .action-list view {
