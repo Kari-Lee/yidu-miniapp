@@ -39,7 +39,7 @@ function buildProfileStatus(profile, records) {
     return {
       tone: 'progress',
       label: report.total + '/' + report.target,
-      text: '七日周报还差 ' + report.needed + ' 条记录',
+      text: '七日周报还差 ' + report.needed + ' 天记录',
       action: '继续补材料'
     }
   }

@@ -64,7 +64,7 @@
           <view class="weekly-kicker">{{weeklyReport.ready ? 'RELATION TREND' : 'REPORT PROGRESS'}}</view>
           <view class="weekly-title">{{weeklyReport.status}}</view>
         </view>
-        <view class="weekly-count">{{weeklyReport.total}}/3</view>
+        <view class="weekly-count">{{weeklyReport.total}}/{{weeklyReport.target}}</view>
       </view>
       <view class="weekly-verdict">{{weeklyReport.verdict}}</view>
       <view class="weekly-copy">{{weeklyReport.trend}}</view>
@@ -102,7 +102,7 @@
     <view wx:if="{{!hasRecords}}" class="start-card">
       <view class="start-kicker">START FILE</view>
       <view class="start-title">先给这段关系留第一条记录</view>
-      <view class="start-copy">七日关系报告需要 3 条记录。先上传一段聊天，或从一句话开始，后面再看趋势。</view>
+      <view class="start-copy">七日关系报告需要 7 天记录。先上传一段聊天，或从一句话开始，后面每天看趋势。</view>
       <view class="start-action" bindtap="goTodayAction">
         <text>{{todayPlan.actionLabel}}</text>
         <text>↗</text>
@@ -110,7 +110,7 @@
       <view class="start-progress">
         <text>周报进度</text>
         <view><view style="width: {{weeklyReport.progress}}%;"></view></view>
-        <text>{{weeklyReport.total}}/3</text>
+        <text>{{weeklyReport.total}}/{{weeklyReport.target}}</text>
       </view>
     </view>
 

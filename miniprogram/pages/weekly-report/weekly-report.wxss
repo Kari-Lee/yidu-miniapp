@@ -84,6 +84,37 @@
   background: #10A8E8;
 }
 
+.hero-progress-meta {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 18rpx;
+  margin-top: 18rpx;
+  color: rgba(45,47,51,0.46);
+  font-size: 21rpx;
+  font-weight: 900;
+}
+
+.primary-record {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 20rpx;
+  min-height: 82rpx;
+  margin-top: 28rpx;
+  padding: 0 26rpx;
+  background: #2D2F33;
+  color: #FFFFFF;
+  font-size: 25rpx;
+  font-weight: 900;
+  box-sizing: border-box;
+}
+
+.primary-record text:last-child {
+  color: #10A8E8;
+  font-size: 32rpx;
+}
+
 .share-strip {
   display: flex;
   align-items: center;
@@ -158,11 +189,213 @@
   margin-bottom: 28rpx;
 }
 
+.section-head.compact {
+  margin-bottom: 22rpx;
+}
+
 .section-head view {
   color: #2D2F33;
   font-size: 26rpx;
   font-weight: 900;
   text-align: right;
+}
+
+.trend-card,
+.month-card {
+  margin-bottom: 28rpx;
+  padding: 32rpx 30rpx;
+  border-top: 6rpx solid #10A8E8;
+  background: #FFFFFF;
+  box-sizing: border-box;
+}
+
+.curve-chart {
+  position: relative;
+  height: 164rpx;
+  margin-top: 18rpx;
+  border-left: 2rpx solid rgba(45,47,51,0.08);
+  border-bottom: 2rpx solid rgba(45,47,51,0.08);
+}
+
+.curve-chart::before,
+.curve-chart::after {
+  content: '';
+  position: absolute;
+  left: 0;
+  right: 0;
+  height: 2rpx;
+  background: rgba(45,47,51,0.06);
+}
+
+.curve-chart::before {
+  top: 46rpx;
+}
+
+.curve-chart::after {
+  top: 92rpx;
+}
+
+.curve-line {
+  position: absolute;
+  z-index: 1;
+  height: 4rpx;
+  background: #10A8E8;
+  transform-origin: 0 50%;
+}
+
+.curve-point {
+  position: absolute;
+  z-index: 2;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  transform: translate(-50%, -50%);
+}
+
+.curve-point > view {
+  width: 18rpx;
+  height: 18rpx;
+  border: 5rpx solid #10A8E8;
+  border-radius: 50%;
+  background: #FFFFFF;
+  box-sizing: border-box;
+}
+
+.curve-point text {
+  margin-top: 8rpx;
+  color: #2D2F33;
+  font-size: 17rpx;
+  font-weight: 900;
+}
+
+.curve-point.muted > view {
+  border-color: rgba(45,47,51,0.16);
+}
+
+.curve-point.muted text {
+  color: rgba(45,47,51,0.28);
+}
+
+.curve-labels {
+  display: grid;
+  grid-template-columns: repeat(7, minmax(0, 1fr));
+  margin-top: 14rpx;
+  color: rgba(45,47,51,0.42);
+  font-size: 18rpx;
+  font-weight: 900;
+  text-align: center;
+}
+
+.empty-records {
+  padding: 28rpx 26rpx;
+  background: #F3F4F8;
+}
+
+.empty-records view {
+  color: #2D2F33;
+  font-size: 30rpx;
+  font-weight: 900;
+}
+
+.empty-records text {
+  display: block;
+  margin-top: 12rpx;
+  color: rgba(45,47,51,0.56);
+  font-size: 23rpx;
+  line-height: 1.68;
+}
+
+.daily-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 22rpx;
+  min-height: 104rpx;
+  border-top: 2rpx solid rgba(45,47,51,0.08);
+}
+
+.daily-row:first-of-type {
+  border-top: none;
+}
+
+.daily-row > view {
+  flex: 1;
+  min-width: 0;
+}
+
+.daily-row text {
+  color: rgba(45,47,51,0.42);
+  font-size: 20rpx;
+  font-weight: 900;
+}
+
+.daily-row view text {
+  color: #10A8E8;
+  letter-spacing: 3rpx;
+}
+
+.daily-row view view {
+  margin-top: 8rpx;
+  color: #2D2F33;
+  font-size: 26rpx;
+  font-weight: 900;
+  line-height: 1.38;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.month-card {
+  border-top-color: rgba(45,47,51,0.18);
+}
+
+.month-copy {
+  color: rgba(45,47,51,0.58);
+  font-size: 23rpx;
+  line-height: 1.68;
+}
+
+.month-progress {
+  height: 8rpx;
+  margin-top: 24rpx;
+  background: rgba(45,47,51,0.08);
+  overflow: hidden;
+}
+
+.month-progress view {
+  height: 100%;
+  background: #2D2F33;
+}
+
+.insight-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  border-top: 2rpx solid rgba(45,47,51,0.08);
+  border-left: 2rpx solid rgba(45,47,51,0.08);
+}
+
+.insight-grid > view {
+  min-width: 0;
+  min-height: 110rpx;
+  padding: 18rpx 12rpx;
+  border-right: 2rpx solid rgba(45,47,51,0.08);
+  border-bottom: 2rpx solid rgba(45,47,51,0.08);
+  box-sizing: border-box;
+}
+
+.insight-grid text {
+  display: block;
+  color: #10A8E8;
+  font-size: 18rpx;
+  font-weight: 900;
+}
+
+.insight-grid view view {
+  margin-top: 10rpx;
+  color: #2D2F33;
+  font-size: 25rpx;
+  font-weight: 900;
+  line-height: 1.28;
 }
 
 .stage-grid,

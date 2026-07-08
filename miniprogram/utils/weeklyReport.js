@@ -1,5 +1,6 @@
-var WEEK_MS = 7 * 24 * 60 * 60 * 1000
-var TARGET = 3
+var DAY_MS = 24 * 60 * 60 * 1000
+var WEEK_DAYS = 7
+var MONTH_DAYS = 30
 
 var KIND_LABELS = {
   translate: '潜台词',
@@ -20,6 +21,30 @@ var RESPONSE_LABELS = {
   replied: '回了',
   silent: '没回',
   cold: '很冷'
+}
+
+var WEEK_LABELS = ['周日', '周一', '周二', '周三', '周四', '周五', '周六']
+
+function startOfDay(ts) {
+  var d = new Date(ts)
+  d.setHours(0, 0, 0, 0)
+  return d.getTime()
+}
+
+function dateKey(ts) {
+  var d = new Date(ts)
+  return d.getFullYear() + '-' + (d.getMonth() + 1) + '-' + d.getDate()
+}
+
+function dayLabel(ts, todayStart) {
+  var diff = Math.round((todayStart - startOfDay(ts)) / DAY_MS)
+  if (diff === 0) return '今天'
+  if (diff === 1) return '昨天'
+  return WEEK_LABELS[new Date(ts).getDay()]
+}
+
+function clamp(n, min, max) {
+  return Math.max(min, Math.min(max, n))
 }
 
 function countBy(records, key) {
@@ -67,14 +92,149 @@ function dominant(counts) {
   })[0] || ''
 }
 
+function scoreRecord(record) {
+  var score = 0
+  if (record.kind === 'diagnose') score += 7
+  else if (record.kind === 'translate') score += 5
+  else if (record.kind === 'reply') score += 4
+  else if (record.kind === 'check') score += 3
+  else if (record.kind === 'misread') score += 2
+  else if (record.kind === 'predict') score -= 2
+
+  var feedback = record.feedback || {}
+  if (feedback.action === 'sent') score += 3
+  if (feedback.action === 'skipped') score += 2
+  if (feedback.action === 'thinking') score -= 1
+  if (feedback.response === 'replied') score += 16
+  if (feedback.response === 'silent') score -= 16
+  if (feedback.response === 'cold') score -= 11
+  return score
+}
+
+function scoreDay(records) {
+  if (!records.length) return null
+  var score = 48
+  records.forEach(function(record) {
+    score += scoreRecord(record)
+  })
+  if (records.length >= 3) score -= 4
+  return clamp(Math.round(score), 0, 100)
+}
+
+function buildDayBuckets(records, dayCount, now) {
+  var todayStart = startOfDay(now)
+  var byKey = {}
+  records.forEach(function(record) {
+    if (!record.createdAt) return
+    var key = dateKey(record.createdAt)
+    byKey[key] = byKey[key] || []
+    byKey[key].push(record)
+  })
+
+  var days = []
+  for (var i = dayCount - 1; i >= 0; i--) {
+    var ts = todayStart - i * DAY_MS
+    var key = dateKey(ts)
+    var dayRecords = byKey[key] || []
+    days.push({
+      key: key,
+      ts: ts,
+      label: dayLabel(ts, todayStart),
+      shortLabel: i === 0 ? '今' : WEEK_LABELS[new Date(ts).getDay()].replace('周', ''),
+      count: dayRecords.length,
+      records: dayRecords,
+      score: scoreDay(dayRecords)
+    })
+  }
+  return days
+}
+
+function buildTemperature(days) {
+  var chartHeight = 140
+  var chartWidth = 560
+  var points = days.map(function(day, index) {
+    var x = days.length === 1 ? 50 : 4 + index * (92 / (days.length - 1))
+    var score = day.score === null ? 0 : day.score
+    var y = day.score === null ? chartHeight : Math.round(chartHeight - score / 100 * 116 - 12)
+    return {
+      key: day.key,
+      label: day.shortLabel,
+      score: day.score,
+      scoreText: day.score === null ? '--' : String(day.score),
+      hasRecord: day.score !== null,
+      left: Math.round(x * 10) / 10,
+      top: y
+    }
+  })
+  var lines = []
+  for (var i = 0; i < points.length - 1; i++) {
+    var a = points[i]
+    var b = points[i + 1]
+    if (!a.hasRecord || !b.hasRecord) continue
+    var dxPercent = b.left - a.left
+    var dx = dxPercent / 100 * chartWidth
+    var dy = b.top - a.top
+    lines.push({
+      key: a.key + '-' + b.key,
+      left: a.left,
+      top: a.top,
+      width: Math.round(Math.sqrt(dx * dx + dy * dy) / chartWidth * 1000) / 10,
+      angle: Math.round(Math.atan2(dy, dx) * 180 / Math.PI)
+    })
+  }
+  return { points: points, lines: lines }
+}
+
+function buildRecentDays(days) {
+  return days.filter(function(day) {
+    return day.count > 0
+  }).slice().reverse().slice(0, 3).map(function(day) {
+    var first = day.records[0] || {}
+    return {
+      key: day.key,
+      label: day.label,
+      count: day.count,
+      score: day.score,
+      title: first.title || first.summary || '记录了一次互动',
+      meta: day.count + ' 条记录｜温度 ' + (day.score === null ? '--' : day.score)
+    }
+  })
+}
+
+function buildInsight(reportSeed) {
+  var temperature = reportSeed.latestScore === null ? '采样中' : reportSeed.latestScore + '/100'
+  var initiative = '继续观察'
+  var cost = '轻度消耗'
+  if (reportSeed.replied > reportSeed.weak && reportSeed.replied > 0) initiative = '回应可看'
+  else if (reportSeed.weak > reportSeed.replied && reportSeed.weak > 0) initiative = '回应偏弱'
+  else if (reportSeed.sent > 0) initiative = '已开始推进'
+  if (reportSeed.weak >= 2 || reportSeed.thinking >= 2) cost = '消耗偏高'
+  else if (reportSeed.skipped > reportSeed.sent) cost = '克制较多'
+  return [
+    { label: '关系温度', value: temperature },
+    { label: 'Ta 主动性', value: initiative },
+    { label: '你的消耗', value: cost }
+  ]
+}
+
 function build(profile, records) {
   var now = Date.now()
-  var weekRecords = (records || []).filter(function(item) {
-    return item.createdAt && now - item.createdAt <= WEEK_MS
+  records = records || []
+  var weekStart = startOfDay(now) - (WEEK_DAYS - 1) * DAY_MS
+  var monthStart = startOfDay(now) - (MONTH_DAYS - 1) * DAY_MS
+  var weekRecords = records.filter(function(item) {
+    return item.createdAt && item.createdAt >= weekStart
   })
-  var total = weekRecords.length
-  var needed = Math.max(0, TARGET - total)
-  var progress = Math.min(100, Math.round(total / TARGET * 100))
+  var monthRecords = records.filter(function(item) {
+    return item.createdAt && item.createdAt >= monthStart
+  })
+  var weekDays = buildDayBuckets(weekRecords, WEEK_DAYS, now)
+  var monthDays = buildDayBuckets(monthRecords, MONTH_DAYS, now)
+  var recordedWeekDays = weekDays.filter(function(day) { return day.count > 0 }).length
+  var recordedMonthDays = monthDays.filter(function(day) { return day.count > 0 }).length
+  var needed = Math.max(0, WEEK_DAYS - recordedWeekDays)
+  var progress = Math.min(100, Math.round(recordedWeekDays / WEEK_DAYS * 100))
+  var monthProgress = Math.min(100, Math.round(recordedMonthDays / MONTH_DAYS * 100))
   var kindCounts = countBy(weekRecords, function(item) { return item.kind })
   var actionCounts = countBy(weekRecords, function(item) { return item.feedback && item.feedback.action })
   var responseCounts = countBy(weekRecords, function(item) { return item.feedback && item.feedback.response })
@@ -84,66 +244,92 @@ function build(profile, records) {
   var thinking = actionCounts.thinking || 0
   var replied = responseCounts.replied || 0
   var weak = (responseCounts.silent || 0) + (responseCounts.cold || 0)
-  var status = '采样中'
-  var verdict = '再记录 ' + needed + ' 次，就能生成第一份七日关系报告。'
-  var trend = '先补足材料，别急着给 ' + profile.name + ' 定性。'
-  var advice = '建议先完成一次潜台词翻译或发不发检测，让档案有可比较的记录。'
-  var focus = '先收集材料'
+  var temperature = buildTemperature(weekDays)
+  var scoredDays = weekDays.filter(function(day) { return day.score !== null })
+  var latestScore = scoredDays.length ? scoredDays[scoredDays.length - 1].score : null
+  var firstScore = scoredDays.length ? scoredDays[0].score : null
+  var maxScore = scoredDays.length ? Math.max.apply(null, scoredDays.map(function(day) { return day.score })) : null
+  var minScore = scoredDays.length ? Math.min.apply(null, scoredDays.map(function(day) { return day.score })) : null
+  var delta = latestScore === null || firstScore === null ? 0 : latestScore - firstScore
+  var volatility = maxScore === null || minScore === null ? 0 : maxScore - minScore
+  var status = '关系趋势采样中'
+  var verdict = '已记录 ' + recordedWeekDays + '/7 天，再记录 ' + needed + ' 天生成七日关系周报。'
+  var trend = '每天记一次和 ' + profile.name + ' 的真实互动，才能看清这段关系是在升温、降温，还是反复拉扯。'
+  var advice = '今天先补一条聊天截图、Ta 的原话，或你想发出去的一句话。'
+  var focus = '记录今天的互动'
 
   if (!needed) {
-    if ((kindCounts.check || 0) + (kindCounts.reply || 0) >= 2) {
-      status = '行动决策期'
-      trend = '这周重点不是看懂 Ta，而是你在反复决定要不要行动。'
-      focus = '发之前先降温'
-    } else if ((kindCounts.translate || 0) >= 2) {
-      status = '信号解读期'
-      trend = '你这周主要在拆 Ta 的话，说明关系还停在猜测和确认阶段。'
-      focus = '少猜一句，多看一个动作'
-    } else if ((kindCounts.diagnose || 0) + (kindCounts.predict || 0) >= 2) {
-      status = '关系复盘期'
-      trend = '你已经开始看整体模式，不只是盯着某一句话。'
-      focus = '看模式，不看单点情绪'
+    if (volatility >= 28) {
+      status = '忽冷忽热'
+      verdict = '本周趋势：反复拉扯'
+      trend = '这周关系温度波动明显，说明互动里既有推进，也有让你消耗的回落。'
+      focus = '少追问，看主动性'
+    } else if (delta >= 12) {
+      status = '正在升温'
+      verdict = '本周趋势：关系升温'
+      trend = '这周关系温度整体向上，可以轻推进，但不要一次性交底。'
+      focus = '轻推进'
+    } else if (delta <= -12) {
+      status = '明显降温'
+      verdict = '本周趋势：关系降温'
+      trend = '这周关系温度往下走，先减少解释和追问，观察 Ta 会不会主动补回应。'
+      focus = '先降频'
     } else {
-      status = '轻量观察期'
-      trend = '记录开始形成连续性，但还需要更多具体互动来判断走向。'
-      focus = '继续补样本'
+      status = '稳定观察'
+      verdict = '本周趋势：稳定观察'
+      trend = '这周没有明显升降，关系还在观察区。重点不是猜，而是继续看具体动作。'
+      focus = '继续记录'
     }
 
     if (sent && weak >= sent) {
-      verdict = '主动后反馈偏弱'
       advice = '下周少追加解释，优先观察 Ta 有没有主动补回应。'
     } else if (skipped > sent) {
-      verdict = '克制比推进更多'
-      advice = '这不是坏事。下周继续看回应质量，不要用长消息测试短回复的人。'
+      advice = '下周可以把想发的话先过一遍风险，别只靠忍。'
     } else if (replied > weak && replied > 0) {
-      verdict = '回应质量暂时可看'
-      advice = '可以轻推进，但每次只推进一小步，别一次性交底。'
+      advice = '可以轻推进，每次只推进一小步，别一次性交底。'
     } else if (thinking >= 2) {
-      verdict = '你还在观望'
       advice = '下周把问题落到具体一句话上，少脑补，多记录。'
     } else {
-      verdict = '关系信号仍不稳定'
       advice = '下周继续记录 Ta 的真实动作，不要只记录自己的情绪波动。'
     }
   }
 
   return {
     ready: !needed,
-    total: total,
-    target: TARGET,
+    total: recordedWeekDays,
+    target: WEEK_DAYS,
     needed: needed,
     progress: progress,
+    monthTotal: recordedMonthDays,
+    monthTarget: MONTH_DAYS,
+    monthProgress: monthProgress,
+    recordTotal: weekRecords.length,
     status: status,
     verdict: verdict,
     trend: trend,
     advice: advice,
     focus: focus,
+    latestScore: latestScore,
+    latestScoreText: latestScore === null ? '采样中' : latestScore + '/100',
+    firstScore: firstScore,
+    delta: delta,
     mainKind: mainKind ? labelKind(mainKind) : '暂无',
     sent: sent,
     skipped: skipped,
     thinking: thinking,
     replied: replied,
     weak: weak,
+    temperaturePoints: temperature.points,
+    temperatureLines: temperature.lines,
+    recentDays: buildRecentDays(weekDays),
+    insight: buildInsight({
+      latestScore: latestScore,
+      replied: replied,
+      weak: weak,
+      sent: sent,
+      skipped: skipped,
+      thinking: thinking
+    }),
     kindBreakdown: toBreakdown(kindCounts, KIND_LABELS),
     actionBreakdown: toBreakdown(actionCounts, ACTION_LABELS),
     responseBreakdown: toBreakdown(responseCounts, RESPONSE_LABELS),

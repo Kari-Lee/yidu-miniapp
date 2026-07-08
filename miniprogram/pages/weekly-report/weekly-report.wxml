@@ -15,20 +15,28 @@
 
   <view wx:if="{{profile && report}}" class="report-content">
     <view class="report-hero">
-      <view class="report-kicker">7-DAY REPORT</view>
+      <view class="report-kicker">RELATION TREND</view>
       <view class="report-meta">
         <text>{{profile.name}}</text>
-        <text>{{report.total}}/{{report.target}}</text>
+        <text>七日 {{report.total}}/{{report.target}} 天</text>
       </view>
-      <view class="report-title">{{report.ready ? report.verdict : report.status}}</view>
-      <view class="report-subtitle">{{report.ready ? report.trend : report.verdict}}</view>
+      <view class="report-title">{{report.ready ? report.verdict : '关系趋势采样中'}}</view>
+      <view class="report-subtitle">{{report.ready ? report.trend : '每天记录一点，看清这段关系是在升温、降温，还是反复拉扯。'}}</view>
       <view class="report-progress">
         <view style="width: {{report.progress}}%;"></view>
+      </view>
+      <view class="hero-progress-meta">
+        <text>七日周报：{{report.total}}/7 天</text>
+        <text>三十日月报：{{report.monthTotal}}/30 天</text>
+      </view>
+      <view wx:if="{{nextPlan}}" class="primary-record" bindtap="goNextPlan">
+        <text>{{nextPlan.actionLabel}}</text>
+        <text>↗</text>
       </view>
       <view wx:if="{{report.ready}}" class="share-strip">
         <view class="share-copy">
           <text>SHARE REPORT</text>
-          <view>只分享结论，不带聊天内容</view>
+          <view>只分享趋势结论，不展示聊天内容</view>
         </view>
         <view class="share-actions">
           <button disabled="{{posterSaving}}" bindtap="saveWeeklyPoster">{{posterSaving ? '生成中' : '保存图'}}</button>
@@ -37,110 +45,65 @@
       </view>
     </view>
 
-    <view class="report-section lead-section">
-      <view class="section-head">
-        <text>01 / STAGE</text>
+    <view class="trend-card">
+      <view class="section-head compact">
+        <text>7 天关系温度</text>
+        <view>{{report.latestScoreText}}</view>
+      </view>
+      <view class="curve-chart">
+        <view wx:for="{{report.temperatureLines}}" wx:key="key" class="curve-line" style="left: {{item.left}}%; top: {{item.top}}rpx; width: {{item.width}}%; transform: rotate({{item.angle}}deg);"></view>
+        <view wx:for="{{report.temperaturePoints}}" wx:key="key" class="curve-point {{item.hasRecord ? '' : 'muted'}}" style="left: {{item.left}}%; top: {{item.top}}rpx;">
+          <view></view>
+          <text>{{item.scoreText}}</text>
+        </view>
+      </view>
+      <view class="curve-labels">
+        <text wx:for="{{report.temperaturePoints}}" wx:key="key">{{item.label}}</text>
+      </view>
+    </view>
+
+    <view class="report-section">
+      <view class="section-head compact">
+        <text>DAILY RECORDS</text>
+        <view>最近记录</view>
+      </view>
+      <view wx:if="{{!report.recentDays.length}}" class="empty-records">
+        <view>今天还没记录</view>
+        <text>记录 Ta 今天说了什么、你想发什么，或者上传一张聊天截图。</text>
+      </view>
+      <view wx:for="{{report.recentDays}}" wx:key="key" class="daily-row">
+        <view>
+          <text>{{item.label}}</text>
+          <view>{{item.title}}</view>
+        </view>
+        <text>{{item.meta}}</text>
+      </view>
+    </view>
+
+    <view class="month-card">
+      <view class="section-head compact">
+        <text>30 日月报</text>
+        <view>{{report.monthTotal}}/30 天</view>
+      </view>
+      <view class="month-copy">长期记录会更适合判断这个人是在稳定推进，还是周期性消耗你。</view>
+      <view class="month-progress">
+        <view style="width: {{report.monthProgress}}%;"></view>
+      </view>
+    </view>
+
+    <view wx:if="{{report.ready}}" class="report-section insight-section">
+      <view class="section-head compact">
+        <text>TREND INSIGHT</text>
         <view>{{report.status}}</view>
       </view>
-      <view class="stage-grid">
-        <view>
-          <text>本周主线</text>
-          <view>{{report.mainKind}}</view>
-        </view>
-        <view class="dark">
-          <text>下周重点</text>
-          <view>{{report.focus}}</view>
+      <view class="insight-grid">
+        <view wx:for="{{report.insight}}" wx:key="label">
+          <text>{{item.label}}</text>
+          <view>{{item.value}}</view>
         </view>
       </view>
       <view class="section-copy">{{report.advice}}</view>
-    </view>
-
-    <view class="report-section">
-      <view class="section-head">
-        <text>02 / SIGNAL MIX</text>
-        <view>这周都分析了什么</view>
-      </view>
-      <view wx:if="{{!report.kindBreakdown.length}}" class="empty-copy">还没有足够记录。先从聊天截图、潜台词或发不发开始。</view>
-      <view wx:for="{{report.kindBreakdown}}" wx:key="key" class="metric-row">
-        <view>
-          <text>{{item.label}}</text>
-          <view>{{item.count}} 次</view>
-        </view>
-      </view>
-    </view>
-
-    <view class="report-section">
-      <view class="section-head">
-        <text>03 / FEEDBACK</text>
-        <view>行动与回应</view>
-      </view>
-      <view class="feedback-grid">
-        <view>
-          <text>已发</text>
-          <view>{{report.sent}}</view>
-        </view>
-        <view>
-          <text>没发</text>
-          <view>{{report.skipped}}</view>
-        </view>
-        <view>
-          <text>观望</text>
-          <view>{{report.thinking}}</view>
-        </view>
-        <view>
-          <text>有效回应</text>
-          <view>{{report.replied}}</view>
-        </view>
-        <view>
-          <text>弱回应</text>
-          <view>{{report.weak}}</view>
-        </view>
-      </view>
-      <view wx:if="{{!report.actionBreakdown.length && !report.responseBreakdown.length}}" class="section-copy">
-        还没有反馈标记。后面每次分析后标一下「发了没发、Ta 回没回」，周报会更准。
-      </view>
-    </view>
-
-    <view class="report-section">
-      <view class="section-head">
-        <text>04 / EVIDENCE</text>
-        <view>本周证据</view>
-      </view>
-      <view wx:if="{{!report.evidence.length}}" class="empty-copy">还没有本周记录。</view>
-      <view wx:for="{{report.evidence}}" wx:key="id" class="evidence-row" data-id="{{item.id}}" bindtap="openRecord">
-        <view class="evidence-no">{{item.no}}</view>
-        <view class="evidence-body">
-          <view class="evidence-meta">
-            <text>{{item.label}}</text>
-            <text>{{item.timeText}}</text>
-          </view>
-          <view class="evidence-title">{{item.title}}</view>
-          <view class="evidence-summary">{{item.summary}}</view>
-        </view>
-        <view class="evidence-arrow">↗</view>
-      </view>
-    </view>
-
-    <view class="report-section action-section">
-      <view class="section-head">
-        <text>05 / NEXT</text>
-        <view>{{report.ready ? '下周继续观察' : '先补材料'}}</view>
-      </view>
-      <view wx:if="{{nextPlan}}" class="next-plan-card" bindtap="goNextPlan">
-        <view class="next-plan-kicker">{{nextPlan.kicker}}</view>
-        <view class="next-plan-title">{{nextPlan.title}}</view>
-        <view class="next-plan-copy">{{nextPlan.copy}}</view>
-        <view class="next-plan-action">
-          <text>{{nextPlan.actionLabel}}</text>
-          <text>↗</text>
-        </view>
-      </view>
-      <view class="action-list">
-        <view bindtap="goDiagnose">上传聊天截图 <text>↗</text></view>
-        <view bindtap="goTranslate">Ta 这句话什么意思 <text>↗</text></view>
-        <view bindtap="goCheck">我这句能不能发 <text>↗</text></view>
-      </view>
-      <button wx:if="{{report.ready}}" class="bottom-share" disabled="{{posterSaving}}" bindtap="saveWeeklyPoster">{{posterSaving ? '生成中' : '保存周报分享图'}}</button>
+      <button class="bottom-share" disabled="{{posterSaving}}" bindtap="saveWeeklyPoster">{{posterSaving ? '生成中' : '保存周报分享图'}}</button>
     </view>
   </view>
 

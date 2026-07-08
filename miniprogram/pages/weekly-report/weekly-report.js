@@ -20,16 +20,16 @@ function buildNextPlan(report) {
   if (!report) return null
   if (!report.ready) {
     return {
-      kicker: 'NEXT SAMPLE',
-      title: '先补一条真实互动',
-      copy: '周报还差样本。先上传聊天截图，或者补一句 Ta 的原话，别让报告只靠感觉写。',
+      kicker: 'TODAY RECORD',
+      title: '记录今天的互动',
+      copy: '七日周报按天生成。今天补一条聊天截图、Ta 的原话，或你想发出去的一句话。',
       action: 'diagnose',
-      actionLabel: '上传聊天截图'
+      actionLabel: '记录今天的互动'
     }
   }
   if (report.sent && report.weak >= report.sent) {
     return {
-      kicker: 'NEXT MOVE',
+      kicker: 'NEXT RECORD',
       title: '先别二连，看看 Ta 下一句',
       copy: '这周主动后的反馈偏弱。下次有回复先翻译潜台词，再决定要不要继续推进。',
       action: 'translate',
@@ -38,7 +38,7 @@ function buildNextPlan(report) {
   }
   if (report.skipped > report.sent) {
     return {
-      kicker: 'NEXT MOVE',
+      kicker: 'NEXT RECORD',
       title: '想发的那句，先过风控',
       copy: '这周克制比推进更多。不是让你硬冲，是把要发的话先降温，再决定发不发。',
       action: 'check',
@@ -47,7 +47,7 @@ function buildNextPlan(report) {
   }
   if (report.replied > report.weak && report.replied > 0) {
     return {
-      kicker: 'NEXT MOVE',
+      kicker: 'NEXT RECORD',
       title: '轻推进，别一次性交底',
       copy: '回应质量暂时可看。下一句可以往前走一点，但不要把周报写成遗书发出去。',
       action: 'reply',
@@ -55,7 +55,7 @@ function buildNextPlan(report) {
     }
   }
   return {
-    kicker: 'NEXT MOVE',
+    kicker: 'NEXT RECORD',
     title: '继续记录一个具体动作',
     copy: '这段关系还没形成稳定趋势。下一次别只记情绪，优先记录 Ta 的真实回复或你的实际动作。',
     action: 'translate',
@@ -164,20 +164,20 @@ Page({
       footer: '只分享结论，不展示聊天内容',
       sections: [
         {
-          label: 'STAGE',
-          title: report.status || '采样中',
-          body: report.trend || '先补足材料，别急着定性。',
+          label: 'TREND',
+          title: report.verdict || '关系趋势采样中',
+          body: report.trend || '每天记录一点，看清这段关系往哪走。',
           dark: true
         },
         {
-          label: 'NEXT',
+          label: 'ADVICE',
           title: report.focus || '继续补样本',
           body: report.advice || '继续记录真实动作，不要只记录情绪波动。'
         },
         {
-          label: 'SIGNAL',
-          title: '本周主线：' + (report.mainKind || '暂无'),
-          body: '记录 ' + (report.total || 0) + ' 条｜已发 ' + (report.sent || 0) + ' 次｜有效回应 ' + (report.replied || 0) + ' 次'
+          label: 'PROGRESS',
+          title: '七日 ' + (report.total || 0) + '/7｜三十日 ' + (report.monthTotal || 0) + '/30',
+          body: '关系温度：' + (report.latestScore === null ? '采样中' : report.latestScore + '/100')
         }
       ]
     }

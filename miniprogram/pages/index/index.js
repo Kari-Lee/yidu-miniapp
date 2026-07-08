@@ -27,8 +27,8 @@ function buildWeeklyCard() {
     countText: report.total + '/' + report.target,
     badge: report.ready ? 'READY REPORT' : '7-DAY REPORT',
     title: report.ready ? '七日关系周报已生成' : profile.name + ' 的七日周报 ' + report.total + '/' + report.target,
-    copy: report.ready ? profile.name + '｜' + report.verdict : '还差 ' + report.needed + ' 条记录，补完就能看趋势。',
-    action: report.ready ? '查看周报' : '补一条记录'
+    copy: report.ready ? profile.name + '｜' + report.verdict : '还差 ' + report.needed + ' 天记录，补完就能看趋势。',
+    action: report.ready ? '查看周报' : '记录今天'
   }
 }
 
