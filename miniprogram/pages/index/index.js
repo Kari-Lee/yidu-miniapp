@@ -5,14 +5,41 @@ var Profiles = require('../../utils/profiles')
 var H = require('../../utils/history')
 var Weekly = require('../../utils/weeklyReport')
 
+function startOfDay(ts) {
+  var d = new Date(ts)
+  d.setHours(0, 0, 0, 0)
+  return d.getTime()
+}
+
+function hasTodayRecord(records) {
+  var today = startOfDay(Date.now())
+  return (records || []).some(function(record) {
+    return record.createdAt && record.createdAt >= today
+  })
+}
+
+function getTodayScore(report) {
+  var points = report && report.temperaturePoints || []
+  var today = points[points.length - 1]
+  if (!today || !today.hasRecord) return ''
+  return today.scoreText + '/100'
+}
+
 function buildWeeklyCard() {
   var profiles = Profiles.getProfiles()
   if (!profiles.length) return null
   var cards = profiles.map(function(profile) {
-    var report = Weekly.build(profile, H.getRecordsByProfile(profile.id))
-    return { profile: profile, report: report }
+    var records = H.getRecordsByProfile(profile.id)
+    var report = Weekly.build(profile, records)
+    return {
+      profile: profile,
+      report: report,
+      hasToday: hasTodayRecord(records),
+      todayScore: getTodayScore(report)
+    }
   })
   cards.sort(function(a, b) {
+    if (a.hasToday !== b.hasToday) return a.hasToday ? 1 : -1
     if (a.report.ready !== b.report.ready) return a.report.ready ? -1 : 1
     if (a.report.total !== b.report.total) return b.report.total - a.report.total
     return (b.profile.updatedAt || 0) - (a.profile.updatedAt || 0)
@@ -20,15 +47,21 @@ function buildWeeklyCard() {
   var best = cards[0]
   var profile = best.profile
   var report = best.report
+  var hasToday = best.hasToday
+  var todayScore = best.todayScore
   return {
     profileId: profile.id,
     ready: report.ready,
+    hasToday: hasToday,
     progress: report.progress,
     countText: report.total + '/' + report.target,
-    badge: report.ready ? 'READY REPORT' : '7-DAY REPORT',
-    title: report.ready ? '七日关系周报已生成' : profile.name + ' 的七日周报 ' + report.total + '/' + report.target,
-    copy: report.ready ? profile.name + '｜' + report.verdict : '还差 ' + report.needed + ' 天记录，补完就能看趋势。',
-    action: report.ready ? '查看周报' : '记录今天'
+    badge: hasToday ? 'TODAY DONE' : 'TODAY RECORD',
+    title: hasToday ? '今天已记录 ' + profile.name + ' 的互动' : '今天还没记录 ' + profile.name + ' 的互动',
+    copy: hasToday
+      ? '关系温度 ' + todayScore + '｜七日周报 ' + report.total + '/' + report.target + ' 天'
+      : '补一句话或一张聊天截图，七日趋势会更准。',
+    action: hasToday ? '查看趋势' : '记录今天',
+    actionKind: hasToday ? 'report' : 'record'
   }
 }
 
@@ -130,7 +163,12 @@ Page({
   goWeeklyCard: function() {
     var card = this.data.weeklyCard
     if (!card) return
-    wx.navigateTo({ url: '/pages/weekly-report/weekly-report?id=' + encodeURIComponent(card.profileId) })
+    var id = encodeURIComponent(card.profileId)
+    if (card.actionKind === 'record') {
+      wx.navigateTo({ url: '/pages/profile-detail/profile-detail?id=' + id })
+      return
+    }
+    wx.navigateTo({ url: '/pages/weekly-report/weekly-report?id=' + id })
   },
   openFollowupRecord: function() {
     var card = this.data.followupCard

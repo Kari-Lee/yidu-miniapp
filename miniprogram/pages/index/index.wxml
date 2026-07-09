@@ -106,7 +106,7 @@
 
     <view
       wx:if="{{weeklyCard}}"
-      class="weekly-home-card {{weeklyCard.ready ? 'ready' : ''}}"
+      class="weekly-home-card {{weeklyCard.hasToday ? 'today-done' : 'today-missing'}}"
       bindtap="goWeeklyCard"
       hover-class="weekly-home-card-pressed"
       hover-start-time="20"

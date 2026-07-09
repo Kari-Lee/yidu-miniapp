@@ -3,6 +3,20 @@ var SEEN_KEY = 'yidu_seen_release_v1'
 // 每次发布功能更新时，把新版本放在数组最前面并更换 id。
 var RELEASES = [
   {
+    id: '2026-07-08-daily-record',
+    date: '2026.07.08',
+    kicker: 'YIDU UPDATE · 07.08',
+    title: '关系页会提醒你今天该记录谁。',
+    summary: '打开关系页，会优先显示今天还没记录的 Ta。每天补一条，七日趋势才会更准。',
+    items: [
+      '首页关系页新增今日记录状态',
+      '优先提醒还没记录的关系档案',
+      '今日已记录后可直接查看关系趋势'
+    ],
+    actionLabel: '去记录今天',
+    actionUrl: '/pages/index/index?tab=relation'
+  },
+  {
     id: '2026-07-08-trend-diary',
     date: '2026.07.08',
     kicker: 'YIDU UPDATE · 07.08',

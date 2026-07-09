@@ -239,7 +239,7 @@
   transition: transform 160ms ease, box-shadow 160ms ease;
 }
 
-.weekly-home-card.ready {
+.weekly-home-card.today-done {
   background: #2D2F33;
   box-shadow: 18rpx 22rpx 48rpx rgba(45,47,51,0.16), -12rpx -12rpx 32rpx rgba(255,255,255,0.68);
 }
@@ -278,7 +278,7 @@
   line-height: 1.28;
 }
 
-.weekly-home-card.ready .weekly-home-title {
+.weekly-home-card.today-done .weekly-home-title {
   color: #FFFFFF;
 }
 
@@ -289,7 +289,7 @@
   line-height: 1.58;
 }
 
-.weekly-home-card.ready .weekly-home-copy {
+.weekly-home-card.today-done .weekly-home-copy {
   color: rgba(255,255,255,0.68);
 }
 
@@ -300,7 +300,7 @@
   overflow: hidden;
 }
 
-.weekly-home-card.ready .weekly-home-progress {
+.weekly-home-card.today-done .weekly-home-progress {
   background: rgba(255,255,255,0.12);
 }
 
@@ -317,7 +317,7 @@
   font-weight: 900;
 }
 
-.weekly-home-card.ready .weekly-home-action {
+.weekly-home-card.today-done .weekly-home-action {
   color: #FFFFFF;
 }
 
