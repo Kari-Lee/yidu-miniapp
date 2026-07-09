@@ -256,6 +256,65 @@ function buildMilestone(recordedDays, streak, ready) {
   }
 }
 
+function buildTodayRecap(today) {
+  if (!today || !today.count) {
+    return {
+      label: '今日复盘',
+      title: '今天还没记录',
+      copy: '补一条后，这里会给出当天关系温度和明天建议。',
+      scoreText: '未记录',
+      tone: 'empty'
+    }
+  }
+
+  var actionCounts = countBy(today.records, function(item) {
+    return item.feedback && item.feedback.action
+  })
+  var responseCounts = countBy(today.records, function(item) {
+    return item.feedback && item.feedback.response
+  })
+  var score = today.score || 0
+  var title = '今天信号平稳'
+  var copy = '今天有记录，但还不够下结论。明天再补一条，看曲线往哪边走。'
+  var tone = 'neutral'
+
+  if (score >= 68) {
+    title = '今天有升温信号'
+    copy = '有真实回应或有效互动。明天可以轻推进，但别一次性交底。'
+    tone = 'warm'
+  } else if (score < 42) {
+    title = '今天消耗偏高'
+    copy = '先别追问。明天重点看 Ta 会不会主动补一句，而不是你继续加码。'
+    tone = 'cold'
+  } else if (score < 52) {
+    title = '今天偏拉扯'
+    copy = '信号不算稳，适合少解释、多观察，把主动性留给对方一点。'
+    tone = 'cool'
+  }
+
+  if ((responseCounts.silent || 0) + (responseCounts.cold || 0) > 0) {
+    title = score < 52 ? title : '今天回应偏弱'
+    copy = '对方回应质量一般。先别急着二连，明天看 Ta 会不会主动补回应。'
+    tone = score < 42 ? 'cold' : 'cool'
+  } else if ((responseCounts.replied || 0) > 0 && (responseCounts.replied || 0) >= (responseCounts.silent || 0) + (responseCounts.cold || 0)) {
+    title = '今天回应可看'
+    copy = '有回应是好事，但先观察稳定性。明天继续看 Ta 会不会主动延续话题。'
+    tone = 'warm'
+  } else if ((actionCounts.skipped || 0) > (actionCounts.sent || 0)) {
+    title = '今天克制住了'
+    copy = '没发不等于没进展。明天可以把想发的话先过一遍，再决定。'
+    tone = 'neutral'
+  }
+
+  return {
+    label: '今日复盘',
+    title: title,
+    copy: copy,
+    scoreText: score + '/100',
+    tone: tone
+  }
+}
+
 function buildInsight(reportSeed) {
   var temperature = reportSeed.latestScore === null ? '采样中' : reportSeed.latestScore + '/100'
   var initiative = '继续观察'
@@ -291,6 +350,7 @@ function build(profile, records) {
   var ready = !needed
   var streak = buildStreak(weekDays)
   var milestone = buildMilestone(recordedWeekDays, streak, ready)
+  var todayRecap = buildTodayRecap(weekDays[weekDays.length - 1])
   var progress = Math.min(100, Math.round(recordedWeekDays / WEEK_DAYS * 100))
   var monthProgress = Math.min(100, Math.round(recordedMonthDays / MONTH_DAYS * 100))
   var kindCounts = countBy(weekRecords, function(item) { return item.kind })
@@ -361,6 +421,7 @@ function build(profile, records) {
     streakIncludesToday: streak.includesToday,
     streakText: streak.text,
     milestone: milestone,
+    todayRecap: todayRecap,
     progress: progress,
     monthTotal: recordedMonthDays,
     monthTarget: MONTH_DAYS,

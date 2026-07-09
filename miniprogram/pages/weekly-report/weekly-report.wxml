@@ -36,6 +36,13 @@
           <text>{{report.milestone.copy}}</text>
         </view>
       </view>
+      <view class="today-recap-note {{report.todayRecap.tone}}">
+        <text>{{report.todayRecap.scoreText}}</text>
+        <view>
+          <view>{{report.todayRecap.title}}</view>
+          <text>{{report.todayRecap.copy}}</text>
+        </view>
+      </view>
       <view wx:if="{{nextPlan}}" class="primary-record" bindtap="goNextPlan">
         <text>{{nextPlan.actionLabel}}</text>
         <text>↗</text>

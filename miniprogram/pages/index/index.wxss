@@ -328,6 +328,53 @@
   color: rgba(255,255,255,0.72);
 }
 
+.weekly-home-recap {
+  display: flex;
+  gap: 16rpx;
+  margin-top: 16rpx;
+  padding-top: 16rpx;
+  border-top: 2rpx solid rgba(45,47,51,0.08);
+}
+
+.weekly-home-card.today-done .weekly-home-recap {
+  border-top-color: rgba(255,255,255,0.12);
+}
+
+.weekly-home-recap > text {
+  flex-shrink: 0;
+  color: #10A8E8;
+  font-size: 22rpx;
+  font-weight: 900;
+}
+
+.weekly-home-recap > view {
+  flex: 1;
+  min-width: 0;
+}
+
+.weekly-home-recap view view {
+  color: #2D2F33;
+  font-size: 23rpx;
+  font-weight: 900;
+  line-height: 1.35;
+}
+
+.weekly-home-card.today-done .weekly-home-recap view view {
+  color: #FFFFFF;
+}
+
+.weekly-home-recap view text {
+  display: block;
+  margin-top: 6rpx;
+  color: rgba(45,47,51,0.54);
+  font-size: 20rpx;
+  line-height: 1.48;
+}
+
+.weekly-home-card.today-done .weekly-home-recap view text {
+  color: rgba(255,255,255,0.62);
+}
+
 .weekly-home-progress {
   height: 7rpx;
   margin-top: 22rpx;

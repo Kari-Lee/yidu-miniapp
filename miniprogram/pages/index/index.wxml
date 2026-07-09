@@ -122,6 +122,13 @@
         <text>{{weeklyCard.stageLabel}}</text>
         <view>{{weeklyCard.streakText}}｜{{weeklyCard.stageTitle}}</view>
       </view>
+      <view wx:if="{{weeklyCard.recapTitle}}" class="weekly-home-recap">
+        <text>{{weeklyCard.recapScore}}</text>
+        <view>
+          <view>{{weeklyCard.recapTitle}}</view>
+          <text>{{weeklyCard.recapCopy}}</text>
+        </view>
+      </view>
       <view class="weekly-home-progress">
         <view style="width: {{weeklyCard.progress}}%;"></view>
       </view>

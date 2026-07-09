@@ -3,6 +3,20 @@ var SEEN_KEY = 'yidu_seen_release_v1'
 // 每次发布功能更新时，把新版本放在数组最前面并更换 id。
 var RELEASES = [
   {
+    id: '2026-07-09-daily-recap',
+    date: '2026.07.09',
+    kicker: 'YIDU UPDATE · 07.09',
+    title: '每天记录后，现在会给一句复盘。',
+    summary: '当天有记录时，会显示今日关系温度和一句明天建议，让你不用等到第七天才知道趋势。',
+    items: [
+      '新增今日关系复盘',
+      '记录后显示当天关系温度',
+      '根据回应强弱给明天建议'
+    ],
+    actionLabel: '去记录今天',
+    actionUrl: '/pages/index/index?tab=relation'
+  },
+  {
     id: '2026-07-09-record-streak',
     date: '2026.07.09',
     kicker: 'YIDU UPDATE · 07.09',

@@ -59,6 +59,9 @@ function buildWeeklyCard() {
     stageLabel: report.milestone && report.milestone.label || '',
     stageTitle: report.milestone && report.milestone.title || '',
     stageCopy: report.milestone && report.milestone.copy || '',
+    recapTitle: hasToday && report.todayRecap ? report.todayRecap.title : '',
+    recapCopy: hasToday && report.todayRecap ? report.todayRecap.copy : '',
+    recapScore: hasToday && report.todayRecap ? report.todayRecap.scoreText : '',
     badge: hasToday ? 'TODAY DONE' : 'TODAY RECORD',
     title: hasToday ? '今天已记录 ' + profile.name + ' 的互动' : '今天还没记录 ' + profile.name + ' 的互动',
     copy: hasToday
