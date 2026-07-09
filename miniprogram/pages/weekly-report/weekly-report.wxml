@@ -29,6 +29,13 @@
         <text>七日周报：{{report.total}}/7 天</text>
         <text>三十日月报：{{report.monthTotal}}/30 天</text>
       </view>
+      <view class="milestone-note">
+        <text>{{report.milestone.label}}</text>
+        <view>
+          <view>{{report.milestone.title}}</view>
+          <text>{{report.milestone.copy}}</text>
+        </view>
+      </view>
       <view wx:if="{{nextPlan}}" class="primary-record" bindtap="goNextPlan">
         <text>{{nextPlan.actionLabel}}</text>
         <text>↗</text>

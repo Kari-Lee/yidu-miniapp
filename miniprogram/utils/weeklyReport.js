@@ -201,6 +201,61 @@ function buildRecentDays(days) {
   })
 }
 
+function buildStreak(days) {
+  var todayIndex = days.length - 1
+  var includesToday = !!(days[todayIndex] && days[todayIndex].count > 0)
+  var index = includesToday ? todayIndex : todayIndex - 1
+  var count = 0
+  for (var i = index; i >= 0; i--) {
+    if (!days[i] || !days[i].count) break
+    count += 1
+  }
+  var text = count
+    ? (includesToday ? '已连续记录 ' + count + ' 天' : '已连续记录 ' + count + ' 天，今天补一条继续')
+    : '还没形成连续记录'
+  return {
+    count: count,
+    includesToday: includesToday,
+    text: text
+  }
+}
+
+function buildMilestone(recordedDays, streak, ready) {
+  if (ready) {
+    return {
+      label: '7/7',
+      title: '七日周报已生成',
+      copy: '这段关系已经有一周趋势，可以看升温、降温还是反复拉扯。'
+    }
+  }
+  if (recordedDays >= 5) {
+    return {
+      label: '5/7',
+      title: '趋势开始成型',
+      copy: '已经能看出关系温度的方向，再补两天就能生成完整周报。'
+    }
+  }
+  if (recordedDays >= 3) {
+    return {
+      label: '3/7',
+      title: '已经看出一点苗头',
+      copy: '互动样本开始连续了，可以初步观察谁在推进、谁在降温。'
+    }
+  }
+  if (streak.includesToday) {
+    return {
+      label: '1/7',
+      title: '今天已记录',
+      copy: '明天回来再记一条，就能开始对比关系温度。'
+    }
+  }
+  return {
+    label: '0/7',
+    title: '今天先记一条',
+    copy: '不用写很多，一句话或一张截图就能让趋势开始有数据。'
+  }
+}
+
 function buildInsight(reportSeed) {
   var temperature = reportSeed.latestScore === null ? '采样中' : reportSeed.latestScore + '/100'
   var initiative = '继续观察'
@@ -233,6 +288,9 @@ function build(profile, records) {
   var recordedWeekDays = weekDays.filter(function(day) { return day.count > 0 }).length
   var recordedMonthDays = monthDays.filter(function(day) { return day.count > 0 }).length
   var needed = Math.max(0, WEEK_DAYS - recordedWeekDays)
+  var ready = !needed
+  var streak = buildStreak(weekDays)
+  var milestone = buildMilestone(recordedWeekDays, streak, ready)
   var progress = Math.min(100, Math.round(recordedWeekDays / WEEK_DAYS * 100))
   var monthProgress = Math.min(100, Math.round(recordedMonthDays / MONTH_DAYS * 100))
   var kindCounts = countBy(weekRecords, function(item) { return item.kind })
@@ -258,7 +316,7 @@ function build(profile, records) {
   var advice = '今天先补一条聊天截图、Ta 的原话，或你想发出去的一句话。'
   var focus = '记录今天的互动'
 
-  if (!needed) {
+  if (ready) {
     if (volatility >= 28) {
       status = '忽冷忽热'
       verdict = '本周趋势：反复拉扯'
@@ -295,10 +353,14 @@ function build(profile, records) {
   }
 
   return {
-    ready: !needed,
+    ready: ready,
     total: recordedWeekDays,
     target: WEEK_DAYS,
     needed: needed,
+    streak: streak.count,
+    streakIncludesToday: streak.includesToday,
+    streakText: streak.text,
+    milestone: milestone,
     progress: progress,
     monthTotal: recordedMonthDays,
     monthTarget: MONTH_DAYS,

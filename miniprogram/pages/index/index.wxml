@@ -118,6 +118,10 @@
       </view>
       <view class="weekly-home-title">{{weeklyCard.title}}</view>
       <view class="weekly-home-copy">{{weeklyCard.copy}}</view>
+      <view wx:if="{{weeklyCard.stageTitle}}" class="weekly-home-stage">
+        <text>{{weeklyCard.stageLabel}}</text>
+        <view>{{weeklyCard.streakText}}｜{{weeklyCard.stageTitle}}</view>
+      </view>
       <view class="weekly-home-progress">
         <view style="width: {{weeklyCard.progress}}%;"></view>
       </view>

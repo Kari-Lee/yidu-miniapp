@@ -55,6 +55,10 @@ function buildWeeklyCard() {
     hasToday: hasToday,
     progress: report.progress,
     countText: report.total + '/' + report.target,
+    streakText: report.streakText,
+    stageLabel: report.milestone && report.milestone.label || '',
+    stageTitle: report.milestone && report.milestone.title || '',
+    stageCopy: report.milestone && report.milestone.copy || '',
     badge: hasToday ? 'TODAY DONE' : 'TODAY RECORD',
     title: hasToday ? '今天已记录 ' + profile.name + ' 的互动' : '今天还没记录 ' + profile.name + ' 的互动',
     copy: hasToday

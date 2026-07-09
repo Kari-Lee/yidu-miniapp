@@ -68,6 +68,10 @@
       </view>
       <view class="weekly-verdict">{{weeklyReport.verdict}}</view>
       <view class="weekly-copy">{{weeklyReport.trend}}</view>
+      <view class="weekly-stage">
+        <text>{{weeklyReport.milestone.label}}</text>
+        <view>{{weeklyReport.streakText}}｜{{weeklyReport.milestone.title}}</view>
+      </view>
       <view class="weekly-progress">
         <view style="width: {{weeklyReport.progress}}%;"></view>
       </view>

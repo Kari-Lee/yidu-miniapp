@@ -19,11 +19,12 @@ function hasPendingFollowup(records) {
 
 function buildProfileStatus(profile, records) {
   var report = Weekly.build(profile, records)
+  var streakPrefix = report.streak ? report.streakText + ' · ' : ''
   if (hasPendingFollowup(records)) {
     return {
       tone: 'warn',
       label: '等待反馈',
-      text: '有已发消息还没标记 Ta 的回应',
+      text: streakPrefix + '有已发消息还没标记 Ta 的回应',
       action: '去补反馈'
     }
   }
@@ -31,7 +32,7 @@ function buildProfileStatus(profile, records) {
     return {
       tone: 'ready',
       label: '周报已生成',
-      text: report.verdict,
+      text: streakPrefix + report.verdict,
       action: '查看周报'
     }
   }
@@ -39,7 +40,7 @@ function buildProfileStatus(profile, records) {
     return {
       tone: 'progress',
       label: report.total + '/' + report.target,
-      text: '七日周报还差 ' + report.needed + ' 天记录',
+      text: streakPrefix + report.milestone.title + '，还差 ' + report.needed + ' 天',
       action: '继续补材料'
     }
   }

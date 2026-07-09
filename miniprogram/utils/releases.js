@@ -3,6 +3,20 @@ var SEEN_KEY = 'yidu_seen_release_v1'
 // 每次发布功能更新时，把新版本放在数组最前面并更换 id。
 var RELEASES = [
   {
+    id: '2026-07-09-record-streak',
+    date: '2026.07.09',
+    kicker: 'YIDU UPDATE · 07.09',
+    title: '现在会显示连续记录天数了。',
+    summary: '关系页、档案和周报会提示已连续记录几天，并在第 3、5、7 天给出阶段反馈。',
+    items: [
+      '新增连续记录天数',
+      '新增 3/5/7 天阶段提示',
+      '七日周报前也能看到趋势苗头'
+    ],
+    actionLabel: '去看关系趋势',
+    actionUrl: '/pages/index/index?tab=relation'
+  },
+  {
     id: '2026-07-08-daily-record',
     date: '2026.07.08',
     kicker: 'YIDU UPDATE · 07.08',

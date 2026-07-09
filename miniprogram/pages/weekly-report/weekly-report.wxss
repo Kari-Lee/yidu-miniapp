@@ -95,6 +95,43 @@
   font-weight: 900;
 }
 
+.milestone-note {
+  display: flex;
+  gap: 18rpx;
+  margin-top: 22rpx;
+  padding: 20rpx 22rpx;
+  background: #FFFFFF;
+  border-left: 6rpx solid #10A8E8;
+  box-sizing: border-box;
+}
+
+.milestone-note > text {
+  flex-shrink: 0;
+  color: #10A8E8;
+  font-size: 20rpx;
+  font-weight: 900;
+}
+
+.milestone-note > view {
+  flex: 1;
+  min-width: 0;
+}
+
+.milestone-note view view {
+  color: #2D2F33;
+  font-size: 25rpx;
+  font-weight: 900;
+  line-height: 1.34;
+}
+
+.milestone-note view text {
+  display: block;
+  margin-top: 8rpx;
+  color: rgba(45,47,51,0.56);
+  font-size: 22rpx;
+  line-height: 1.55;
+}
+
 .primary-record {
   display: flex;
   align-items: center;
