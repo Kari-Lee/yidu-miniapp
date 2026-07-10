@@ -357,13 +357,22 @@
 }
 
 .poster-save-btn {
-  margin-top: 22rpx;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 56%;
+  min-width: 360rpx;
+  max-width: 460rpx;
   height: 104rpx;
+  margin: 22rpx auto 0;
+  padding: 0 28rpx;
+  box-sizing: border-box;
   border-radius: 24rpx;
   background: #2D2F33;
   color: #FFFFFF;
   font-size: 29rpx;
   font-weight: 900;
+  line-height: 1.2;
 }
 
 .poster-save-btn::after,
@@ -375,16 +384,12 @@
 .share-actions,
 .result-actions {
   display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
   gap: 14rpx;
   margin-top: 14rpx;
 }
 
-.share-actions {
-  grid-template-columns: repeat(2, 1fr);
-}
-
 .result-actions {
-  grid-template-columns: repeat(3, 1fr);
   margin-top: 30rpx;
   padding-top: 30rpx;
   border-top: 2rpx solid rgba(45,47,51,0.08);
@@ -392,18 +397,27 @@
 
 .share-actions button,
 .result-actions button {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
   min-height: 84rpx;
+  min-width: 0;
+  margin: 0;
   padding: 0 12rpx;
+  box-sizing: border-box;
   border-radius: 20rpx;
   background: rgba(255,255,255,0.7);
   color: #2D2F33;
   font-size: 22rpx;
   font-weight: 900;
+  line-height: 1.25;
   box-shadow: none;
   border: 2rpx solid rgba(45,47,51,0.08);
 }
 
 .result-actions button.dark {
+  grid-column: 1 / -1;
   background: #2D2F33;
   color: #FFFFFF;
 }
